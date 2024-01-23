@@ -13,6 +13,7 @@ using std::vector;
 using std::string;
 using std::cout;
 using std::endl;
+#include "ImagePath.h"
 
 ImageHandler::ImageHandler() {}
 
@@ -56,13 +57,18 @@ bool ImageHandler::LoadTextureFromFile(const char *filename, GLuint *out_texture
 
 bool ImageHandler::CreateAnimation(vector<string>& paths, vector<image*> &frames)
 {
+    ImagePath abs = ImagePath();
     for(int i = 0; i < paths.size(); i++)
     {
         int height = 0;
         int width = 0;
         GLuint texture = 0;
 
-        bool ret = ImageHandler::LoadTextureFromFile(paths.at(i).data(), &texture, &width, &height);
+        string absolute = abs.absolutePath + paths.at(i);
+        //todo - remove print
+        cout << "-----PATH:" << absolute << endl;
+
+        bool ret = ImageHandler::LoadTextureFromFile(absolute.c_str(), &texture, &width, &height);
         IM_ASSERT(ret);
 
         image* frame = new image(texture,width,height);
