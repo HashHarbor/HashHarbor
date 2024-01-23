@@ -49,17 +49,19 @@ public:
     CharacterManager();
 
     void createCharacter(string name, bool npc, bool fullMovement, ImageHandler* imgHandler);
-        // name required to access the character
-        // npc designates character type
-        // full movement designates if all movement animations are requires or not
+    // name required to access the character
+    // npc designates character type
+    // full movement designates if all movement animations are requires or not
 
     character* getPlayerCharacter(string name);
     character* getNpcCharacter(string name);
 
     character* getMainPlayer();
-        // quickly get the main character to reduce map find calls
+    // quickly get the main character to reduce map find calls
     void setMainPlayer(string name);
-        // set the main character to animate
-        // can be used to change the players character after game started
+    // set the main character to animate
+    // can be used to change the players character after game started
+    void moveMainCharacter(ImageHandler* imgHandler, int fourFrame, int sixFrame);
+    // used to move the main character based on keyboard input
 
 };

@@ -22,6 +22,8 @@
 #include <vector>
 #include <map>
 
+namespace ImGui { extern ImGuiKeyData* GetKeyData(ImGuiKey key); }
+
 using std::vector;
 using std::string;
 using std::cout;
@@ -84,4 +86,49 @@ character *CharacterManager::getMainPlayer()
 void CharacterManager::setMainPlayer(std::string name)
 {
     mainPlayer = playerCharacters.find(name)->second;
+}
+
+void CharacterManager::moveMainCharacter(ImageHandler* imgHandler, int fourFrame, int sixFrame)
+{
+#ifdef IMGUI_DISABLE_OBSOLETE_KEYIO
+    struct funcs { static bool IsLegacyNativeDupe(ImGuiKey) { return false; } };
+            const ImGuiKey key_first = ImGuiKey_NamedKey_BEGIN;
+#else
+    struct funcs { static bool IsLegacyNativeDupe(ImGuiKey key) { return key < 512 && ImGui::GetIO().KeyMap[key] != -1; } }; // Hide Native<>ImGuiKey duplicates when both exists in the array
+    const ImGuiKey key_first = 0;
+    //ImGui::Text("Legacy raw:");       for (ImGuiKey key = key_first; key < ImGuiKey_COUNT; key++) { if (io.KeysDown[key]) { ImGui::SameLine(); ImGui::Text("\"%s\" %d", ImGui::GetKeyName(key), key); } }
+#endif
+
+    int keyDown = 0; // used to identify which direction the character is moving
+    for (ImGuiKey key = key_first; key < ImGuiKey_COUNT; key++)
+    {
+        if (funcs::IsLegacyNativeDupe(key)) continue;
+        if(ImGui::IsKeyDown(ImGuiKey_UpArrow) || ImGui::IsKeyDown(ImGuiKey_W)) { keyDown = 1; }
+        else if(ImGui::IsKeyDown(ImGuiKey_DownArrow) || ImGui::IsKeyDown(ImGuiKey_S)) { keyDown = 2; }
+        else if(ImGui::IsKeyDown(ImGuiKey_RightArrow) || ImGui::IsKeyDown(ImGuiKey_D)) { keyDown = 3; }
+        else if(ImGui::IsKeyDown(ImGuiKey_LeftArrow) || ImGui::IsKeyDown(ImGuiKey_A)) { keyDown = 4; }
+        else { keyDown = 0; }
+    }
+
+    switch(keyDown)
+    {
+        case 1:
+            imgHandler->DrawImage(*mainPlayer->walkUp.at(sixFrame));
+            break;
+        case 2:
+            imgHandler->DrawImage(*mainPlayer->walkDown.at(sixFrame));
+            break;
+        case 3:
+            imgHandler->DrawImage(*mainPlayer->walkRight.at(sixFrame));
+            break;
+        case 4:
+            imgHandler->DrawImage(*mainPlayer->walkLeft.at(sixFrame));
+            break;
+        default:
+            imgHandler->DrawImage(*mainPlayer->idle.at(fourFrame));
+            break;
+    }
+
+    //todo - remove on screen key printout
+    ImGui::Text("Keys down:"); for (ImGuiKey key = key_first; key < ImGuiKey_COUNT; key++) { if (funcs::IsLegacyNativeDupe(key)) continue; if (ImGui::IsKeyDown(key)) { ImGui::SameLine(); ImGui::Text("\"%s\" %d (%.02f secs)", ImGui::GetKeyName(key), key, ImGui::GetKeyData(key)->DownDuration); } }
 }

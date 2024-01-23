@@ -2,6 +2,7 @@
 // (GLFW is a cross-platform general purpose library for handling windows, inputs, OpenGL/Vulkan/Metal graphics context creation, etc.)
 // If you are new to Dear ImGui, read documentation from the docs/ folder + read the top of imgui.cpp.
 // Read online: https://github.com/ocornut/imgui/tree/master/docs
+#define GL_SILENCE_DEPRECATION
 
 #include "../imgui/imgui.h"
 #include "../backends/imgui_impl_glfw.h"
@@ -12,12 +13,24 @@
 #endif
 #include <GLFW/glfw3.h> // Will drag system OpenGL headers
 
+#define IMGUI_DEFINE_MATH_OPERATORS
+#include "../imgui/imgui_internal.h"
+
+#include "ImageHandler.h"
+#include "CharacterManager.h"
+
+#include <iostream>
+#include <vector>
+using std::vector;
+using std::string;
 // [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to maximize ease of testing and compatibility with old VS compilers.
 // To link with VS2010-era libraries, VS2015+ requires linking with legacy_stdio_definitions.lib, which we do using this pragma.
 // Your own project should not be affected, as you are likely to link with a newer binary of GLFW that is adequate for your version of Visual Studio.
 #if defined(_MSC_VER) && (_MSC_VER >= 1900) && !defined(IMGUI_DISABLE_WIN32_FUNCTIONS)
 #pragma comment(lib, "legacy_stdio_definitions")
 #endif
+
+namespace ImGui { extern ImGuiKeyData* GetKeyData(ImGuiKey key); } // required for keyboard input
 
 static void glfw_error_callback(int error, const char* description)
 {
@@ -65,7 +78,7 @@ int main(int, char**)
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
     // Setup Dear ImGui style
@@ -75,6 +88,14 @@ int main(int, char**)
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
+
+    // Handlers and Managers
+    ImageHandler imageHandler = ImageHandler();
+    CharacterManager characterManager = CharacterManager();
+
+    //Create Characters
+    characterManager.createCharacter("Bob", false, true, &imageHandler);
+    characterManager.setMainPlayer("Bob");
 
     // Our state
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
@@ -88,8 +109,34 @@ int main(int, char**)
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+        // The window below is the screen where the player is drawn
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoTitleBar;
+        window_flags |= ImGuiWindowFlags_NoMove;
+        window_flags |= ImGuiWindowFlags_NoResize;
+        window_flags |= ImGuiWindowFlags_NoBackground;
+        bool is_open = true;
 
-       // Add items to draw here
+        //Used to control frame rate of animations
+        static int frameCount_4 = 0;
+        static int frameCount_6 = 0;
+        const float frameLength = 2.5f / 10.f; // In seconds, so 4 FPS
+        static float frameTimer = frameLength;
+
+        ImGui::Begin("Window Name", &is_open, window_flags);
+
+        ImGui::SetCursorPos(ImGui::GetCursorPos() + (ImGui::GetContentRegionAvail() - ImVec2(32, 64)) * 0.5f);
+        characterManager.moveMainCharacter(&imageHandler, frameCount_4, frameCount_6);
+
+        frameTimer -= ImGui::GetIO().DeltaTime;
+        if (frameTimer <= 0.f)
+        {
+            frameTimer = frameLength;
+            frameCount_4 ++;
+            frameCount_6 ++;
+            if (frameCount_4 % 4 == 0) frameCount_4=0;
+            if (frameCount_6 % 6 == 0) frameCount_6=0;
+        }
+        ImGui::End();
 
         // Rendering
         ImGui::Render();
