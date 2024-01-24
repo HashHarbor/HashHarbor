@@ -14,7 +14,7 @@
 #CXX = g++
 #CXX = clang++
 
-EXE = abc
+EXE = HashHarbor_app
 IMGUI_DIR = ../
 
 SOURCES = main.cpp graphic.cpp ImageHandler.cpp CharacterManager.cpp
@@ -50,6 +50,24 @@ ifeq ($(UNAME_S), Linux) #LINUX
 
 	CXXFLAGS += `sdl2-config --cflags`
 	CFLAGS = $(CXXFLAGS)
+endif
+
+ifeq ($(UNAME_S), Darwin) #APPLE
+	ECHO_MESSAGE = "Mac OS X"
+	LIBS += -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo `sdl2-config --libs`
+	LIBS += -L/usr/local/lib -L/opt/local/lib
+
+	CXXFLAGS += `sdl2-config --cflags`
+	CXXFLAGS += -I/usr/local/include -I/opt/local/include
+	CFLAGS = $(CXXFLAGS)
+endif
+
+ifeq ($(OS), Windows_NT)
+    ECHO_MESSAGE = "MinGW"
+    LIBS += -lgdi32 -lopengl32 -limm32 `pkg-config --static --libs sdl2`
+
+    CXXFLAGS += `pkg-config --cflags sdl2`
+    CFLAGS = $(CXXFLAGS)
 endif
 
 ##---------------------------------------------------------------------

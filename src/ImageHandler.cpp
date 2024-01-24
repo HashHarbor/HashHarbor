@@ -1,14 +1,23 @@
 #define GL_SILENCE_DEPRECATION
+#include "imgui.h"
+#include "imgui_impl_sdl.h"
+#include "imgui_impl_opengl3.h"
+#include <SDL2/SDL.h>
+#if defined(IMGUI_IMPL_OPENGL_ES2)
+#include <SDL_opengles2.h>
+#else
+#include <SDL2/SDL_opengl.h>
+#endif
 #include "ImageHandler.h"
-#include <stdio.h>          // vsnprintf, sscanf, printf
+#include <stdio.h>
 
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
 #endif
-#include <GLFW/glfw3.h> // Will drag system OpenGL headers
+
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "../backends/stb_image.h"
+#include "stb_image.h"
 
 using std::vector;
 using std::string;
@@ -16,7 +25,7 @@ using std::cout;
 using std::endl;
 #include "ImagePath.h"
 
-ImageHandler::ImageHandler() {}
+ImageHandler::ImageHandler() = default;
 
 bool ImageHandler::LoadTextureFromFile(const char *filename, GLuint *out_texture, int *out_width, int *out_height)
 {
