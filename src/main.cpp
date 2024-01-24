@@ -111,32 +111,40 @@ int main(int, char**)
         ImGui::NewFrame();
         // The window below is the screen where the player is drawn
         ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoTitleBar;
-        window_flags |= ImGuiWindowFlags_NoMove;
-        window_flags |= ImGuiWindowFlags_NoResize;
         window_flags |= ImGuiWindowFlags_NoBackground;
+        window_flags |= ImGuiWindowFlags_NoCollapse;
+        window_flags |= ImGuiWindowFlags_NoDecoration;
+        window_flags |= ImGuiWindowFlags_NoMove;
+        window_flags |= ImGuiWindowFlags_NoNav;
+        window_flags |= ImGuiWindowFlags_NoResize;
+        window_flags |= ImGuiWindowFlags_NoScrollWithMouse;
+        window_flags |= ImGuiWindowFlags_NoScrollbar;
+
         bool is_open = true;
 
         //Used to control frame rate of animations
-        static int frameCount_4 = 0;
-        static int frameCount_6 = 0;
         const float frameLength = 2.5f / 10.f; // In seconds, so 4 FPS
         static float frameTimer = frameLength;
 
-        ImGui::Begin("Window Name", &is_open, window_flags);
-
-        ImGui::SetCursorPos(ImGui::GetCursorPos() + (ImGui::GetContentRegionAvail() - ImVec2(32, 64)) * 0.5f);
-        characterManager.moveMainCharacter(&imageHandler, frameCount_4, frameCount_6);
+        ImGui::SetNextWindowPos(ImVec2(0,0));
+        ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+        ImGui::Begin("Window Name", &is_open,window_flags);
 
         frameTimer -= ImGui::GetIO().DeltaTime;
+
+        ImGui::SetCursorPos(ImGui::GetCursorPos() + (ImGui::GetContentRegionAvail() - ImVec2(32, 64)) * 0.5f);
+        characterManager.moveMainCharacter(&imageHandler, frameTimer);
+
+        ImGui::Text("Window SIZE ");
+        ImGui::Text("\"%f\" %f", io.DisplaySize.x, io.DisplaySize.y);
+
         if (frameTimer <= 0.f)
         {
             frameTimer = frameLength;
-            frameCount_4 ++;
-            frameCount_6 ++;
-            if (frameCount_4 % 4 == 0) frameCount_4=0;
-            if (frameCount_6 % 6 == 0) frameCount_6=0;
         }
         ImGui::End();
+        ImGui::PopStyleVar();
 
         // Rendering
         ImGui::Render();

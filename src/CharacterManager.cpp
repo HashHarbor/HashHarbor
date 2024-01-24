@@ -1,4 +1,5 @@
 #include "CharacterManager.h"
+#define GL_SILENCE_DEPRECATION
 #include "../imgui/imgui.h"
 #include "../backends/imgui_impl_glfw.h"
 #include "../backends/imgui_impl_opengl3.h"
@@ -88,13 +89,14 @@ void CharacterManager::setMainPlayer(std::string name)
     mainPlayer = playerCharacters.find(name)->second;
 }
 
-void CharacterManager::moveMainCharacter(ImageHandler* imgHandler, int fourFrame, int sixFrame)
+void CharacterManager::moveMainCharacter(ImageHandler* imgHandler, float frameTimer)
 {
 #ifdef IMGUI_DISABLE_OBSOLETE_KEYIO
     struct funcs { static bool IsLegacyNativeDupe(ImGuiKey) { return false; } };
             const ImGuiKey key_first = ImGuiKey_NamedKey_BEGIN;
 #else
-    struct funcs { static bool IsLegacyNativeDupe(ImGuiKey key) { return key < 512 && ImGui::GetIO().KeyMap[key] != -1; } }; // Hide Native<>ImGuiKey duplicates when both exists in the array
+    struct funcs { static bool IsLegacyNativeDupe(ImGuiKey key) { return key < 512 && ImGui::GetIO().KeyMap[key] != -1; } };
+    // Hide Native<>ImGuiKey duplicates when both exists in the array
     const ImGuiKey key_first = 0;
     //ImGui::Text("Legacy raw:");       for (ImGuiKey key = key_first; key < ImGuiKey_COUNT; key++) { if (io.KeysDown[key]) { ImGui::SameLine(); ImGui::Text("\"%s\" %d", ImGui::GetKeyName(key), key); } }
 #endif
@@ -113,20 +115,28 @@ void CharacterManager::moveMainCharacter(ImageHandler* imgHandler, int fourFrame
     switch(keyDown)
     {
         case 1:
-            imgHandler->DrawImage(*mainPlayer->walkUp.at(sixFrame));
+            imgHandler->DrawImage(*mainPlayer->walkUp.at(frameCount_6));
             break;
         case 2:
-            imgHandler->DrawImage(*mainPlayer->walkDown.at(sixFrame));
+            imgHandler->DrawImage(*mainPlayer->walkDown.at(frameCount_6));
             break;
         case 3:
-            imgHandler->DrawImage(*mainPlayer->walkRight.at(sixFrame));
+            imgHandler->DrawImage(*mainPlayer->walkRight.at(frameCount_6));
             break;
         case 4:
-            imgHandler->DrawImage(*mainPlayer->walkLeft.at(sixFrame));
+            imgHandler->DrawImage(*mainPlayer->walkLeft.at(frameCount_6));
             break;
         default:
-            imgHandler->DrawImage(*mainPlayer->idle.at(fourFrame));
+            imgHandler->DrawImage(*mainPlayer->idle.at(frameCount_4));
             break;
+    }
+
+    if (frameTimer <= 0.f)
+    {
+        frameCount_4 ++;
+        frameCount_6 ++;
+        if (frameCount_4 % 4 == 0) frameCount_4=0;
+        if (frameCount_6 % 6 == 0) frameCount_6=0;
     }
 
     //todo - remove on screen key printout

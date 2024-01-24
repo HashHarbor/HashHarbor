@@ -1,3 +1,4 @@
+#define GL_SILENCE_DEPRECATION
 #include "ImageHandler.h"
 #include <stdio.h>          // vsnprintf, sscanf, printf
 

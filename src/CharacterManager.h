@@ -1,6 +1,6 @@
 #pragma once
 
-#pragma once
+#define GL_SILENCE_DEPRECATION
 
 #include "../imgui/imgui.h"
 #include "../backends/imgui_impl_glfw.h"
@@ -45,6 +45,9 @@ class CharacterManager
     map<string, character*> npcCharacters; // stores all npc characters
 
     character* mainPlayer; // stores a pointer to the main player character to reduce map finds
+
+    int frameCount_4 = 0; // animation control for 4 frame
+    int frameCount_6 = 0; // animation control for 6 frame
 public:
     CharacterManager();
 
@@ -61,7 +64,7 @@ public:
     void setMainPlayer(string name);
     // set the main character to animate
     // can be used to change the players character after game started
-    void moveMainCharacter(ImageHandler* imgHandler, int fourFrame, int sixFrame);
+    void moveMainCharacter(ImageHandler* imgHandler, float frameTimer);
     // used to move the main character based on keyboard input
 
 };
