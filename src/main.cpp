@@ -11,7 +11,7 @@
 
 #include <bits/stdc++.h>
 
-#include "graphic.h"
+#include "graphic/graphic.h"
 
 
 int main(int argc, char **argv) 
