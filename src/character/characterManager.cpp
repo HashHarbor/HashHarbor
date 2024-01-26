@@ -107,6 +107,7 @@ void characterManager::moveMainCharacter(imageHandler* imgHandler, float frameTi
 
     switch(keyDown)
     {
+        
         case 1:
             imgHandler->DrawImage(*mainPlayer->walkUp.at(frameCount_6));
             break;

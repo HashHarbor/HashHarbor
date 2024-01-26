@@ -17,7 +17,7 @@ public:
 
     //graphic functions
     void setup();
-    void makeDisplay(imageHandler image, characterManager character);
+    void makeDisplay(imageHandler image, characterManager &character);
     void makeProcess();
     void makeConfig();
 

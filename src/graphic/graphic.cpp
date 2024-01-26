@@ -18,7 +18,8 @@
 #include "../imageHandler/imageHandler.h"
 #include "../character/characterManager.h"
 
-
+#define IMGUI_DEFINE_MATH_OPERATORS
+#include "imgui_internal.h"
 
 void graphic::setup(){
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) != 0)
@@ -64,8 +65,9 @@ void graphic::setup(){
 
     character.createCharacter("Bob", false, true, &image);
     character.setMainPlayer("Bob");
-    
 
+    
+    
     // Main loop
     bool done = false;
     while (!done)
@@ -89,7 +91,7 @@ void graphic::setup(){
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
-        
+
         if(show_display){
             makeDisplay(image, character);
         }
@@ -127,12 +129,10 @@ void graphic::setup(){
     SDL_Quit();
 }
 
-void graphic::makeDisplay(imageHandler image, characterManager character){
+void graphic::makeDisplay(imageHandler image, characterManager &character){
     // Graphics window calculation
     ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
     ImGui::SetNextWindowPos({0, 0});
-
-    
 
     const float frameLength = 2.5f / 10.f; // In seconds, so 4 FPS
     static float frameTimer = frameLength;
@@ -141,11 +141,15 @@ void graphic::makeDisplay(imageHandler image, characterManager character){
     ImGui::Begin("Graphics", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
     {
         frameTimer -= ImGui::GetIO().DeltaTime;
+
+        ImVec2 characterPos = ImVec2((ImGui::GetContentRegionAvail() - ImVec2(32, 64)) * 0.5f);
+
+        ImGui::SetCursorPos(characterPos);
         character.moveMainCharacter(&image, frameTimer);
 
         if (frameTimer <= 0.f)
         {
-            frameTimer = frameLength;
+            frameTimer = 2.5f / 10.f;
         }
         
     }
