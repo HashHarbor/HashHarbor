@@ -1,6 +1,8 @@
 #pragma once
 
 #include "imgui.h"
+#include "../imageHandler/imageHandler.h"
+#include "../character/characterManager.h"
 
 class graphic {
 public:
@@ -15,7 +17,7 @@ public:
 
     //graphic functions
     void setup();
-    void makeDisplay();
+    void makeDisplay(imageHandler image, characterManager character);
     void makeProcess();
     void makeConfig();
 

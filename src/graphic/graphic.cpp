@@ -2,7 +2,9 @@
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
+
 #include <SDL.h>
+#include <SDL2/SDL.h>
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <SDL_opengles2.h>
 #else
@@ -56,6 +58,12 @@ void graphic::setup(){
     // Setup Platform/Renderer backends
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init(glsl_version);
+
+    imageHandler image = imageHandler();
+    characterManager character = characterManager();
+
+    character.createCharacter("Bob", false, true, &image);
+    character.setMainPlayer("Bob");
     
 
     // Main loop
@@ -83,7 +91,7 @@ void graphic::setup(){
         ImGui::NewFrame();
         
         if(show_display){
-            makeDisplay();
+            makeDisplay(image, character);
         }
         
         if(show_process){
@@ -119,17 +127,12 @@ void graphic::setup(){
     SDL_Quit();
 }
 
-void graphic::makeDisplay(){
+void graphic::makeDisplay(imageHandler image, characterManager character){
     // Graphics window calculation
     ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
     ImGui::SetNextWindowPos({0, 0});
 
-    imageHandler image = imageHandler();
-    characterManager character = characterManager();
-
-    //Create Characters
-    character.createCharacter("Bob", false, true, &image);
-    character.setMainPlayer("Bob");
+    
 
     const float frameLength = 2.5f / 10.f; // In seconds, so 4 FPS
     static float frameTimer = frameLength;
