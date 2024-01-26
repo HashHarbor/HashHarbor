@@ -1,5 +1,7 @@
 #include "imageHandler.h"
+#include "imagePath.h"
 #include <stdio.h>
+#include <bits/stdc++.h>
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
@@ -15,66 +17,74 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+imageHandler::imageHandler(){}
+
 imageHandler::imageHandler(const char* filepath){
     this->filepath = filepath;
 }
 
-bool imageHandler::loadTexture(){
-    unsigned char* image_data = stbi_load(filepath, width, height, NULL, channels);
-        if(image_data == NULL){
-            return false;
-        }
+imageHandler::imageHandler(GLuint texture, int width, int height){
+    this->texture = texture;
+    this->width = width;
+    this->height = height;
+}
 
-        // Create a OpenGL texture identifier
-        GLuint image_texture;
-        glGenTextures(1, &image_texture);
-        glBindTexture(GL_TEXTURE_2D, image_texture);
+bool imageHandler::loadTexture(const char *filename, imageHandler* image){
+    int image_width = 0;
+    int image_height = 0;
+    int image_channel = 0;
+    auto image_data = stbi_load(filename, &image_width, &image_height, &image_channel, 0);
+    
+    if(image_data == NULL){
+        return false;
+    }
 
-        // Setup filtering parameters for display
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); // This is required on WebGL for non power-of-two textures
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // Same
+    // Create a OpenGL texture identifier
+    GLuint image_texture;
+    glGenTextures(1, &image_texture);
+    glBindTexture(GL_TEXTURE_2D, image_texture);
 
-        // Upload pixels into texture
-    #if defined(GL_UNPACK_ROW_LENGTH) && !defined(__EMSCRIPTEN__)
-        glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-    #endif
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
-        stbi_image_free(image_data);
+    // Setup filtering parameters for display
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); // This is required on WebGL for non power-of-two textures
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // Same
 
-        *out_texture = image_texture;
-        *out_width = image_width;
-        *out_height = image_height;
+    // Upload pixels into texture
+#if defined(GL_UNPACK_ROW_LENGTH) && !defined(__EMSCRIPTEN__)
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+#endif
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+    stbi_image_free(image_data);
 
-        return true;
+    image->texture = image_texture;
+    image->width= image_width;
+    image->height = image_height;
+
+    return true;
 
 }
 
-bool imageHandler::CreateAnimation(vector<string>& paths, vector<image*> &frames)
+bool imageHandler::CreateAnimation(vector<string>& paths, vector<imageHandler*> &frames)
 {
-    ImagePath abs = ImagePath();
+    imagePath abs = imagePath();
     for(int i = 0; i < paths.size(); i++)
     {
-        int height = 0;
-        int width = 0;
-        GLuint texture = 0;
+        imageHandler* frame = new imageHandler();
 
         string absolute = abs.absolutePath + paths.at(i);
-        //todo - remove print
-        cout << "-----PATH:" << absolute << endl;
 
-        bool ret = ImageHandler::LoadTextureFromFile(absolute.c_str(), &texture, &width, &height);
+        //cout << absolute << endl;
+
+        bool ret = imageHandler::loadTexture(absolute.c_str(), frame);
         IM_ASSERT(ret);
-
-        image* frame = new image(texture,width,height);
 
         frames.push_back(frame);
     }
     return true;
 }
 
-void imageHandler::DrawImage(image _image)
+void imageHandler::DrawImage(imageHandler _image)
 {
     ImGui::Image((void*)(intptr_t)_image.texture, ImVec2(_image.width, _image.height));
 }

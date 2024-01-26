@@ -13,6 +13,10 @@
 
 #include "graphic.h"
 
+#include "../imageHandler/imageHandler.h"
+#include "../character/characterManager.h"
+
+
 
 void graphic::setup(){
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) != 0)
@@ -120,9 +124,26 @@ void graphic::makeDisplay(){
     ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
     ImGui::SetNextWindowPos({0, 0});
 
+    imageHandler image = imageHandler();
+    characterManager character = characterManager();
+
+    //Create Characters
+    character.createCharacter("Bob", false, true, &image);
+    character.setMainPlayer("Bob");
+
+    const float frameLength = 2.5f / 10.f; // In seconds, so 4 FPS
+    static float frameTimer = frameLength;
+
     // Window - Graphics
     ImGui::Begin("Graphics", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
     {
+        frameTimer -= ImGui::GetIO().DeltaTime;
+        character.moveMainCharacter(&image, frameTimer);
+
+        if (frameTimer <= 0.f)
+        {
+            frameTimer = frameLength;
+        }
         
     }
     ImGui::End();

@@ -11,6 +11,8 @@
 #include <SDL_opengl.h>
 #endif
 
+#include <bits/stdc++.h>
+using namespace std;
 
 
 class imageHandler{
@@ -24,10 +26,11 @@ public:
     
     imageHandler();
     imageHandler(const char* filepath);
+    imageHandler(GLuint texture, int width, int height);
 
-    bool loadTexture();
-    bool CreateAnimation(vector<string>& paths, vector <image*> &frames);
-    void DrawImage(image _image);
+    bool loadTexture(const char *filename, imageHandler* image);
+    bool CreateAnimation(vector<string>& paths, vector <imageHandler*> &frames);
+    void DrawImage(imageHandler _image);
 
 private:
 
