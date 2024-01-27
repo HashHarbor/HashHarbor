@@ -48,7 +48,14 @@ public:
         // In testing, it required an absolute path to import images
         // To test relative paths set absolutePath to "../"
         //todo -  Pleases change the absolute path to
+        // /Users/david/CLionProjects/HashHarbor/
+#if defined(__APPLE__)
+// USER DEPENDENT
     string absolutePath = "/Users/david/CLionProjects/HashHarbor/";
+#else
+    string absolutePath = "../";
+#endif
+
 
     map<string, map<string, vector<string>>> index = {
             {"Bob", Bob}

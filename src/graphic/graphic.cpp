@@ -184,8 +184,6 @@ void graphic::makeProcess(){
     ImGui::Begin("Processor Information", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
     {
  
-
- 
     }
     ImGui::End();
 }

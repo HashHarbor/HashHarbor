@@ -14,13 +14,14 @@
 #if defined(__APPLE__)
 #include <iostream>
 #include <vector>
-using std::string;
-using std::vector;
 using std::cout;
 using std::endl;
 #else
 #include <bits/stdc++.h>
 #endif
+
+using std::string;
+using std::vector;
 
 
 class imageHandler{
