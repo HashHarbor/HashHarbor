@@ -11,7 +11,16 @@
 #include <SDL2/SDL_opengl.h>
 #endif
 
-//#include <bits/stdc++.h>
+#if defined(__APPLE__)
+#include <iostream>
+#include <vector>
+using std::string;
+using std::vector;
+using std::cout;
+using std::endl;
+#else
+#include <bits/stdc++.h>
+#endif
 
 #include "graphic.h"
 
@@ -38,7 +47,7 @@ void graphic::setup(){
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 #else
-    glsl_version = "#version 130"
+    glsl_version = "#version 130";
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);

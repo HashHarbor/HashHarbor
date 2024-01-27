@@ -1,7 +1,17 @@
 #include "imageHandler.h"
 #include "imagePath.h"
 #include <stdio.h>
-//#include <bits/stdc++.h>
+
+#if defined(__APPLE__)
+#include <iostream>
+using std::string;
+using std::vector;
+using std::cout;
+using std::endl;
+#else
+#include <bits/stdc++.h>
+#endif
+
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
@@ -13,11 +23,6 @@
 #else
 #include <SDL2/SDL_opengl.h>
 #endif
-
-#include <iostream>
-using std::cout;
-using std::endl;
-using std::vector;
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"

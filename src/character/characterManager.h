@@ -10,13 +10,19 @@
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
 #endif
-#include <GLFW/glfw3.h>  // Will drag system OpenGL headers
 
+#if defined(__APPLE__)
 #include <iostream>
 #include <vector>
 #include <map>
-
-using namespace std;
+using std::string;
+using std::vector;
+using std::map;
+using std::cout;
+using std::endl;
+#else
+#include <bits/stdc++.h>
+#endif
 
 #include "../imageHandler/imageHandler.h"
 #include "../imageHandler/imagePath.h"

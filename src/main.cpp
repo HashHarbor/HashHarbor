@@ -9,7 +9,15 @@
 #include <SDL2/SDL_opengl.h>
 #endif
 
-//#include <bits/stdc++.h>
+#if defined(__APPLE__)
+#include <iostream>
+using std::string;
+using std::vector;
+using std::cout;
+using std::endl;
+#else
+#include <bits/stdc++.h>
+#endif
 
 #include "graphic/graphic.h"
 

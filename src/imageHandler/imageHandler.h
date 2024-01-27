@@ -9,12 +9,18 @@
 #include <SDL_opengles2.h>
 #else
 #include <SDL2/SDL_opengl.h>
-#include <vector>
-
 #endif
 
-//#include <bits/stdc++.h>
-using namespace std;
+#if defined(__APPLE__)
+#include <iostream>
+#include <vector>
+using std::string;
+using std::vector;
+using std::cout;
+using std::endl;
+#else
+#include <bits/stdc++.h>
+#endif
 
 
 class imageHandler{
