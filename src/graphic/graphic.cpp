@@ -2,25 +2,24 @@
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
+
+#include <SDL.h>
 #include <SDL2/SDL.h>
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <SDL_opengles2.h>
 #else
-#include <SDL2/SDL_opengl.h>
+#include <SDL_opengl.h>
 #endif
+
+#include <bits/stdc++.h>
+
+#include "graphic.h"
+
+#include "../imageHandler/imageHandler.h"
+#include "../character/characterManager.h"
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui_internal.h"
-
-//#include <bits/stdc++.h>
-
-#include "graphic.h"
-#include "ImageHandler.h"
-#include "CharacterManager.h"
-
-#include <iostream>
-using std::cout;
-using std::endl;
 
 void graphic::setup(){
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) != 0)
@@ -29,27 +28,18 @@ void graphic::setup(){
         return;
     }
 
-#if defined(IMGUI_IMPL_OPENGL_ES2)
     // GL 3.0 + GLSL 130
     const char* glsl_version = "#version 130";
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-#elif defined(__APPLE__)
-    // GL 3.2 Core + GLSL 150
-    const char* glsl_version = "#version 150";
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG); // Always required on Mac
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-#endif
 
     // Create window with graphics context
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-    SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE);
+    SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI);
     SDL_Window* window = SDL_CreateWindow("test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, this->width_px, this->height_px, window_flags);
     SDL_GLContext gl_context = SDL_GL_CreateContext(window);
     SDL_GL_MakeCurrent(window, gl_context);
@@ -70,13 +60,14 @@ void graphic::setup(){
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    imageHandler image = imageHandler();
+    characterManager character = characterManager();
 
-    //Create Characters
-    characterManager.createCharacter("Bob", false, true, &imageHandler);
-    characterManager.setMainPlayer("Bob");
+    character.createCharacter("Bob", false, true, &image);
+    character.setMainPlayer("Bob");
+
     
-
+    
     // Main loop
     bool done = false;
     while (!done)
@@ -94,11 +85,6 @@ void graphic::setup(){
                 done = true;
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
                 done = true;
-            if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED)
-            {
-                io.DisplaySize.x = static_cast<float>(event.window.data1);
-                io.DisplaySize.y = static_cast<float>(event.window.data2);
-            }
         }
 
         // Start the Dear ImGui frame
@@ -106,13 +92,8 @@ void graphic::setup(){
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
 
-        if(show_MainCharacter)
-        {
-            makeMainCharacter();
-        }
-        /*
         if(show_display){
-            makeDisplay();
+            makeDisplay(image, character);
         }
         
         if(show_process){
@@ -122,7 +103,6 @@ void graphic::setup(){
         if(show_config){
             makeConfig();
         }
-         */
 
         // if(emulate){
         //     while(chip.pc < sizeof(chip.memory)){
@@ -134,7 +114,6 @@ void graphic::setup(){
         // Rendering
         ImGui::Render();
         glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
-        glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         SDL_GL_SwapWindow(window);
@@ -150,14 +129,28 @@ void graphic::setup(){
     SDL_Quit();
 }
 
-void graphic::makeDisplay(){
+void graphic::makeDisplay(imageHandler image, characterManager &character){
     // Graphics window calculation
     ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
     ImGui::SetNextWindowPos({0, 0});
 
+    const float frameLength = 2.5f / 10.f; // In seconds, so 4 FPS
+    static float frameTimer = frameLength;
+
     // Window - Graphics
     ImGui::Begin("Graphics", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
     {
+        frameTimer -= ImGui::GetIO().DeltaTime;
+
+        ImVec2 characterPos = ImVec2((ImGui::GetContentRegionAvail() - ImVec2(32, 64)) * 0.5f);
+
+        ImGui::SetCursorPos(characterPos);
+        character.moveMainCharacter(&image, frameTimer);
+
+        if (frameTimer <= 0.f)
+        {
+            frameTimer = 2.5f / 10.f;
+        }
         
     }
     ImGui::End();
@@ -192,44 +185,4 @@ void graphic::makeConfig(){
     ImGui::End();
 
         
-}
-
-void graphic::makeMainCharacter()
-{
-    // The window below is the screen where the player is drawn
-    ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoTitleBar;
-    window_flags |= ImGuiWindowFlags_NoBackground;
-    window_flags |= ImGuiWindowFlags_NoCollapse;
-    window_flags |= ImGuiWindowFlags_NoDecoration;
-    window_flags |= ImGuiWindowFlags_NoMove;
-    window_flags |= ImGuiWindowFlags_NoNav;
-    window_flags |= ImGuiWindowFlags_NoResize;
-    window_flags |= ImGuiWindowFlags_NoScrollWithMouse;
-    window_flags |= ImGuiWindowFlags_NoScrollbar;
-
-    //Used to control frame rate of animations
-    const float frameLength = 2.5f / 10.f; // In seconds, so 4 FPS
-    static float frameTimer = frameLength;
-
-    ImGui::SetNextWindowPos(ImVec2(0,0));
-    ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-    ImGui::Begin("Window Name", &show_MainCharacter,window_flags);
-
-    frameTimer -= ImGui::GetIO().DeltaTime;
-
-    ImGui::SetCursorPos(ImGui::GetCursorPos() + (ImGui::GetContentRegionAvail() - ImVec2(32, 64)) * 0.5f);
-    characterManager.moveMainCharacter(&imageHandler, frameTimer);
-
-    ImGui::Text("Window SIZE ");
-    ImGui::Text("\"%f\" %f", ImGui::GetIO().DisplaySize.x, ImGui::GetIO().DisplaySize.y);
-
-    if (frameTimer <= 0.f)
-    {
-        frameTimer = frameLength;
-    }
-    ImGui::End();
-    ImGui::PopStyleVar();
-
-
 }

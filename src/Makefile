@@ -14,11 +14,9 @@
 #CXX = g++
 #CXX = clang++
 
-EXE = HashHarbor_app
+EXE = abc
 IMGUI_DIR = ../
-
-SOURCES = main.cpp graphic.cpp ImageHandler.cpp CharacterManager.cpp
-
+SOURCES = main.cpp graphic/graphic.cpp imageHandler/imageHandler.cpp character/characterManager.cpp
 SOURCES += $(IMGUI_DIR)/imgui/imgui.cpp $(IMGUI_DIR)/imgui/imgui_demo.cpp $(IMGUI_DIR)/imgui/imgui_draw.cpp $(IMGUI_DIR)/imgui/imgui_tables.cpp $(IMGUI_DIR)/imgui/imgui_widgets.cpp
 SOURCES += $(IMGUI_DIR)/backends/imgui_impl_sdl.cpp $(IMGUI_DIR)/backends/imgui_impl_opengl3.cpp
 OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))
@@ -75,6 +73,15 @@ endif
 ##---------------------------------------------------------------------
 
 %.o:%.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+%.o:graphic/%.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+%.o:imageHandler/%.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+%.o:character/%.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 %.o:$(IMGUI_DIR)/imgui/%.cpp

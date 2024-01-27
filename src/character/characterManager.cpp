@@ -1,23 +1,15 @@
-#include "CharacterManager.h"
-#define GL_SILENCE_DEPRECATION
-#include "../imgui/imgui.h"
-//#include "../backends/imgui_impl_glfw.h"
-#include "../backends/imgui_impl_opengl3.h"
+#include <stdio.h>
 
-#define IMGUI_DEFINE_MATH_OPERATORS
-#include "../imgui/imgui_internal.h"
-
-#include <ctype.h>          // toupper
-#include <limits.h>         // INT_MIN, INT_MAX
-#include <math.h>           // sqrtf, powf, cosf, sinf, floorf, ceilf
-#include <stdio.h>          // vsnprintf, sscanf, printf
-#include <stdlib.h>         // NULL, malloc, free, atoi
-
+#include "imgui.h"
+#include "imgui_impl_sdl.h"
+#include "imgui_impl_opengl3.h"
+#include <stdio.h>
+#include <SDL.h>
 #if defined(IMGUI_IMPL_OPENGL_ES2)
-#include <GLES2/gl2.h>
+#include <SDL_opengles2.h>
+#else
+#include <SDL_opengl.h>
 #endif
-#include <GLFW/glfw3.h> // Will drag system OpenGL headers
-
 
 #include <iostream>
 #include <vector>
@@ -30,14 +22,15 @@ using std::string;
 using std::cout;
 using std::endl;
 
-#include "ImageHandler.h"
-#include "ImagePath.h"
+#include "../imageHandler/imageHandler.h"
+#include "../imageHandler/imagePath.h"
+#include "characterManager.h"
 
-CharacterManager::CharacterManager() {}
+characterManager::characterManager() {}
 
-void CharacterManager::createCharacter(std::string name, bool npc, bool fullMovement, ImageHandler* imgHandler)
+void characterManager::createCharacter(std::string name, bool npc, bool fullMovement, imageHandler* imgHandler)
 {
-    ImagePath paths = ImagePath(); // gets access to the class with all file paths
+    imagePath paths = imagePath(); // gets access to the class with all file paths
     auto charPath = paths.index.find(name); // get the character to create
     if(charPath == paths.index.end())
     {
@@ -62,7 +55,7 @@ void CharacterManager::createCharacter(std::string name, bool npc, bool fullMove
         npcCharacters.emplace(name, newChar);
 }
 
-character* CharacterManager::getPlayerCharacter(string name)
+character* characterManager::getPlayerCharacter(string name)
 {
     character* find = playerCharacters.find(name)->second;
     if(find == nullptr)
@@ -73,23 +66,23 @@ character* CharacterManager::getPlayerCharacter(string name)
     return find;
 }
 
-character* CharacterManager::getNpcCharacter(string name)
+character* characterManager::getNpcCharacter(string name)
 {
     character* find = npcCharacters.find(name)->second;
     return find;
 }
 
-character *CharacterManager::getMainPlayer()
+character *characterManager::getMainPlayer()
 {
     return mainPlayer;
 }
 
-void CharacterManager::setMainPlayer(std::string name)
+void characterManager::setMainPlayer(std::string name)
 {
     mainPlayer = playerCharacters.find(name)->second;
 }
 
-void CharacterManager::moveMainCharacter(ImageHandler* imgHandler, float frameTimer)
+void characterManager::moveMainCharacter(imageHandler* imgHandler, float frameTimer)
 {
 #ifdef IMGUI_DISABLE_OBSOLETE_KEYIO
     struct funcs { static bool IsLegacyNativeDupe(ImGuiKey) { return false; } };
@@ -114,6 +107,7 @@ void CharacterManager::moveMainCharacter(ImageHandler* imgHandler, float frameTi
 
     switch(keyDown)
     {
+        
         case 1:
             imgHandler->DrawImage(*mainPlayer->walkUp.at(frameCount_6));
             break;
@@ -140,5 +134,5 @@ void CharacterManager::moveMainCharacter(ImageHandler* imgHandler, float frameTi
     }
 
     //todo - remove on screen key printout
-    ImGui::Text("Keys down:"); for (ImGuiKey key = key_first; key < ImGuiKey_COUNT; key++) { if (funcs::IsLegacyNativeDupe(key)) continue; if (ImGui::IsKeyDown(key)) { ImGui::SameLine(); ImGui::Text("\"%s\" %d (%.02f secs)", ImGui::GetKeyName(key), key, ImGui::GetKeyData(key)->DownDuration); } }
+    //ImGui::Text("Keys down:"); for (ImGuiKey key = key_first; key < ImGuiKey_COUNT; key++) { if (funcs::IsLegacyNativeDupe(key)) continue; if (ImGui::IsKeyDown(key)) { ImGui::SameLine(); ImGui::Text("\"%s\" %d (%.02f secs)", ImGui::GetKeyName(key), key, ImGui::GetKeyData(key)->DownDuration); } }
 }
