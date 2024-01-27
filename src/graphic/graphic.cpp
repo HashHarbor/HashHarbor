@@ -2,7 +2,9 @@
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
+
 #include <SDL.h>
+#include <SDL2/SDL.h>
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <SDL_opengles2.h>
 #else
@@ -13,6 +15,11 @@
 
 #include "graphic.h"
 
+#include "../imageHandler/imageHandler.h"
+#include "../character/characterManager.h"
+
+#define IMGUI_DEFINE_MATH_OPERATORS
+#include "imgui_internal.h"
 
 void graphic::setup(){
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) != 0)
@@ -52,8 +59,15 @@ void graphic::setup(){
     // Setup Platform/Renderer backends
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init(glsl_version);
-    
 
+    imageHandler image = imageHandler();
+    characterManager character = characterManager();
+
+    character.createCharacter("Bob", false, true, &image);
+    character.setMainPlayer("Bob");
+
+    
+    
     // Main loop
     bool done = false;
     while (!done)
@@ -77,9 +91,9 @@ void graphic::setup(){
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
-        
+
         if(show_display){
-            makeDisplay();
+            makeDisplay(image, character);
         }
         
         if(show_process){
@@ -115,14 +129,28 @@ void graphic::setup(){
     SDL_Quit();
 }
 
-void graphic::makeDisplay(){
+void graphic::makeDisplay(imageHandler image, characterManager &character){
     // Graphics window calculation
     ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
     ImGui::SetNextWindowPos({0, 0});
 
+    const float frameLength = 2.5f / 10.f; // In seconds, so 4 FPS
+    static float frameTimer = frameLength;
+
     // Window - Graphics
     ImGui::Begin("Graphics", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
     {
+        frameTimer -= ImGui::GetIO().DeltaTime;
+
+        ImVec2 characterPos = ImVec2((ImGui::GetContentRegionAvail() - ImVec2(32, 64)) * 0.5f);
+
+        ImGui::SetCursorPos(characterPos);
+        character.moveMainCharacter(&image, frameTimer);
+
+        if (frameTimer <= 0.f)
+        {
+            frameTimer = 2.5f / 10.f;
+        }
         
     }
     ImGui::End();
