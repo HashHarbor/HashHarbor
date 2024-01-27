@@ -152,7 +152,7 @@
 //   Some important concepts to understand to use this library:
 //
 //      Codepoint
-//         Characters are defined by unicode codepoints, e.g. 65 is
+//         characters are defined by unicode codepoints, e.g. 65 is
 //         uppercase A, 231 is lowercase c with a cedilla, 0x7e30 is
 //         the hiragana for "ma".
 //
@@ -165,7 +165,7 @@
 //
 //      Baseline
 //         Glyph shapes are defined relative to a baseline, which is the
-//         bottom of uppercase characters. Characters extend both above
+//         bottom of uppercase characters. characters extend both above
 //         and below the baseline.
 //
 //      Current Point
@@ -561,7 +561,7 @@ STBTT_DEF void stbtt_GetBakedQuad(const stbtt_bakedchar *chardata, int pw, int p
 //
 // The coordinate system used assumes y increases downwards.
 //
-// Characters will extend both above and below the current position;
+// characters will extend both above and below the current position;
 // see discussion of "BASELINE" above.
 //
 // It's inefficient; you might want to c&p it and optimize it.
