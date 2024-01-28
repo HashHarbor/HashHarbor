@@ -62,21 +62,25 @@ void graphic::setup(){
     ImGui_ImplOpenGL3_Init(glsl_version);
 
     imageHandler image = imageHandler();
+    imageHandler background = imageHandler("../src/abc.png");
+    background.loadTexture(background.filepath, &background);
+
     characterManager character = characterManager();
 
     character.createCharacter("Bob", false, true, &image);
     character.setMainPlayer("Bob");
 
     movementHandler obs = movementHandler("../src/abc.png");
-    auto gr = obs.getGrid();
-    for(int i = 0; i < gr.size(); i++){
-        for(int j = 0; j < gr[0].size(); j++){
-            cout << gr[i][j] << " ";
-        }
-        cout << endl;
-    }
+    // auto gr = obs.getGrid();
+    // for(uint i = 0; i < gr.size(); i++){
+    //     for(uint j = 0; j < gr[0].size(); j++){
+    //         cout << gr[i][j] << " ";
+    //     }
+    //     cout << endl;
+    // }
 
-    
+    int mapGridX = 0;
+    int mapGridY = 0;
     
     // Main loop
     bool done = false;
@@ -103,7 +107,8 @@ void graphic::setup(){
         ImGui::NewFrame();
 
         if(show_display){
-            makeDisplay(image, character);
+            makeBackground(background, mapGridX, mapGridY);
+            //makeDisplay(image, character);
         }
         
         if(show_process){
@@ -139,6 +144,18 @@ void graphic::setup(){
     SDL_Quit();
 }
 
+void graphic::makeBackground(imageHandler background, int gridX, int gridY){
+    ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
+    ImGui::SetNextWindowPos({0, 0});
+    
+    ImGui::Begin("Background", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);
+    {
+        background.DrawImage(background);
+    }
+
+    ImGui::End();
+}
+
 void graphic::makeDisplay(imageHandler image, characterManager &character){
     // Graphics window calculation
     ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
@@ -148,7 +165,7 @@ void graphic::makeDisplay(imageHandler image, characterManager &character){
     static float frameTimer = frameLength;
 
     // Window - Graphics
-    ImGui::Begin("Graphics", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
+    ImGui::Begin("Graphics", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
     {
         frameTimer -= ImGui::GetIO().DeltaTime;
 
@@ -184,7 +201,7 @@ void graphic::makeProcess(){
 void graphic::makeConfig(){
     // Config window calculation
     ImGui::SetNextWindowSize({(float)width_px / 2, (float)height_px / 2});
-    ImGui::SetNextWindowPos({0, 320});
+    ImGui::SetNextWindowPos({0, height_px/2});
 
     // Window - Config
     ImGui::Begin("Config", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);

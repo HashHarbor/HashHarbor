@@ -86,6 +86,7 @@ bool imageHandler::CreateAnimation(vector<string>& paths, vector<imageHandler*> 
 
 void imageHandler::DrawImage(imageHandler _image)
 {
-    ImGui::Image((void*)(intptr_t)_image.texture, ImVec2(_image.width, _image.height));
+
+    ImGui::Image((void*)(intptr_t)_image.texture, ImVec2(_image.width, _image.height), ImVec2(0.0f,0.0f), ImVec2(0.5f,1.0f));
 }
 

@@ -6,8 +6,8 @@
 
 class graphic {
 public:
-    int width_px = 1280;
-    int height_px = 640;
+    int width_px = 1920;
+    int height_px = 1080;
 
     bool show_display = true;
     bool show_process = true;
@@ -18,6 +18,7 @@ public:
     //graphic functions
     void setup();
     void makeDisplay(imageHandler image, characterManager &character);
+    void makeBackground(imageHandler background, int gridX, int gridY);
     void makeProcess();
     void makeConfig();
 
