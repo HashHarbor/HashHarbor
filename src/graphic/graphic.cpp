@@ -17,6 +17,7 @@
 
 #include "../imageHandler/imageHandler.h"
 #include "../character/characterManager.h"
+#include "../movement/movementHandler.h"
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui_internal.h"
@@ -65,6 +66,15 @@ void graphic::setup(){
 
     character.createCharacter("Bob", false, true, &image);
     character.setMainPlayer("Bob");
+
+    movementHandler obs = movementHandler("../src/abc.png");
+    auto gr = obs.getGrid();
+    for(int i = 0; i < gr.size(); i++){
+        for(int j = 0; j < gr[0].size(); j++){
+            cout << gr[i][j] << " ";
+        }
+        cout << endl;
+    }
 
     
     

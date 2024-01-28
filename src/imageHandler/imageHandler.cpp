@@ -68,7 +68,7 @@ bool imageHandler::loadTexture(const char *filename, imageHandler* image){
 bool imageHandler::CreateAnimation(vector<string>& paths, vector<imageHandler*> &frames)
 {
     imagePath abs = imagePath();
-    for(int i = 0; i < paths.size(); i++)
+    for(uint i = 0; i < paths.size(); i++)
     {
         imageHandler* frame = new imageHandler();
 
