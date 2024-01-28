@@ -1,26 +1,28 @@
-#include <stdio.h>
-
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #if defined(IMGUI_IMPL_OPENGL_ES2)
-#include <SDL_opengles2.h>
+#include <SDL2/SDL_opengles2.h>
 #else
-#include <SDL_opengl.h>
+#include <SDL2/SDL_opengl.h>
 #endif
 
+#if defined(__APPLE__)
 #include <iostream>
 #include <vector>
+#include <vector>
 #include <map>
-
-namespace ImGui { extern ImGuiKeyData* GetKeyData(ImGuiKey key); }
-
-using std::vector;
 using std::string;
+using std::vector;
 using std::cout;
 using std::endl;
+#else
+#include <bits/stdc++.h>
+#endif
+
+namespace ImGui { extern ImGuiKeyData* GetKeyData(ImGuiKey key); }
 
 #include "../imageHandler/imageHandler.h"
 #include "../imageHandler/imagePath.h"

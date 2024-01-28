@@ -1,17 +1,27 @@
 #include "imageHandler.h"
 #include "imagePath.h"
 #include <stdio.h>
+
+#if defined(__APPLE__)
+#include <iostream>
+using std::string;
+using std::vector;
+using std::cout;
+using std::endl;
+#else
 #include <bits/stdc++.h>
+#endif
+
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <SDL_opengles2.h>
 #else
-#include <SDL_opengl.h>
+#include <SDL2/SDL_opengl.h>
 #endif
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -35,7 +45,10 @@ bool imageHandler::loadTexture(const char *filename, imageHandler* image){
     int image_channel = 0;
     auto image_data = stbi_load(filename, &image_width, &image_height, &image_channel, 0);
     
-    if(image_data == NULL){
+    if(image_data == NULL)
+    {
+        cout << filename << endl;
+        printf("Error loading image: %s\n", stbi_failure_reason());
         return false;
     }
 

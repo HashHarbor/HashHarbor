@@ -4,15 +4,24 @@
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <SDL_opengles2.h>
 #else
-#include <SDL_opengl.h>
+#include <SDL2/SDL_opengl.h>
 #endif
 
+#if defined(__APPLE__)
+#include <iostream>
+#include <vector>
+using std::cout;
+using std::endl;
+#else
 #include <bits/stdc++.h>
-using namespace std;
+#endif
+
+using std::string;
+using std::vector;
 
 
 class imageHandler{
@@ -31,9 +40,4 @@ public:
     bool loadTexture(const char *filename, imageHandler* image);
     bool CreateAnimation(vector<string>& paths, vector <imageHandler*> &frames);
     void DrawImage(imageHandler _image);
-
-private:
-
-    
-
 };
