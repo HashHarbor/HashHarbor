@@ -31,6 +31,7 @@ public:
     bool loadTexture(const char *filename, imageHandler* image);
     bool CreateAnimation(vector<string>& paths, vector <imageHandler*> &frames);
     void DrawImage(imageHandler _image);
+    void DrawMap(imageHandler _image, int tileX, int tileY, float width, float height);
 
 private:
 

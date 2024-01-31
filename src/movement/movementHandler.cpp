@@ -15,6 +15,7 @@
 #include <opencv2/opencv.hpp>
 
 #include "movementHandler.h"
+#include "../imageHandler/imageHandler.h"
 
 
 movementHandler::movementHandler(string filepath){
@@ -59,4 +60,25 @@ movementHandler::movementHandler(string filepath){
 
 std::vector<std::vector<int>> movementHandler::getGrid(){
     return this->grid;
+}
+
+void movementHandler::mapMovement(int key, imageHandler map, int &gridX, int &gridY){
+    switch(key)
+    {
+        case 1:
+            gridY--;
+            break;
+        case 2:
+            gridY++;
+            break;
+        case 3:
+            gridX++;
+            break;
+        case 4:
+            gridX--;
+            break;
+    }
+
+    map.DrawMap(map, gridX, gridY, 960, 544);
+
 }

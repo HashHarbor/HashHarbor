@@ -70,7 +70,7 @@ void graphic::setup(){
     character.createCharacter("Bob", false, true, &image);
     character.setMainPlayer("Bob");
 
-    movementHandler obs = movementHandler("../src/abc.png");
+    movementHandler move = movementHandler("../src/abc.png");
     // auto gr = obs.getGrid();
     // for(uint i = 0; i < gr.size(); i++){
     //     for(uint j = 0; j < gr[0].size(); j++){
@@ -79,8 +79,8 @@ void graphic::setup(){
     //     cout << endl;
     // }
 
-    int mapGridX = 0;
-    int mapGridY = 0;
+    int mapGridX = 15;
+    int mapGridY = 8;
     
     // Main loop
     bool done = false;
@@ -107,8 +107,8 @@ void graphic::setup(){
         ImGui::NewFrame();
 
         if(show_display){
-            makeBackground(background, mapGridX, mapGridY);
-            //makeDisplay(image, character);
+            makeBackground(background, move, mapGridX, mapGridY);
+            makeDisplay(image, character);
         }
         
         if(show_process){
@@ -144,13 +144,47 @@ void graphic::setup(){
     SDL_Quit();
 }
 
-void graphic::makeBackground(imageHandler background, int gridX, int gridY){
+void graphic::makeBackground(imageHandler background, movementHandler move, int &gridX, int &gridY){
     ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
     ImGui::SetNextWindowPos({0, 0});
-    
+
+    static auto lastKeyEventTime = std::chrono::steady_clock::now();
+
+    // Get the current time
+    auto currentTime = std::chrono::steady_clock::now();
+
+    // Calculate the time elapsed since the last key event
+    auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastKeyEventTime).count();
+
+    // Define the cooldown duration between key events in milliseconds
+    const int cooldownMilliseconds = 1000; // 1 second cooldown
+
+
+    #ifdef IMGUI_DISABLE_OBSOLETE_KEYIO
+    struct funcs { static bool IsLegacyNativeDupe(ImGuiKey) { return false; } };
+            const ImGuiKey key_first = ImGuiKey_NamedKey_BEGIN;
+    #else
+        struct funcs { static bool IsLegacyNativeDupe(ImGuiKey key) { return key < 512 && ImGui::GetIO().KeyMap[key] != -1; } };
+        const ImGuiKey key_first = 0;
+    #endif
+
+    int keyDown = 0; // used to identify which direction the character is moving
+    for (ImGuiKey key = key_first; key < ImGuiKey_COUNT; key++)
+    {
+        if (elapsedTime >= cooldownMilliseconds) {
+            if (funcs::IsLegacyNativeDupe(key)) continue;
+
+            if(ImGui::IsKeyDown(ImGuiKey_UpArrow) || ImGui::IsKeyDown(ImGuiKey_W)) { keyDown = 1; }
+            else if(ImGui::IsKeyDown(ImGuiKey_DownArrow) || ImGui::IsKeyDown(ImGuiKey_S)) { keyDown = 2; }
+            else if(ImGui::IsKeyDown(ImGuiKey_RightArrow) || ImGui::IsKeyDown(ImGuiKey_D)) { keyDown = 3; }
+            else if(ImGui::IsKeyDown(ImGuiKey_LeftArrow) || ImGui::IsKeyDown(ImGuiKey_A)) { keyDown = 4; }
+            
+        }
+    }
+
     ImGui::Begin("Background", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);
     {
-        background.DrawImage(background);
+        move.mapMovement(keyDown, background, gridX, gridY);
     }
 
     ImGui::End();
@@ -192,8 +226,6 @@ void graphic::makeProcess(){
     ImGui::Begin("Processor Information", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
     {
  
-
- 
     }
     ImGui::End();
 }
@@ -201,7 +233,7 @@ void graphic::makeProcess(){
 void graphic::makeConfig(){
     // Config window calculation
     ImGui::SetNextWindowSize({(float)width_px / 2, (float)height_px / 2});
-    ImGui::SetNextWindowPos({0, height_px/2});
+    ImGui::SetNextWindowPos({0, (float)height_px/2});
 
     // Window - Config
     ImGui::Begin("Config", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);

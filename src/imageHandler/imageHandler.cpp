@@ -86,7 +86,19 @@ bool imageHandler::CreateAnimation(vector<string>& paths, vector<imageHandler*> 
 
 void imageHandler::DrawImage(imageHandler _image)
 {
-
-    ImGui::Image((void*)(intptr_t)_image.texture, ImVec2(_image.width, _image.height), ImVec2(0.0f,0.0f), ImVec2(0.5f,1.0f));
+    ImGui::Image((void*)(intptr_t)_image.texture, ImVec2(_image.width, _image.height));
 }
 
+void imageHandler::DrawMap(imageHandler _image, int tileX, int tileY, float width, float height){
+    //ImGui::Image((void*)(intptr_t)_image.texture, ImVec2(_image.width, _image.height));
+
+    float topLeft = (float)(tileX - 15)/ 42;
+    float topRight = (float)(tileY - 8) / 28;
+
+    float botLeft = (float)(tileX + 15)/ 42;
+    float botRight = (float)(tileY + 8) / 28;
+
+    ImGui::Image((void*)(intptr_t)_image.texture, ImVec2(width, height), ImVec2(topLeft, topRight), ImVec2(botLeft, botRight));
+
+    cout << botLeft << " " << botRight << endl;
+}

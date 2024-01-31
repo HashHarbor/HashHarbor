@@ -14,6 +14,8 @@
 #include <bits/stdc++.h>
 #include <opencv2/opencv.hpp>
 
+#include "../imageHandler/imageHandler.h"
+
 using namespace std;
 
 
@@ -27,6 +29,7 @@ public:
 
     movementHandler(string filepath);
     std::vector<std::vector<int>> getGrid();
+    void mapMovement(int key, imageHandler image, int &gridX, int &gridY);
 
 private:
     
