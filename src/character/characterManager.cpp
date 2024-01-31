@@ -18,9 +18,12 @@ using std::string;
 using std::vector;
 using std::cout;
 using std::endl;
+using std::pair;
 #else
 #include <bits/stdc++.h>
 #endif
+
+#include "../imageHandler/imageHandler.h"
 
 namespace ImGui { extern ImGuiKeyData* GetKeyData(ImGuiKey key); }
 
@@ -30,7 +33,7 @@ namespace ImGui { extern ImGuiKeyData* GetKeyData(ImGuiKey key); }
 
 characterManager::characterManager() {}
 
-void characterManager::createCharacter(std::string name, bool npc, bool fullMovement, imageHandler* imgHandler)
+void characterManager::createCharacter(string name, bool npc, bool fullMovement, imageHandler* imgHandler)
 {
     imagePath paths = imagePath(); // gets access to the class with all file paths
     auto charPath = paths.index.find(name); // get the character to create
@@ -38,18 +41,11 @@ void characterManager::createCharacter(std::string name, bool npc, bool fullMove
     {
         return;
     }
+    character* newChar = new character(name, fullMovement, 32.f, 64.f); // create the character
 
-    character* newChar = new character(name, fullMovement); // create the character
-
-    imgHandler->CreateAnimation(charPath->second.find("Idle")->second, newChar->idle);
-
-    if(fullMovement) // if character has full movement create the animations
-    {
-        imgHandler->CreateAnimation(charPath->second.find("Up")->second, newChar->walkUp);
-        imgHandler->CreateAnimation(charPath->second.find("Down")->second, newChar->walkDown);
-        imgHandler->CreateAnimation(charPath->second.find("Right")->second, newChar->walkRight);
-        imgHandler->CreateAnimation(charPath->second.find("Left")->second, newChar->walkLeft);
-    }
+    newChar->spriteSheet = new imageHandler();
+    string path = "/Users/david/CLionProjects/HashHarbor/assets/characters/Bob.png";
+    imgHandler->loadTexture(path.c_str(), newChar->spriteSheet);
 
     if(!npc)
         playerCharacters.emplace(name, newChar);
@@ -64,7 +60,6 @@ character* characterManager::getPlayerCharacter(string name)
     { //todo - delete print statement
         std::cout << "FAIL TO FIND BOB" << std::endl;
     }
-    cout << "I: " << find->idle.size()  << " |||| " << find->name<< endl;
     return find;
 }
 
@@ -107,23 +102,28 @@ void characterManager::moveMainCharacter(imageHandler* imgHandler, float frameTi
         else { keyDown = 0; }
     }
 
+    float factor = 1.f;
     switch(keyDown)
     {
-        
         case 1:
-            imgHandler->DrawImage(*mainPlayer->walkUp.at(frameCount_6));
+            imgHandler->DrawAniamtionFrame(*mainPlayer->spriteSheet, cordsWalkUp.at(frameCount_6), factor);
+            //imgHandler->DrawImage(*mainPlayer->walkUp.at(frameCount_6), factor);
             break;
         case 2:
-            imgHandler->DrawImage(*mainPlayer->walkDown.at(frameCount_6));
+            imgHandler->DrawAniamtionFrame(*mainPlayer->spriteSheet, cordsWalkDown.at(frameCount_6), factor);
+            //imgHandler->DrawImage(*mainPlayer->walkDown.at(frameCount_6),factor);
             break;
         case 3:
-            imgHandler->DrawImage(*mainPlayer->walkRight.at(frameCount_6));
+            imgHandler->DrawAniamtionFrame(*mainPlayer->spriteSheet, cordsWalkRight.at(frameCount_6), factor);
+            //imgHandler->DrawImage(*mainPlayer->walkRight.at(frameCount_6),factor);
             break;
         case 4:
-            imgHandler->DrawImage(*mainPlayer->walkLeft.at(frameCount_6));
+            imgHandler->DrawAniamtionFrame(*mainPlayer->spriteSheet, cordsWalkLeft.at(frameCount_6), factor);
+            //imgHandler->DrawImage(*mainPlayer->walkLeft.at(frameCount_6),factor);
             break;
         default:
-            imgHandler->DrawImage(*mainPlayer->idle.at(frameCount_4));
+            //imgHandler->DrawImage(*mainPlayer->idle.at(frameCount_4),factor);
+            imgHandler->DrawAniamtionFrame(*mainPlayer->spriteSheet, cordsIdle.at(frameCount_6), factor);
             break;
     }
 

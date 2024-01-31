@@ -2,10 +2,10 @@
 
 #define GL_SILENCE_DEPRECATION
 
-#include "imgui.h"
+#include "../../imgui/imgui.h"
 //#include "../backends/imgui_impl_glfw.h"
 #include "SDL2/SDL.h"
-#include "imgui_impl_opengl3.h"
+#include "../../backends/imgui_impl_opengl3.h"
 
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
@@ -33,16 +33,22 @@ public:
     string name; // character name used for identification
     bool fullMovement; // used to differentiate player or npc that needs all animations and npc that just idles
     /* --- Animation Frames --- */
-    vector<imageHandler*> idle;
-    vector<imageHandler*> walkUp;
-    vector<imageHandler*> walkDown;
-    vector<imageHandler*> walkRight;
-    vector<imageHandler*> walkLeft;
+    //vector<imageHandler*> idle;
+    //vector<imageHandler*> walkUp;
+    //vector<imageHandler*> walkDown;
+    //vector<imageHandler*> walkRight;
+    //vector<imageHandler*> walkLeft;
 
-    character(string name, bool fullMovement)
+    imageHandler* spriteSheet;
+    float spriteWidth;
+    float spriteHeight;
+
+    character(string name, bool fullMovement, float width, float height)
     {
         this->name = name;
         this->fullMovement = fullMovement;
+        this->spriteWidth = width;
+        this->spriteHeight = height;
     }
 };
 
@@ -52,6 +58,47 @@ class characterManager
     map<string, character*> npcCharacters; // stores all npc characters
 
     character* mainPlayer; // stores a pointer to the main player character to reduce map finds
+
+    vector<pair<ImVec2,ImVec2>> cordsIdle = {
+            {ImVec2(0.f / 192.f, 0.f/320.f),ImVec2(32.f/192.f, 64.f/320.f)},
+            {ImVec2(32.f / 192.f, 0.f/320.f),ImVec2(64.f/192.f, 64.f/320.f)},
+            {ImVec2(64.f / 192.f, 0.f/320.f),ImVec2(96.f/192.f, 64.f/320.f)},
+            {ImVec2(96.f / 192.f, 0.f/320.f),ImVec2(128.f/192.f, 64.f/320.f)},
+            {ImVec2(128.f / 192.f, 0.f/320.f),ImVec2(160.f/192.f, 64.f/320.f)},
+             {ImVec2(160.f / 192.f, 0.f/320.f),ImVec2(192.f/192.f, 64.f/320.f)}
+    };
+    vector<pair<ImVec2,ImVec2>> cordsWalkUp = {
+            {ImVec2(0.f / 192.f, 64.f/320.f),ImVec2(32.f/192.f, 128.f/320.f)},
+            {ImVec2(32.f / 192.f, 64.f/320.f),ImVec2(64.f/192.f, 128.f/320.f)},
+            {ImVec2(64.f / 192.f, 64.f/320.f),ImVec2(96.f/192.f, 128.f/320.f)},
+            {ImVec2(96.f / 192.f, 64.f/320.f),ImVec2(128.f/192.f, 128.f/320.f)},
+            {ImVec2(128.f / 192.f, 64.f/320.f),ImVec2(160.f/192.f, 128.f/320.f)},
+            {ImVec2(160.f / 192.f, 64.f/320.f),ImVec2(192.f/192.f, 128.f/320.f)}
+    };
+    vector<pair<ImVec2,ImVec2>> cordsWalkDown = {
+            {ImVec2(0.f / 192.f, 128.f/320.f),ImVec2(32.f/192.f, 192.f/320.f)},
+            {ImVec2(32.f / 192.f, 128.f/320.f),ImVec2(64.f/192.f, 192.f/320.f)},
+            {ImVec2(64.f / 192.f, 128.f/320.f),ImVec2(96.f/192.f, 192.f/320.f)},
+            {ImVec2(96.f / 192.f, 128.f/320.f),ImVec2(128.f/192.f, 192.f/320.f)},
+            {ImVec2(128.f / 192.f, 128.f/320.f),ImVec2(160.f/192.f, 192.f/320.f)},
+            {ImVec2(160.f / 192.f, 128.f/320.f),ImVec2(192.f/192.f, 192.f/320.f)}
+    };
+    vector<pair<ImVec2,ImVec2>> cordsWalkRight = {
+            {ImVec2(0.f / 192.f, 192.f/320.f),ImVec2(32.f/192.f, 256.f/320.f)},
+            {ImVec2(32.f / 192.f, 192.f/320.f),ImVec2(64.f/192.f, 256.f/320.f)},
+            {ImVec2(64.f / 192.f, 192.f/320.f),ImVec2(96.f/192.f, 256.f/320.f)},
+            {ImVec2(96.f / 192.f, 192.f/320.f),ImVec2(128.f/192.f, 256.f/320.f)},
+            {ImVec2(128.f / 192.f, 192.f/320.f),ImVec2(160.f/192.f, 256.f/320.f)},
+            {ImVec2(160.f / 192.f, 192.f/320.f),ImVec2(192.f/192.f, 256.f/320.f)}
+    };
+    vector<pair<ImVec2,ImVec2>> cordsWalkLeft = {
+            {ImVec2(0.f / 192.f, 256.f/320.f),ImVec2(32.f/192.f, 320.f/320.f)},
+            {ImVec2(32.f / 192.f, 256.f/320.f),ImVec2(64.f/192.f, 320.f/320.f)},
+            {ImVec2(64.f / 192.f, 256.f/320.f),ImVec2(96.f/192.f, 320.f/320.f)},
+            {ImVec2(96.f / 192.f, 256.f/320.f),ImVec2(128.f/192.f, 320.f/320.f)},
+            {ImVec2(128.f / 192.f, 256.f/320.f),ImVec2(160.f/192.f, 320.f/320.f)},
+            {ImVec2(160.f / 192.f, 256.f/320.f),ImVec2(192.f/192.f, 320.f/320.f)}
+    };
 
     int frameCount_4 = 0; // animation control for 4 frame
     int frameCount_6 = 0; // animation control for 6 frame

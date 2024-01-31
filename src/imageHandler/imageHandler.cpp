@@ -75,30 +75,20 @@ bool imageHandler::loadTexture(const char *filename, imageHandler* image){
     image->height = image_height;
 
     return true;
-
-}
-
-bool imageHandler::CreateAnimation(vector<string>& paths, vector<imageHandler*> &frames)
-{
-    imagePath abs = imagePath();
-    for(int i = 0; i < paths.size(); i++)
-    {
-        imageHandler* frame = new imageHandler();
-
-        string absolute = abs.absolutePath + paths.at(i);
-
-        //cout << absolute << endl;
-
-        bool ret = imageHandler::loadTexture(absolute.c_str(), frame);
-        IM_ASSERT(ret);
-
-        frames.push_back(frame);
-    }
-    return true;
 }
 
 void imageHandler::DrawImage(imageHandler _image)
 {
     ImGui::Image((void*)(intptr_t)_image.texture, ImVec2(_image.width, _image.height));
+}
+
+void imageHandler::DrawImage(imageHandler& _image, float scaleFactor)
+{
+    ImGui::Image((void*)(intptr_t)_image.texture, ImVec2((_image.width * scaleFactor), (_image.height * scaleFactor)));
+}
+
+void imageHandler::DrawAniamtionFrame(imageHandler _image, pair<ImVec2,ImVec2> cords, float scaleFactor)
+{
+    ImGui::Image((void*)(intptr_t)_image.texture, ImVec2((32.f * scaleFactor), (64.f * scaleFactor)),cords.first, cords.second);
 }
 

@@ -18,6 +18,7 @@ using std::string;
 using std::vector;
 using std::cout;
 using std::endl;
+using std::pair;
 #else
 #include <bits/stdc++.h>
 #endif
@@ -153,7 +154,7 @@ void graphic::makeDisplay(imageHandler image, characterManager &character){
     ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
     ImGui::SetNextWindowPos({0, 0});
 
-    const float frameLength = 2.5f / 10.f; // In seconds, so 4 FPS
+    const float frameLength = 1.f / 10.f; // In seconds, so  FPS
     static float frameTimer = frameLength;
 
     // Window - Graphics

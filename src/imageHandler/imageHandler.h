@@ -16,6 +16,7 @@
 #include <vector>
 using std::cout;
 using std::endl;
+using std::pair;
 #else
 #include <bits/stdc++.h>
 #endif
@@ -38,6 +39,7 @@ public:
     imageHandler(GLuint texture, int width, int height);
 
     bool loadTexture(const char *filename, imageHandler* image);
-    bool CreateAnimation(vector<string>& paths, vector <imageHandler*> &frames);
     void DrawImage(imageHandler _image);
+    void DrawImage(imageHandler& _image, float scaleFactor);
+    void DrawAniamtionFrame(imageHandler _image, pair<ImVec2,ImVec2> cords, float scaleFactor);
 };
