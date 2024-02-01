@@ -35,16 +35,17 @@ characterManager::characterManager() {}
 
 void characterManager::createCharacter(string name, bool npc, bool fullMovement, imageHandler* imgHandler)
 {
-    imagePath paths = imagePath(); // gets access to the class with all file paths
-    auto charPath = paths.index.find(name); // get the character to create
-    if(charPath == paths.index.end())
+    imagePath imgPath = imagePath(); // gets access to the class with all file paths
+    auto charPath = imgPath.charIndex.find(name); // get the character to create
+    if(charPath == imgPath.charIndex.end())
     {
+        cout << "NOT FOUND" << endl;
         return;
     }
-    character* newChar = new character(name, fullMovement, 32.f, 64.f); // create the character
+    string path = imgPath.absolutePath + charPath->second;
 
+    character* newChar = new character(name, fullMovement, 32.f, 64.f); // create the character
     newChar->spriteSheet = new imageHandler();
-    string path = "/Users/david/CLionProjects/HashHarbor/assets/characters/Bob.png";
     imgHandler->loadTexture(path.c_str(), newChar->spriteSheet);
 
     if(!npc)
@@ -102,7 +103,7 @@ void characterManager::moveMainCharacter(imageHandler* imgHandler, float frameTi
         else { keyDown = 0; }
     }
 
-    float factor = 1.f;
+    float factor = 3.f;
     switch(keyDown)
     {
         case 1:

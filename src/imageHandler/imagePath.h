@@ -60,4 +60,30 @@ public:
     map<string, map<string, vector<string>>> index = {
             {"Bob", Bob}
     };
+    map<string, string> charIndex = {
+            {"Bob", "assets/characters/Bob.png"},
+            {"1", "assets/characters/1.png"},
+            {"2", "assets/characters/2.png"},
+            {"3", "assets/characters/3.png"},
+            {"4", "assets/characters/4.png"},
+            {"5", "assets/characters/5.png"},
+            {"6", "assets/characters/6.png"},
+            {"7", "assets/characters/7.png"},
+            {"8", "assets/characters/8.png"},
+            {"9", "assets/characters/9.png"},
+            {"10", "assets/characters/10.png"},
+            {"11", "assets/characters/11.png"},
+            {"12", "assets/characters/12.png"},
+            {"13", "assets/characters/13.png"},
+            {"14", "assets/characters/14.png"},
+            {"15", "assets/characters/15.png"},
+            {"16", "assets/characters/16.png"},
+            {"17", "assets/characters/17.png"},
+            {"18", "assets/characters/18.png"},
+            {"19", "assets/characters/19.png"},
+            {"20", "assets/characters/20.png"},
+            {"21", "assets/characters/21.png"},
+            {"22", "assets/characters/22.png"},
+            {"23", "assets/characters/23.png"}
+    };
 };

@@ -83,11 +83,10 @@ void graphic::setup(){
     imageHandler image = imageHandler();
     characterManager character = characterManager();
 
-    character.createCharacter("Bob", false, true, &image);
-    character.setMainPlayer("Bob");
+    character.createCharacter("7", false, true, &image);
+    character.setMainPlayer("7");
 
-    
-    
+
     // Main loop
     bool done = false;
     while (!done)
