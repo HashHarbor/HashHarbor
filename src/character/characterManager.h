@@ -59,6 +59,7 @@ class characterManager
 
     character* mainPlayer; // stores a pointer to the main player character to reduce map finds
 
+    // ----- Hardcoded Coordinates for Character Drawing ONLY ------ //
     vector<pair<ImVec2,ImVec2>> cordsIdle = {
             {ImVec2(0.f / 192.f, 0.f/320.f),ImVec2(32.f/192.f, 64.f/320.f)},
             {ImVec2(32.f / 192.f, 0.f/320.f),ImVec2(64.f/192.f, 64.f/320.f)},
@@ -120,5 +121,4 @@ public:
     // can be used to change the players character after game started
     void moveMainCharacter(imageHandler* imgHandler, float frameTimer);
     // used to move the main character based on keyboard input
-
 };

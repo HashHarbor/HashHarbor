@@ -92,3 +92,17 @@ void imageHandler::DrawAniamtionFrame(imageHandler _image, pair<ImVec2,ImVec2> c
     ImGui::Image((void*)(intptr_t)_image.texture, ImVec2((32.f * scaleFactor), (64.f * scaleFactor)),cords.first, cords.second);
 }
 
+pair<ImVec2, ImVec2> imageHandler::generateCords(int animation, int frame, float spriteWidth, float spriteHeight, float imageWidth, float imageHeight)
+{
+    float minX = ((float)frame * spriteWidth);
+    float minY = ((float)animation * spriteHeight);
+    float maxX = (minX + spriteWidth) / imageWidth;
+    float maxY = (minY + spriteHeight) / imageHeight;
+
+    minX /= imageWidth;
+    minY /= imageHeight;
+
+    return make_pair(ImVec2(minX,minY), ImVec2(maxX,maxY));
+    // Example if character: imgHandler->generateCords(1,frameCount_6,32.f,64.f,192.f,320.f)
+}
+
