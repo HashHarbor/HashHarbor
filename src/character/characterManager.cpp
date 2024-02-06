@@ -103,27 +103,22 @@ void characterManager::moveMainCharacter(imageHandler* imgHandler, float frameTi
         else { keyDown = 0; }
     }
 
-    float factor = 3.f;
+    float factor = 1.f;
     switch(keyDown)
     {
         case 1:
             imgHandler->DrawAniamtionFrame(*mainPlayer->spriteSheet, cordsWalkUp.at(frameCount_6), factor);
-            //imgHandler->DrawImage(*mainPlayer->walkUp.at(frameCount_6), factor);
             break;
         case 2:
             imgHandler->DrawAniamtionFrame(*mainPlayer->spriteSheet, cordsWalkDown.at(frameCount_6), factor);
-            //imgHandler->DrawImage(*mainPlayer->walkDown.at(frameCount_6),factor);
             break;
         case 3:
             imgHandler->DrawAniamtionFrame(*mainPlayer->spriteSheet, cordsWalkRight.at(frameCount_6), factor);
-            //imgHandler->DrawImage(*mainPlayer->walkRight.at(frameCount_6),factor);
             break;
         case 4:
             imgHandler->DrawAniamtionFrame(*mainPlayer->spriteSheet, cordsWalkLeft.at(frameCount_6), factor);
-            //imgHandler->DrawImage(*mainPlayer->walkLeft.at(frameCount_6),factor);
             break;
         default:
-            //imgHandler->DrawImage(*mainPlayer->idle.at(frameCount_4),factor);
             imgHandler->DrawAniamtionFrame(*mainPlayer->spriteSheet, cordsIdle.at(frameCount_6), factor);
             break;
     }
@@ -135,7 +130,4 @@ void characterManager::moveMainCharacter(imageHandler* imgHandler, float frameTi
         if (frameCount_4 % 4 == 0) frameCount_4=0;
         if (frameCount_6 % 6 == 0) frameCount_6=0;
     }
-
-    //todo - remove on screen key printout
-    //ImGui::Text("Keys down:"); for (ImGuiKey key = key_first; key < ImGuiKey_COUNT; key++) { if (funcs::IsLegacyNativeDupe(key)) continue; if (ImGui::IsKeyDown(key)) { ImGui::SameLine(); ImGui::Text("\"%s\" %d (%.02f secs)", ImGui::GetKeyName(key), key, ImGui::GetKeyData(key)->DownDuration); } }
 }

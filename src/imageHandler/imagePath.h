@@ -62,7 +62,7 @@ public:
     };
     map<string, string> charIndex = {
             {"Bob", "assets/characters/Bob.png"},
-            {"1", "assets/characters/1.png"},
+            {"1", "assets/characters/Jake.png"},
             {"2", "assets/characters/2.png"},
             {"3", "assets/characters/3.png"},
             {"4", "assets/characters/4.png"},
