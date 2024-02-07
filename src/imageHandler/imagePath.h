@@ -48,4 +48,39 @@ public:
             {"22", "assets/npc/22.png"},
             {"23", "assets/npc/23.png"},
     };
+
+    map<string, string> accessories ={
+            {"backpack_5","assets/characters/accessories/backpack_5.png"},
+            {"beanie_1","assets/characters/accessories/beanie_1.png"},
+            {"beard_1","assets/characters/accessories/beard_1.png"},
+            {"chef_1","assets/characters/accessories/chef_1.png"},
+            {"dinohat_3","assets/characters/accessories/dinohat_3.png"}
+    };
+    map<string, string> body ={
+            {"body_1","assets/characters/body/body_1.png"},
+            {"body_2","assets/characters/body/body_2.png"},
+            {"body_3","assets/characters/body/body_3.png"},
+            {"body_4","assets/characters/body/body_4.png"}
+    };
+    map<string, string> eyes ={
+            {"eyes_2","assets/characters/eyes/eyes_2.png"},
+            {"eyes_4","assets/characters/eyes/eyes_4.png"},
+            {"eyes_7","assets/characters/eyes/eyes_7.png"}
+    };
+    map<string, string> hairstyle ={
+            {"hairstyle_1_2","assets/characters/hairstyle/hairstyle_1_2.png"},
+            {"hairstyle_3_2","assets/characters/hairstyle/hairstyle_3_2.png"},
+            {"hairstyle_4_2","assets/characters/hairstyle/hairstyle_4_2.png"},
+            {"hairstyle_9_3","assets/characters/hairstyle/hairstyle_9_3.png"},
+            {"hairstyle_11_1","assets/characters/hairstyle/hairstyle_11_1.png"},
+            {"hairstyle_12_7","assets/characters/hairstyle/hairstyle_12_7.png"},
+            {"hairstyle_19_6","assets/characters/hairstyle/hairstyle_19_6.png"}
+    };
+    map<string, string> outfits ={
+            {"outfit_1_1","assets/characters/outfits/outfit_1_1.png"},
+            {"outfit_2_1","assets/characters/outfits/outfit_2_1.png"},
+            {"outfit_4_1","assets/characters/outfits/outfit_4_1.png"},
+            {"outfit_10_1","assets/characters/outfits/outfit_10_1.png"},
+            {"outfit_24_1","assets/characters/outfits/outfit_24_1.png"}
+    };
 };
