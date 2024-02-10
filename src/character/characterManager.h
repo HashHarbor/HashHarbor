@@ -32,12 +32,6 @@ struct character
 public:
     string name; // character name used for identification
     bool fullMovement; // used to differentiate player or npc that needs all animations and npc that just idles
-    /* --- Animation Frames --- */
-    //vector<imageHandler*> idle;
-    //vector<imageHandler*> walkUp;
-    //vector<imageHandler*> walkDown;
-    //vector<imageHandler*> walkRight;
-    //vector<imageHandler*> walkLeft;
 
     imageHandler* spriteSheet;
     float spriteWidth;
@@ -104,6 +98,7 @@ class characterManager
     int frameCount_4 = 0; // animation control for 4 frame
     int frameCount_6 = 0; // animation control for 6 frame
 public:
+    ImVec2 drawPos;
     characterManager();
 
     void createCharacter(string name, bool npc, bool fullMovement, imageHandler* imgHandler);

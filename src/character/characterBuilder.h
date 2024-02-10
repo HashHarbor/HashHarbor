@@ -38,25 +38,37 @@ class characterBuilder
     vector<imageHandler*> body;
     vector<imageHandler*> eyes;
     vector<imageHandler*> outfit;
-    vector<imageHandler*> hair;
+    vector<vector<imageHandler*>> hair;
     vector<imageHandler*> accessories;
 
-    int indexBody;
-    int indexEyes;
-    int indexOutfit;
-    int indexHair;
-    int indexAccessories;
+    int indexBody = 0;
+    int indexEyes = 0;
+    int indexOutfit = 0;
+    int indexHair = 0;
+    int indexHairColor = 0;
+    int indexAccessories = 0;
+
+    int frameCount_4 = 0;
+
+    vector<pair<ImVec2,ImVec2>> cordsAnim = {
+            {ImVec2(0.f / 192.f, 0.f/320.f),ImVec2(32.f/192.f, 64.f/320.f)},
+            {ImVec2(160.f / 192.f, 256.f/320.f),ImVec2(192.f/192.f, 320.f/320.f)},
+            {ImVec2(64.f / 192.f, 64.f/320.f),ImVec2(96.f/192.f, 128.f/320.f)},
+            {ImVec2(160.f / 192.f, 192.f/320.f),ImVec2(192.f/192.f, 256.f/320.f)}
+    };
 public:
-    characterBuilder();
+    ImVec2 drawPos;
 
-    void drawDynamicCharacter();
-    // function to draw everything
+    characterBuilder(imageHandler* imgHandler);
+        // ONLY CONSTRUCT ONCE BECAUSE IT WILL USE A LOT OF VRAM DUE TO LARGE ASSET AMOUNT BEING LOADED
 
-    void changeBody();
-    void changeEyes();
-    void chnageOutfit();
-    void changeHair();
-    void changeAccessorie();
+    void changeBody(int i);
+    void changeEyes(int i);
+    void changeOutfit(int i);
+    void changeHair(int i);
+    void changeHairColor(int i);
+    void changeAccessories(int i);
+    void drawCharacterBuilder(imageHandler* imgHandler, float frameTimer);
 
     void setAsMainCharacter();
 };
