@@ -203,9 +203,8 @@ void characterBuilder::changeHairColor(int i)
     }
 }
 
-void characterBuilder::drawCharacterBuilder(imageHandler* imgHandler, float frameTimer)
+void characterBuilder::drawCharacter(imageHandler *imgHandler, float frameTimer)
 {
-    cout <<  "Body: " <<indexBody <<  " Eyes: " << indexEyes <<  " Outfit: " << indexOutfit <<  " Hair: " << indexHair <<  " Accessories: " << indexAccessories << endl;
     float factor = 4.f;
 
     ImGui::SetCursorPos(drawPos);
@@ -234,4 +233,157 @@ void characterBuilder::drawCharacterBuilder(imageHandler* imgHandler, float fram
         frameCount_4 ++;
         if (frameCount_4 % 4 == 0) frameCount_4=0;
     }
+}
+void characterBuilder::drawHairControls()
+{
+    ImGui::SetCursorPos(ImVec2(50.f,342.f));
+    ImGui::Text("Hair       ");
+    ImGui::SameLine();
+    ImGui::PushButtonRepeat(true);
+    if (ImGui::ArrowButton("##Hleft", ImGuiDir_Left)) { changeHair(0); }
+    ImGui::SameLine(0.0f, 15.f);
+    if (ImGui::ArrowButton("##Hright", ImGuiDir_Right)) { changeHair(1); }
+    ImGui::PopButtonRepeat();
+
+    // hairstyle_x_1
+    ImGui::SetCursorPos(ImVec2(30.f,372.f));
+    ImGui::PushID(1);
+    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(31.f / 360.f, 0.648f, 0.702f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(32.f / 360.f, 0.564f, 0.8f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(25.f / 360.f, 0.684f, 0.671f));
+    if(ImGui::Button("  "))
+    {
+        changeHairColor(0);
+    }
+    ImGui::PopStyleColor(3);
+    ImGui::PopID();
+
+    // hairstyle_x_2
+    ImGui::SetCursorPos(ImVec2(60.f,372.f));
+    ImGui::PushID(2);
+    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(30.f / 360.f, 0.463f, 0.584f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(31.f / 360.f, 0.495f, 0.729f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(20.f / 360.f, 0.406f, 0.541f));
+    if(ImGui::Button("  "))
+    {
+        changeHairColor(1);
+    }
+    ImGui::PopStyleColor(3);
+    ImGui::PopID();
+
+    // hairstyle_x_3
+    ImGui::SetCursorPos(ImVec2(90.f,372.f));
+    ImGui::PushID(3);
+    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(12.f / 360.f, 0.43f, 0.502f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(19.f / 360.f, 0.403f, 0.525f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(12.f / 360.f, 0.439f, 0.447f));
+    if(ImGui::Button("  "))
+    {
+        changeHairColor(2);
+    }
+    ImGui::PopStyleColor(3);
+    ImGui::PopID();
+
+    // hairstyle_x_4
+    ImGui::SetCursorPos(ImVec2(120.f,372.f));
+    ImGui::PushID(4);
+    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(8.f / 360.f, 0.291f, 0.404f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(17.f / 360.f, 0.342f, 0.435f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(8.f / 360.f, 0.264f, 0.357f));
+    if(ImGui::Button("  "))
+    {
+        changeHairColor(3);
+    }
+    ImGui::PopStyleColor(3);
+    ImGui::PopID();
+
+    // hairstyle_x_5
+    ImGui::SetCursorPos(ImVec2(150.f,372.f));
+    ImGui::PushID(5);
+    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(60.f / 360.f, 0.007f, 0.588f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(60.f / 360.f, 0.012f, 0.635f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(30.f / 360.f, 0.015f, 0.537f));
+    if(ImGui::Button("  "))
+    {
+        changeHairColor(4);
+    }
+    ImGui::PopStyleColor(3);
+    ImGui::PopID();
+
+    // hairstyle_x_6
+    ImGui::SetCursorPos(ImVec2(180.f,372.f));
+    ImGui::PushID(6);
+    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(30.f / 360.f, 0.083f, 0.475f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(40.f / 360.f, 0.175f, 0.537f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(14.f / 360.f, 0.116f, 0.439f));
+    if(ImGui::Button("  "))
+    {
+        changeHairColor(5);
+    }
+    ImGui::PopStyleColor(3);
+    ImGui::PopID();
+
+    // hairstyle_x_7
+    ImGui::SetCursorPos(ImVec2(210.f,372.f));
+    ImGui::PushID(7);
+    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
+    if(ImGui::Button("  "))
+    {
+        changeHairColor(6);
+    }
+    ImGui::PopStyleColor(3);
+    ImGui::PopID();
+}
+void characterBuilder::drawBodyEyeContorl()
+{
+    ImGui::SetCursorPos(ImVec2(50.f,138.f));
+    ImGui::Text("Body       ");
+    ImGui::SameLine();
+    ImGui::PushButtonRepeat(true);
+    if (ImGui::ArrowButton("##bodyLEFT", ImGuiDir_Left)) { changeBody(0); }
+    ImGui::SameLine(0.0f, 15.f);
+    if (ImGui::ArrowButton("##bodyRIGHT", ImGuiDir_Right)) { changeBody(1); }
+    ImGui::PopButtonRepeat();
+
+    ImGui::SetCursorPos(ImVec2(50.f,206.f));
+    ImGui::Text("Eyes       ");
+    ImGui::SameLine();
+    ImGui::PushButtonRepeat(true);
+    if (ImGui::ArrowButton("##Eleft", ImGuiDir_Left)) { changeEyes(0); }
+    ImGui::SameLine(0.0f, 15.f);
+    if (ImGui::ArrowButton("##Eright", ImGuiDir_Right)) { changeEyes(1); }
+    ImGui::PopButtonRepeat();
+}
+void characterBuilder::drawOutfitControls()
+{
+    ImGui::SetCursorPos(ImVec2(50.f,274.f));
+    ImGui::Text("Outfit     ");
+    ImGui::SameLine();
+    ImGui::PushButtonRepeat(true);
+    if (ImGui::ArrowButton("##Oleft", ImGuiDir_Left)) { changeOutfit(0); }
+    ImGui::SameLine(0.0f, 15.f);
+    if (ImGui::ArrowButton("##Oright", ImGuiDir_Right)) { changeOutfit(1); }
+    ImGui::PopButtonRepeat();
+}
+void characterBuilder::drawAccessoriesControl()
+{
+    ImGui::SetCursorPos(ImVec2(50.f,70.f));
+    ImGui::Text("Accessories");
+    ImGui::SameLine();
+    ImGui::PushButtonRepeat(true);
+    if (ImGui::ArrowButton("##accessorieLEFT", ImGuiDir_Left)) { changeAccessories(0); }
+    ImGui::SameLine(0.0f, 15.f);
+    if (ImGui::ArrowButton("##accessorieRIGHT", ImGuiDir_Right)) { changeAccessories(1); }
+    ImGui::PopButtonRepeat();
+}
+
+void characterBuilder::drawCharacterBuilder(imageHandler* imgHandler, float frameTimer)
+{
+    drawCharacter(imgHandler,frameTimer);
+    drawAccessoriesControl();
+    drawBodyEyeContorl();
+    drawOutfitControls();
+    drawHairControls();
 }

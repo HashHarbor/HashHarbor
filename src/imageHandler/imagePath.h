@@ -60,11 +60,20 @@ public:
             {"assets/characters/body/body_1.png"},
             {"assets/characters/body/body_2.png"},
             {"assets/characters/body/body_3.png"},
-            {"assets/characters/body/body_4.png"}
+            {"assets/characters/body/body_4.png"},
+            {"assets/characters/body/body_5.png"},
+            {"assets/characters/body/body_6.png"},
+            {"assets/characters/body/body_7.png"},
+            {"assets/characters/body/body_8.png"},
+            {"assets/characters/body/body_9.png"}
     };
     vector<string> eyes ={
+            {"assets/characters/eyes/eyes_1.png"},
             {"assets/characters/eyes/eyes_2.png"},
+            {"assets/characters/eyes/eyes_3.png"},
             {"assets/characters/eyes/eyes_4.png"},
+            {"assets/characters/eyes/eyes_5.png"},
+            {"assets/characters/eyes/eyes_6.png"},
             {"assets/characters/eyes/eyes_7.png"}
     };
     map<int, vector<string>> hairstyle ={

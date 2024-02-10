@@ -43,9 +43,13 @@ class characterBuilder
 
     int indexBody = 0;
     int indexEyes = 0;
+
     int indexOutfit = 0;
+    int indexOutfitColor = 0;
+
     int indexHair = 0;
     int indexHairColor = 0;
+
     int indexAccessories = 0;
 
     int frameCount_4 = 0;
@@ -56,6 +60,12 @@ class characterBuilder
             {ImVec2(64.f / 192.f, 64.f/320.f),ImVec2(96.f/192.f, 128.f/320.f)},
             {ImVec2(160.f / 192.f, 192.f/320.f),ImVec2(192.f/192.f, 256.f/320.f)}
     };
+
+    void drawCharacter(imageHandler* imgHandler, float frameTimer);
+    void drawBodyEyeContorl();
+    void drawHairControls();
+    void drawOutfitControls();
+    void drawAccessoriesControl();
 public:
     ImVec2 drawPos;
 
