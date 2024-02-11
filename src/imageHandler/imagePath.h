@@ -128,10 +128,18 @@ public:
                          "assets/characters/hairstyle/hairstyle_19_7.png"}}
     };
     map<int, vector<string>> outfits ={
-            {1, {"assets/characters/outfits/outfit_1_1.png"}},
-            {2, {"assets/characters/outfits/outfit_2_1.png"}},
+            {1, {"assets/characters/outfits/outfit_1_1.png",
+                        "assets/characters/outfits/outfit_1_2.png",
+                        "assets/characters/outfits/outfit_1_3.png"}},
+            {2, {"assets/characters/outfits/outfit_2_1.png",
+                        "assets/characters/outfits/outfit_2_2.png",
+                        "assets/characters/outfits/outfit_2_3.png",
+                        "assets/characters/outfits/outfit_2_4.png"}},
             {4, {"assets/characters/outfits/outfit_4_1.png"}},
             {10, {"assets/characters/outfits/outfit_10_1.png"}},
-            {24, {"assets/characters/outfits/outfit_24_1.png"}}
+            {24, {"assets/characters/outfits/outfit_24_1.png",
+                         "assets/characters/outfits/outfit_24_2.png",
+                         "assets/characters/outfits/outfit_24_3.png",
+                         "assets/characters/outfits/outfit_24_4.png"}}
     };
 };

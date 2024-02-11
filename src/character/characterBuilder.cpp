@@ -37,7 +37,8 @@ characterBuilder::characterBuilder(imageHandler* imgHandler)
         imageHandler* img = new imageHandler();
 
         string path = imgPath.absolutePath + iter;
-        imgHandler->loadTexture(path.c_str(), img);
+        bool ret = imgHandler->loadTexture(path.c_str(), img);
+        IM_ASSERT(ret);
         body.push_back(img);
     }
     cout << "---Body: " << body.size() << endl;
@@ -46,23 +47,31 @@ characterBuilder::characterBuilder(imageHandler* imgHandler)
     {
         imageHandler* img = new imageHandler();
         string path = imgPath.absolutePath + iter;
-        imgHandler->loadTexture(path.c_str(), img);
+        bool ret = imgHandler->loadTexture(path.c_str(), img);
+        IM_ASSERT(ret);
         eyes.push_back(img);
     }
     cout << "---Eyes: " << eyes.size() << endl;
 
     for(auto & iter : imgPath.outfits)
     {
+        vector<imageHandler*> temp;
         for(auto & jter : iter.second)
         {
             imageHandler* img = new imageHandler();
             string path = imgPath.absolutePath + jter;
-            imgHandler->loadTexture(path.c_str(), img);
-            outfit.push_back(img);
+            bool ret = imgHandler->loadTexture(path.c_str(), img);
+            IM_ASSERT(ret);
+            temp.push_back(img);
         }
+        outfit.push_back(temp);
     }
 
     cout << "---Outfit: " << outfit.size() << endl;
+    for(int i = 0; i < outfit.size(); i++)
+    {
+        cout << "------" << i << ": " << outfit.at(i).size() << endl;
+    }
 
     for(auto & iter : imgPath.hairstyle)
     {
@@ -71,7 +80,8 @@ characterBuilder::characterBuilder(imageHandler* imgHandler)
         {
             imageHandler* img = new imageHandler();
             string path = imgPath.absolutePath + jter;
-            imgHandler->loadTexture(path.c_str(), img);
+            bool ret = imgHandler->loadTexture(path.c_str(), img);
+            IM_ASSERT(ret);
             temp.push_back(img);
         }
         hair.push_back(temp);
@@ -90,7 +100,8 @@ characterBuilder::characterBuilder(imageHandler* imgHandler)
         {
             imageHandler* img = new imageHandler();
             string path = imgPath.absolutePath + jter;
-            imgHandler->loadTexture(path.c_str(), img);
+            bool ret = imgHandler->loadTexture(path.c_str(), img);
+            IM_ASSERT(ret);
             accessories.push_back(img);
         }
     }
@@ -202,6 +213,13 @@ void characterBuilder::changeHairColor(int i)
         indexHairColor = i;
     }
 }
+void characterBuilder::changeOutfitColor(int i)
+{
+    if(i < outfit.at(indexOutfit).size())
+    {
+        indexOutfitColor = i;
+    }
+}
 
 void characterBuilder::drawCharacter(imageHandler *imgHandler, float frameTimer)
 {
@@ -214,7 +232,7 @@ void characterBuilder::drawCharacter(imageHandler *imgHandler, float frameTimer)
     imgHandler->DrawAniamtionFrame(*eyes.at(indexEyes), cordsAnim.at(frameCount_4), factor); // eyes
 
     ImGui::SetCursorPos(drawPos);
-    imgHandler->DrawAniamtionFrame(*outfit.at(indexOutfit), cordsAnim.at(frameCount_4), factor); // outfit
+    imgHandler->DrawAniamtionFrame(*outfit.at(indexOutfit).at(indexOutfitColor), cordsAnim.at(frameCount_4), factor); // outfit
 
     if(indexHair != hair.size())
     {
@@ -336,7 +354,7 @@ void characterBuilder::drawHairControls()
     ImGui::PopStyleColor(3);
     ImGui::PopID();
 }
-void characterBuilder::drawBodyEyeContorl()
+void characterBuilder::drawBodyEyeControl()
 {
     ImGui::SetCursorPos(ImVec2(50.f,138.f));
     ImGui::Text("Body       ");
@@ -362,10 +380,36 @@ void characterBuilder::drawOutfitControls()
     ImGui::Text("Outfit     ");
     ImGui::SameLine();
     ImGui::PushButtonRepeat(true);
-    if (ImGui::ArrowButton("##Oleft", ImGuiDir_Left)) { changeOutfit(0); }
+    if (ImGui::ArrowButton("##Oleft", ImGuiDir_Left))
+    {
+        changeOutfit(0);
+        indexOutfitColor = 0;
+    }
     ImGui::SameLine(0.0f, 15.f);
-    if (ImGui::ArrowButton("##Oright", ImGuiDir_Right)) { changeOutfit(1); }
+    if (ImGui::ArrowButton("##Oright", ImGuiDir_Right))
+    {
+        changeOutfit(1);
+        indexOutfitColor = 0;
+    }
     ImGui::PopButtonRepeat();
+
+    for(int i = 0; i < outfit.at(indexOutfit).size(); i++)
+    {
+        float x = 30.f + (30.f * (float)i);
+        ImGui::SetCursorPos(ImVec2(x,304.f));
+        ImGui::PushID(i * 10);
+        int colorIndex = i * 3;
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)outfitButtonColor.at(indexOutfit).at(colorIndex));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)outfitButtonColor.at(indexOutfit).at(colorIndex + 1));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)outfitButtonColor.at(indexOutfit).at(colorIndex + 2));
+        if(ImGui::Button("  "))
+        {
+            cout << "<><><><><><><<><><><><><><><><>" << colorIndex << " | " << (colorIndex + 1)<< " | " << (colorIndex + 2) << endl;
+            changeOutfitColor(i);
+        }
+        ImGui::PopStyleColor(3);
+        ImGui::PopID();
+    }
 }
 void characterBuilder::drawAccessoriesControl()
 {
@@ -383,7 +427,7 @@ void characterBuilder::drawCharacterBuilder(imageHandler* imgHandler, float fram
 {
     drawCharacter(imgHandler,frameTimer);
     drawAccessoriesControl();
-    drawBodyEyeContorl();
+    drawBodyEyeControl();
     drawOutfitControls();
     drawHairControls();
 }
