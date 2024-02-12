@@ -404,7 +404,6 @@ void characterBuilder::drawOutfitControls()
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)outfitButtonColor.at(indexOutfit).at(colorIndex + 2));
         if(ImGui::Button("  "))
         {
-            cout << "<><><><><><><<><><><><><><><><>" << colorIndex << " | " << (colorIndex + 1)<< " | " << (colorIndex + 2) << endl;
             changeOutfitColor(i);
         }
         ImGui::PopStyleColor(3);
