@@ -33,6 +33,12 @@ public:
     string name; // character name used for identification
     bool fullMovement; // used to differentiate player or npc that needs all animations and npc that just idles
 
+    imageHandler* spriteBody;
+    imageHandler* spriteEyes;
+    imageHandler* spriteOutfit;
+    imageHandler* spriteHair;
+    imageHandler* spriteAccessories;
+
     imageHandler* spriteSheet;
     float spriteWidth;
     float spriteHeight;

@@ -239,24 +239,24 @@ void characterBuilder::drawCharacter(imageHandler *imgHandler, float frameTimer)
     float factor = 4.f;
 
     ImGui::SetCursorPos(drawPos);
-    imgHandler->DrawAniamtionFrame(*body.at(indexBody), cordsAnim.at(frameCount_4), factor); // body
+    imgHandler->DrawAnimationFrame(*body.at(indexBody), cordsAnim.at(frameCount_4), factor); // body
 
     ImGui::SetCursorPos(drawPos);
-    imgHandler->DrawAniamtionFrame(*eyes.at(indexEyes), cordsAnim.at(frameCount_4), factor); // eyes
+    imgHandler->DrawAnimationFrame(*eyes.at(indexEyes), cordsAnim.at(frameCount_4), factor); // eyes
 
     ImGui::SetCursorPos(drawPos);
-    imgHandler->DrawAniamtionFrame(*outfit.at(indexOutfit).at(indexOutfitColor), cordsAnim.at(frameCount_4), factor); // outfit
+    imgHandler->DrawAnimationFrame(*outfit.at(indexOutfit).at(indexOutfitColor), cordsAnim.at(frameCount_4), factor); // outfit
 
     if(indexHair != hair.size())
     {
         ImGui::SetCursorPos(drawPos);
-        imgHandler->DrawAniamtionFrame(*hair.at(indexHair).at(indexHairColor), cordsAnim.at(frameCount_4), factor); // hair
+        imgHandler->DrawAnimationFrame(*hair.at(indexHair).at(indexHairColor), cordsAnim.at(frameCount_4), factor); // hair
     }
 
     if(indexAccessories != accessories.size())
     {
         ImGui::SetCursorPos(drawPos);
-        imgHandler->DrawAniamtionFrame(*accessories.at(indexAccessories).at(indexAccessoriesColor), cordsAnim.at(frameCount_4), factor); // accessories
+        imgHandler->DrawAnimationFrame(*accessories.at(indexAccessories).at(indexAccessoriesColor), cordsAnim.at(frameCount_4), factor); // accessories
     }
 
     if (frameTimer <= 0.f)
@@ -470,4 +470,27 @@ void characterBuilder::drawCharacterBuilder(imageHandler* imgHandler, float fram
     drawBodyEyeControl();
     drawOutfitControls();
     drawHairControls();
+}
+
+void characterBuilder::setAsMainCharacter(character *mainCharacter)
+{
+    mainCharacter->spriteBody = body.at(indexBody);
+    mainCharacter->spriteEyes = eyes.at(indexEyes);
+    mainCharacter->spriteOutfit = outfit.at(indexOutfit).at(indexOutfitColor);
+    if(indexHair != hair.size())
+    {
+        mainCharacter->spriteHair = hair.at(indexHair).at(indexHairColor);
+    }
+    else
+    {
+        mainCharacter->spriteHair = nullptr;
+    }
+    if(indexAccessories != accessories.size())
+    {
+        mainCharacter->spriteAccessories = accessories.at(indexAccessories).at(indexAccessoriesColor);
+    }
+    else
+    {
+        mainCharacter->spriteAccessories = nullptr;
+    }
 }

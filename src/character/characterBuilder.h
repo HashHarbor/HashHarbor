@@ -138,5 +138,5 @@ public:
 
     void drawCharacterBuilder(imageHandler* imgHandler, float frameTimer);
 
-    void setAsMainCharacter();
+    void setAsMainCharacter(character* mainCharacter);
 };

@@ -27,6 +27,7 @@ using std::pair;
 
 #include "../imageHandler/imageHandler.h"
 #include "../character/characterManager.h"
+#include "../character/characterBuilder.h"
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui_internal.h"
@@ -82,9 +83,11 @@ void graphic::setup(){
 
     imageHandler image = imageHandler();
     characterManager character = characterManager();
+    characterBuilder builder = characterBuilder(&image);
 
-    character.createCharacter("7", false, true, &image);
-    character.setMainPlayer("7");
+
+    character.createCharacter("main", false, true, &image);
+    character.setMainPlayer("main");
 
 
     // Main loop
@@ -123,6 +126,11 @@ void graphic::setup(){
             makeConfig();
         }
 
+        if(show_charSelector)
+        {
+            makeCharacterSelector(image, character, builder);
+        }
+
         // if(emulate){
         //     while(chip.pc < sizeof(chip.memory)){
         //         chip.emulate_cycle();
@@ -148,7 +156,7 @@ void graphic::setup(){
     SDL_Quit();
 }
 
-void graphic::makeDisplay(imageHandler image, characterManager &character){
+void graphic::makeDisplay(imageHandler& image, characterManager &character){
     // Graphics window calculation
     ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
     ImGui::SetNextWindowPos({0, 0});
@@ -159,16 +167,20 @@ void graphic::makeDisplay(imageHandler image, characterManager &character){
     // Window - Graphics
     ImGui::Begin("Graphics", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
     {
-        frameTimer -= ImGui::GetIO().DeltaTime;
-
-        ImVec2 characterPos = ImVec2((ImGui::GetContentRegionAvail() - ImVec2(32, 64)) * 0.5f);
-
-        ImGui::SetCursorPos(characterPos);
-        character.moveMainCharacter(&image, frameTimer);
-
-        if (frameTimer <= 0.f)
+        if(characterCreated)
         {
-            frameTimer = 2.5f / 10.f;
+            frameTimer -= ImGui::GetIO().DeltaTime;
+
+            ImVec2 characterPos = ImVec2((ImGui::GetContentRegionAvail() - ImVec2(32, 64)) * 0.5f);
+            character.drawPos = characterPos;
+
+            ImGui::SetCursorPos(characterPos);
+            character.moveMainCharacter(&image, frameTimer);
+
+            if (frameTimer <= 0.f)
+            {
+                frameTimer = 2.5f / 10.f;
+            }
         }
         
     }
@@ -184,6 +196,46 @@ void graphic::makeProcess(){
     ImGui::Begin("Processor Information", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
     {
  
+    }
+    ImGui::End();
+}
+
+void graphic::makeCharacterSelector(imageHandler& image, characterManager &character, characterBuilder& charBuild)
+{
+    ImGui::SetNextWindowSize({ImGui::GetIO().DisplaySize.x-550.f, ImGui::GetIO().DisplaySize.y-200.f});
+    ImGui::SetNextWindowPos({275.f,100.f});
+
+    float factor = 4.f;
+    const float frameLength = 5.f / 10.f; // In seconds, so  FPS
+    static float frameTimer = frameLength;
+
+    // Window - Config
+    ImGui::Begin("Character Selector", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar);
+    {
+        frameTimer -= ImGui::GetIO().DeltaTime;
+        ImVec2 characterPos = ImVec2((ImGui::GetContentRegionAvail() - ImVec2((32.f * factor), (64.f * factor))) * 0.25f);
+        charBuild.drawPos = ImVec2(characterPos.x * 3.f, characterPos.y * 2.f);
+        charBuild.drawCharacterBuilder(&image, frameTimer);
+
+        if (frameTimer <= 0.f)
+        {
+            frameTimer = 5.f / 10.f;
+        }
+
+        //---setchar
+        ImGui::SetCursorPos(ImVec2(290.f,390.f));
+        ImGui::PushID(8);
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
+        if(ImGui::Button("Select Character", ImVec2(150.f, 40.f)))
+        {
+            charBuild.setAsMainCharacter(character.getMainPlayer());
+            characterCreated = true;
+            show_charSelector = false;
+        }
+        ImGui::PopStyleColor(3);
+        ImGui::PopID();
     }
     ImGui::End();
 }
