@@ -96,18 +96,24 @@ characterBuilder::characterBuilder(imageHandler* imgHandler)
 
     for(auto & iter : imgPath.accessories)
     {
+        vector<imageHandler*> temp;
         for(auto & jter : iter.second)
         {
             imageHandler* img = new imageHandler();
             string path = imgPath.absolutePath + jter;
             bool ret = imgHandler->loadTexture(path.c_str(), img);
             IM_ASSERT(ret);
-            accessories.push_back(img);
+            temp.push_back(img);
         }
+        accessories.push_back(temp);
     }
 
     indexAccessories = accessories.size();
     cout << "---Accessories: " << accessories.size() << endl;
+    for(int i = 0; i < accessories.size(); i++)
+    {
+        cout << "------" << i << ": " << accessories.at(i).size() << endl;
+    }
 }
 
 void characterBuilder::changeBody(int i)
@@ -220,6 +226,13 @@ void characterBuilder::changeOutfitColor(int i)
         indexOutfitColor = i;
     }
 }
+void characterBuilder::changeAccessoriesColor(int i)
+{
+    if(i < accessories.at(indexAccessories).size())
+    {
+        indexAccessoriesColor = i;
+    }
+}
 
 void characterBuilder::drawCharacter(imageHandler *imgHandler, float frameTimer)
 {
@@ -243,7 +256,7 @@ void characterBuilder::drawCharacter(imageHandler *imgHandler, float frameTimer)
     if(indexAccessories != accessories.size())
     {
         ImGui::SetCursorPos(drawPos);
-        imgHandler->DrawAniamtionFrame(*accessories.at(indexAccessories), cordsAnim.at(frameCount_4), factor); // accessories
+        imgHandler->DrawAniamtionFrame(*accessories.at(indexAccessories).at(indexAccessoriesColor), cordsAnim.at(frameCount_4), factor); // accessories
     }
 
     if (frameTimer <= 0.f)
@@ -397,7 +410,7 @@ void characterBuilder::drawOutfitControls()
     {
         float x = 30.f + (30.f * (float)i);
         ImGui::SetCursorPos(ImVec2(x,304.f));
-        ImGui::PushID(i * 10);
+        ImGui::PushID((i + 1) * 11);
         int colorIndex = i * 3;
         ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)outfitButtonColor.at(indexOutfit).at(colorIndex));
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)outfitButtonColor.at(indexOutfit).at(colorIndex + 1));
@@ -416,10 +429,38 @@ void characterBuilder::drawAccessoriesControl()
     ImGui::Text("Accessories");
     ImGui::SameLine();
     ImGui::PushButtonRepeat(true);
-    if (ImGui::ArrowButton("##accessorieLEFT", ImGuiDir_Left)) { changeAccessories(0); }
+    if (ImGui::ArrowButton("##accessorieLEFT", ImGuiDir_Left))
+    {
+        changeAccessories(0);
+        indexAccessoriesColor = 0;
+    }
     ImGui::SameLine(0.0f, 15.f);
-    if (ImGui::ArrowButton("##accessorieRIGHT", ImGuiDir_Right)) { changeAccessories(1); }
+    if (ImGui::ArrowButton("##accessorieRIGHT", ImGuiDir_Right))
+    {
+        changeAccessories(1);
+        indexAccessoriesColor = 0;
+    }
     ImGui::PopButtonRepeat();
+
+    if(indexAccessories != accessories.size())
+    {
+        for(int i = 0; i < accessories.at(indexAccessories).size(); i++)
+        {
+            float x = 30.f + (30.f * (float)i);
+            ImGui::SetCursorPos(ImVec2(x,100.f));
+            ImGui::PushID((i + 1) * 13);
+            int colorIndex = i * 3;
+            ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)accessoriesButtonColor.at(indexAccessories).at(colorIndex));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)accessoriesButtonColor.at(indexAccessories).at(colorIndex + 1));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)accessoriesButtonColor.at(indexAccessories).at(colorIndex + 2));
+            if(ImGui::Button("  "))
+            {
+                changeAccessoriesColor(i);
+            }
+            ImGui::PopStyleColor(3);
+            ImGui::PopID();
+        }
+    }
 }
 
 void characterBuilder::drawCharacterBuilder(imageHandler* imgHandler, float frameTimer)

@@ -28,18 +28,11 @@ using std::pair;
 
 class characterBuilder
 {
-    // display body
-    // display eyes
-    // display outfit
-    // display hair
-    // display accessories
-
-    //build char / save to character manager
     vector<imageHandler*> body;
     vector<imageHandler*> eyes;
     vector<vector<imageHandler*>> outfit;
     vector<vector<imageHandler*>> hair;
-    vector<imageHandler*> accessories;
+    vector<vector<imageHandler*>> accessories;
 
     vector<vector<ImColor>> outfitButtonColor = {
             //outfit 1
@@ -76,6 +69,32 @@ class characterBuilder
     };
     // ImColor::HSV(0.f / 360.f,0.f,0.f), ImColor::HSV(0.f / 360.f,0.f,0.f), ImColor::HSV(0.f / 360.f,0.f,0.f)
 
+    vector<vector<ImColor>> accessoriesButtonColor = {
+            // backpack
+            {ImColor::HSV(30.f / 360.f,0.289f,0.624f), ImColor::HSV(39.f / 360.f,0.25f,0.816f), ImColor::HSV(18.f / 360.f,0.376f,0.49f), // 1
+             ImColor::HSV(55.f / 360.f,0.37f,0.784f), ImColor::HSV(37.f / 360.f,0.533f,0.706f), ImColor::HSV(18.f / 360.f,0.376f,0.49f), // 2
+             ImColor::HSV(107.f / 360.f,0.518f,0.651f), ImColor::HSV(79.f / 360.f,0.639f,0.761f), ImColor::HSV(156.f / 360.f,0.291f,0.431f), // 3
+             ImColor::HSV(142.f / 360.f,0.53f,0.776f), ImColor::HSV(149.f / 360.f,0.659f,0.69f), ImColor::HSV(166.f / 360.f,0.694f,0.627f), // 4
+             ImColor::HSV(2.f / 360.f,0.757f,0.902f), ImColor::HSV(7.f / 360.f,0.722f,0.988f), ImColor::HSV(359.f / 360.f,0.744f,0.659f), // 5
+             ImColor::HSV(206.f / 360.f,0.655f,0.91f), ImColor::HSV(216.f / 360.f,0.701f,0.867f), ImColor::HSV(230.f / 360.f,0.71f,0.824f), // 6
+             ImColor::HSV(344.f / 360.f,0.307f,0.933f), ImColor::HSV(339.f / 360.f,0.392f,0.91f), ImColor::HSV(336.f / 360.f,0.444f,0.839f), // 7
+             ImColor::HSV(217.f / 360.f,0.115f,0.784f), ImColor::HSV(226.f / 360.f,0.142f,0.718f), ImColor::HSV(240.f / 360.f,0.187f,0.671f), // 8
+             ImColor::HSV(266.f / 360.f,0.569f,0.773f), ImColor::HSV(46.f / 360.f,0.667f,0.706f), ImColor::HSV(38.f / 360.f,0.722f,0.62f), // 9
+             ImColor::HSV(206.f / 360.f,0.655f,0.91f), ImColor::HSV(50.f / 360.f,0.655f,0.91f), ImColor::HSV(44.f / 360.f,0.751f,0.835f)}, // 10
+             // Beanie
+            {ImColor::HSV(229.f / 360.f,0.27f,0.553f), ImColor::HSV(229.f / 360.f,0.098f,0.682f), ImColor::HSV(215.f / 360.f,0.274f,0.416f), // 1
+             ImColor::HSV(22.f / 360.f,0.115f,0.647f), ImColor::HSV(16.f / 360.f,0.176f,0.58f), ImColor::HSV(163.f / 360.f,0.532f,0.427f), // 2
+             ImColor::HSV(326.f / 360.f,0.267f,0.647f), ImColor::HSV(331.f / 360.f,0.345f,0.580f), ImColor::HSV(324.f / 360.f,0.503f,0.561f), // 3
+             ImColor::HSV(186.f / 360.f,0.446f,0.616f), ImColor::HSV(197.f / 360.f,0.493f,0.596f), ImColor::HSV(207.f / 360.f,0.522f,0.541f), // 4
+             ImColor::HSV(8.f / 360.f,0.525f,0.627f), ImColor::HSV(0.f / 360.f,0.423f,0.557f), ImColor::HSV(349.f / 360.f,0.432f,0.49f)}, // 5
+             // Beard
+            {ImColor::HSV(8.f / 360.f,0.525f,0.627f), ImColor::HSV(0.f / 360.f,0.423f,0.557f), ImColor::HSV(349.f / 360.f,0.432f,0.49f)},
+            // Chef Hat
+            {ImColor::HSV(8.f / 360.f,0.525f,0.627f), ImColor::HSV(0.f / 360.f,0.423f,0.557f), ImColor::HSV(349.f / 360.f,0.432f,0.49f)},
+            // Dino Hat
+            {ImColor::HSV(8.f / 360.f,0.525f,0.627f), ImColor::HSV(0.f / 360.f,0.423f,0.557f), ImColor::HSV(349.f / 360.f,0.432f,0.49f)}
+    };
+
     int indexBody = 0;
     int indexEyes = 0;
 
@@ -86,6 +105,7 @@ class characterBuilder
     int indexHairColor = 0;
 
     int indexAccessories = 0;
+    int indexAccessoriesColor = 0;
 
     int frameCount_4 = 0;
 
@@ -109,6 +129,7 @@ class characterBuilder
     void changeHair(int i);
     void changeHairColor(int i);
     void changeAccessories(int i);
+    void changeAccessoriesColor(int i);
 public:
     ImVec2 drawPos;
 
