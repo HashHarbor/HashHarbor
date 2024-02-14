@@ -114,6 +114,22 @@ public:
                         "assets/characters/hairstyle/hairstyle_4_6.png",
                         "assets/characters/hairstyle/hairstyle_4_7.png"}},
 
+            {7, {"assets/characters/hairstyle/hairstyle_7_1.png",
+                        "assets/characters/hairstyle/hairstyle_7_2.png",
+                        "assets/characters/hairstyle/hairstyle_7_3.png",
+                        "assets/characters/hairstyle/hairstyle_7_4.png",
+                        "assets/characters/hairstyle/hairstyle_7_5.png",
+                        "assets/characters/hairstyle/hairstyle_7_6.png",
+                        "assets/characters/hairstyle/hairstyle_7_7.png"}},
+
+            {8, {"assets/characters/hairstyle/hairstyle_8_1.png",
+                        "assets/characters/hairstyle/hairstyle_8_2.png",
+                        "assets/characters/hairstyle/hairstyle_8_3.png",
+                        "assets/characters/hairstyle/hairstyle_8_4.png",
+                        "assets/characters/hairstyle/hairstyle_8_5.png",
+                        "assets/characters/hairstyle/hairstyle_8_6.png",
+                        "assets/characters/hairstyle/hairstyle_8_7.png"}},
+
             {9, {"assets/characters/hairstyle/hairstyle_9_1.png",
                         "assets/characters/hairstyle/hairstyle_9_2.png",
                         "assets/characters/hairstyle/hairstyle_9_3.png",
@@ -121,6 +137,14 @@ public:
                         "assets/characters/hairstyle/hairstyle_9_5.png",
                         "assets/characters/hairstyle/hairstyle_9_6.png",
                         "assets/characters/hairstyle/hairstyle_9_7.png"}},
+
+            {10, {"assets/characters/hairstyle/hairstyle_10_1.png",
+                        "assets/characters/hairstyle/hairstyle_10_2.png",
+                        "assets/characters/hairstyle/hairstyle_10_3.png",
+                        "assets/characters/hairstyle/hairstyle_10_4.png",
+                        "assets/characters/hairstyle/hairstyle_10_5.png",
+                        "assets/characters/hairstyle/hairstyle_10_6.png",
+                        "assets/characters/hairstyle/hairstyle_10_7.png"}},
 
             {11, {"assets/characters/hairstyle/hairstyle_11_1.png",
                          "assets/characters/hairstyle/hairstyle_11_2.png",
@@ -138,13 +162,37 @@ public:
                          "assets/characters/hairstyle/hairstyle_12_6.png",
                          "assets/characters/hairstyle/hairstyle_12_7.png"}},
 
+            {15, {"assets/characters/hairstyle/hairstyle_15_1.png",
+                         "assets/characters/hairstyle/hairstyle_15_2.png",
+                         "assets/characters/hairstyle/hairstyle_15_3.png",
+                         "assets/characters/hairstyle/hairstyle_15_4.png",
+                         "assets/characters/hairstyle/hairstyle_15_5.png",
+                         "assets/characters/hairstyle/hairstyle_15_6.png",
+                         "assets/characters/hairstyle/hairstyle_15_7.png"}},
+
+            {18, {"assets/characters/hairstyle/hairstyle_18_1.png",
+                         "assets/characters/hairstyle/hairstyle_18_2.png",
+                         "assets/characters/hairstyle/hairstyle_18_3.png",
+                         "assets/characters/hairstyle/hairstyle_18_4.png",
+                         "assets/characters/hairstyle/hairstyle_18_5.png",
+                         "assets/characters/hairstyle/hairstyle_18_6.png",
+                         "assets/characters/hairstyle/hairstyle_18_7.png"}},
+
             {19, {"assets/characters/hairstyle/hairstyle_19_1.png",
                          "assets/characters/hairstyle/hairstyle_19_2.png",
                          "assets/characters/hairstyle/hairstyle_19_3.png",
                          "assets/characters/hairstyle/hairstyle_19_4.png",
                          "assets/characters/hairstyle/hairstyle_19_5.png",
                          "assets/characters/hairstyle/hairstyle_19_6.png",
-                         "assets/characters/hairstyle/hairstyle_19_7.png"}}
+                         "assets/characters/hairstyle/hairstyle_19_7.png"}},
+
+            {23, {"assets/characters/hairstyle/hairstyle_23_1.png",
+                         "assets/characters/hairstyle/hairstyle_23_2.png",
+                         "assets/characters/hairstyle/hairstyle_23_3.png",
+                         "assets/characters/hairstyle/hairstyle_23_4.png",
+                         "assets/characters/hairstyle/hairstyle_23_5.png",
+                         "assets/characters/hairstyle/hairstyle_23_6.png",
+                         "assets/characters/hairstyle/hairstyle_23_7.png"}}
     };
     map<int, vector<string>> outfits ={
             {1, {"assets/characters/outfits/outfit_1_1.png",

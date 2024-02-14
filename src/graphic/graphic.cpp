@@ -131,6 +131,19 @@ void graphic::setup(){
             makeCharacterSelector(image, character, builder);
         }
 
+#ifdef IMGUI_DISABLE_OBSOLETE_KEYIO
+        struct funcs { static bool IsLegacyNativeDupe(ImGuiKey) { return false; } };
+            const ImGuiKey key_first = ImGuiKey_NamedKey_BEGIN;
+#else
+        struct funcs { static bool IsLegacyNativeDupe(ImGuiKey key) { return key < 512 && ImGui::GetIO().KeyMap[key] != -1; } };
+        // Hide Native<>ImGuiKey duplicates when both exists in the array
+        //ImGui::Text("Legacy raw:");       for (ImGuiKey key = key_first; key < ImGuiKey_COUNT; key++) { if (io.KeysDown[key]) { ImGui::SameLine(); ImGui::Text("\"%s\" %d", ImGui::GetKeyName(key), key); } }
+#endif
+        if(ImGui::IsKeyDown(ImGuiKey_Escape))
+        {
+            show_charSelector = true;
+        }
+
         // if(emulate){
         //     while(chip.pc < sizeof(chip.memory)){
         //         chip.emulate_cycle();
