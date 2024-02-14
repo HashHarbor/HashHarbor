@@ -97,6 +97,7 @@ public:
                         "assets/characters/hairstyle/hairstyle_1_5.png",
                         "assets/characters/hairstyle/hairstyle_1_6.png",
                         "assets/characters/hairstyle/hairstyle_1_7.png"}},
+
             {3, {"assets/characters/hairstyle/hairstyle_3_1.png",
                         "assets/characters/hairstyle/hairstyle_3_2.png",
                         "assets/characters/hairstyle/hairstyle_3_3.png",
@@ -104,6 +105,7 @@ public:
                         "assets/characters/hairstyle/hairstyle_3_5.png",
                         "assets/characters/hairstyle/hairstyle_3_6.png",
                         "assets/characters/hairstyle/hairstyle_3_7.png"}},
+
             {4, {"assets/characters/hairstyle/hairstyle_4_1.png",
                         "assets/characters/hairstyle/hairstyle_4_2.png",
                         "assets/characters/hairstyle/hairstyle_4_3.png",
@@ -111,6 +113,7 @@ public:
                         "assets/characters/hairstyle/hairstyle_4_5.png",
                         "assets/characters/hairstyle/hairstyle_4_6.png",
                         "assets/characters/hairstyle/hairstyle_4_7.png"}},
+
             {9, {"assets/characters/hairstyle/hairstyle_9_1.png",
                         "assets/characters/hairstyle/hairstyle_9_2.png",
                         "assets/characters/hairstyle/hairstyle_9_3.png",
@@ -118,6 +121,7 @@ public:
                         "assets/characters/hairstyle/hairstyle_9_5.png",
                         "assets/characters/hairstyle/hairstyle_9_6.png",
                         "assets/characters/hairstyle/hairstyle_9_7.png"}},
+
             {11, {"assets/characters/hairstyle/hairstyle_11_1.png",
                          "assets/characters/hairstyle/hairstyle_11_2.png",
                          "assets/characters/hairstyle/hairstyle_11_3.png",
@@ -125,6 +129,7 @@ public:
                          "assets/characters/hairstyle/hairstyle_11_5.png",
                          "assets/characters/hairstyle/hairstyle_11_6.png",
                          "assets/characters/hairstyle/hairstyle_11_7.png"}},
+
             {12, {"assets/characters/hairstyle/hairstyle_12_1.png",
                          "assets/characters/hairstyle/hairstyle_12_2.png",
                          "assets/characters/hairstyle/hairstyle_12_3.png",
@@ -132,6 +137,7 @@ public:
                          "assets/characters/hairstyle/hairstyle_12_5.png",
                          "assets/characters/hairstyle/hairstyle_12_6.png",
                          "assets/characters/hairstyle/hairstyle_12_7.png"}},
+
             {19, {"assets/characters/hairstyle/hairstyle_19_1.png",
                          "assets/characters/hairstyle/hairstyle_19_2.png",
                          "assets/characters/hairstyle/hairstyle_19_3.png",
@@ -151,18 +157,64 @@ public:
                         "assets/characters/outfits/outfit_1_8.png",
                         "assets/characters/outfits/outfit_1_9.png",
                         "assets/characters/outfits/outfit_1_10.png"}},
+
             {2, {"assets/characters/outfits/outfit_2_1.png",
                         "assets/characters/outfits/outfit_2_2.png",
                         "assets/characters/outfits/outfit_2_3.png",
                         "assets/characters/outfits/outfit_2_4.png"}},
+
             {4, {"assets/characters/outfits/outfit_4_1.png",
                         "assets/characters/outfits/outfit_4_2.png",
                         "assets/characters/outfits/outfit_4_3.png"}},
+
+            {5, {"assets/characters/outfits/outfit_5_1.png",
+                        "assets/characters/outfits/outfit_5_2.png",
+                        "assets/characters/outfits/outfit_5_3.png",
+                        "assets/characters/outfits/outfit_5_4.png",
+                        "assets/characters/outfits/outfit_5_5.png"}},
+
+            {6, {"assets/characters/outfits/outfit_6_1.png",
+                        "assets/characters/outfits/outfit_6_2.png",
+                        "assets/characters/outfits/outfit_6_3.png",
+                        "assets/characters/outfits/outfit_6_4.png"}},
+
+            {8, {"assets/characters/outfits/outfit_8_1.png",
+                        "assets/characters/outfits/outfit_8_2.png",
+                        "assets/characters/outfits/outfit_8_3.png"}},
+
+            {9, {"assets/characters/outfits/outfit_9_1.png",
+                        "assets/characters/outfits/outfit_9_2.png",
+                        "assets/characters/outfits/outfit_9_3.png"}},
+
             {10, {"assets/characters/outfits/outfit_10_1.png",
                          "assets/characters/outfits/outfit_10_2.png",
                          "assets/characters/outfits/outfit_10_3.png",
                          "assets/characters/outfits/outfit_10_4.png",
                          "assets/characters/outfits/outfit_10_5.png"}},
+
+            {11, {"assets/characters/outfits/outfit_11_1.png",
+                        "assets/characters/outfits/outfit_11_2.png",
+                        "assets/characters/outfits/outfit_11_3.png",
+                        "assets/characters/outfits/outfit_11_4.png"}},
+
+            {16, {"assets/characters/outfits/outfit_16_1.png",
+                        "assets/characters/outfits/outfit_16_2.png",
+                        "assets/characters/outfits/outfit_16_3.png"}},
+
+            {18, {"assets/characters/outfits/outfit_18_1.png",
+                        "assets/characters/outfits/outfit_18_2.png",
+                        "assets/characters/outfits/outfit_18_3.png",
+                        "assets/characters/outfits/outfit_18_4.png"}},
+
+            {20, {"assets/characters/outfits/outfit_20_1.png",
+                        "assets/characters/outfits/outfit_20_2.png",
+                        "assets/characters/outfits/outfit_20_3.png"}},
+
+            {21, {"assets/characters/outfits/outfit_21_1.png",
+                        "assets/characters/outfits/outfit_21_2.png",
+                        "assets/characters/outfits/outfit_21_3.png",
+                        "assets/characters/outfits/outfit_21_4.png"}},
+
             {24, {"assets/characters/outfits/outfit_24_1.png",
                          "assets/characters/outfits/outfit_24_2.png",
                          "assets/characters/outfits/outfit_24_3.png",
