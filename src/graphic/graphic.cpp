@@ -148,17 +148,6 @@ void graphic::makeBackground(imageHandler background, movementHandler move, int 
     ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
     ImGui::SetNextWindowPos({0, 0});
 
-    static auto lastKeyEventTime = std::chrono::steady_clock::now();
-
-    // Get the current time
-    auto currentTime = std::chrono::steady_clock::now();
-
-    // Calculate the time elapsed since the last key event
-    auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastKeyEventTime).count();
-
-    // Define the cooldown duration between key events in milliseconds
-    const int cooldownMilliseconds = 1000; // 1 second cooldown
-
 
     #ifdef IMGUI_DISABLE_OBSOLETE_KEYIO
     struct funcs { static bool IsLegacyNativeDupe(ImGuiKey) { return false; } };
@@ -171,15 +160,12 @@ void graphic::makeBackground(imageHandler background, movementHandler move, int 
     int keyDown = 0; // used to identify which direction the character is moving
     for (ImGuiKey key = key_first; key < ImGuiKey_COUNT; key++)
     {
-        if (elapsedTime >= cooldownMilliseconds) {
-            if (funcs::IsLegacyNativeDupe(key)) continue;
+        if (funcs::IsLegacyNativeDupe(key)) continue;
 
-            if(ImGui::IsKeyDown(ImGuiKey_UpArrow) || ImGui::IsKeyDown(ImGuiKey_W)) { keyDown = 1; }
-            else if(ImGui::IsKeyDown(ImGuiKey_DownArrow) || ImGui::IsKeyDown(ImGuiKey_S)) { keyDown = 2; }
-            else if(ImGui::IsKeyDown(ImGuiKey_RightArrow) || ImGui::IsKeyDown(ImGuiKey_D)) { keyDown = 3; }
-            else if(ImGui::IsKeyDown(ImGuiKey_LeftArrow) || ImGui::IsKeyDown(ImGuiKey_A)) { keyDown = 4; }
-            
-        }
+        if(ImGui::IsKeyDown(ImGuiKey_UpArrow) || ImGui::IsKeyDown(ImGuiKey_W)) { keyDown = 1; }
+        else if(ImGui::IsKeyDown(ImGuiKey_DownArrow) || ImGui::IsKeyDown(ImGuiKey_S)) { keyDown = 2; }
+        else if(ImGui::IsKeyDown(ImGuiKey_RightArrow) || ImGui::IsKeyDown(ImGuiKey_D)) { keyDown = 3; }
+        else if(ImGui::IsKeyDown(ImGuiKey_LeftArrow) || ImGui::IsKeyDown(ImGuiKey_A)) { keyDown = 4; }
     }
 
     ImGui::Begin("Background", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);

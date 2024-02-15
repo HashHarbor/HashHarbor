@@ -92,13 +92,13 @@ void imageHandler::DrawImage(imageHandler _image)
 void imageHandler::DrawMap(imageHandler _image, int tileX, int tileY, float width, float height){
     //ImGui::Image((void*)(intptr_t)_image.texture, ImVec2(_image.width, _image.height));
 
-    float topLeft = (float)(tileX - 15)/ 42;
-    float topRight = (float)(tileY - 8) / 28;
+    float topLeft = (float)(tileX - 15)/ 42; //left most corner
+    float topRight = (float)(tileY - 8) / 28; //top most coordinate
 
     float botLeft = (float)(tileX + 15)/ 42;
     float botRight = (float)(tileY + 8) / 28;
 
     ImGui::Image((void*)(intptr_t)_image.texture, ImVec2(width, height), ImVec2(topLeft, topRight), ImVec2(botLeft, botRight));
 
-    cout << botLeft << " " << botRight << endl;
+    cout << tileX << " " << tileY << endl;
 }
