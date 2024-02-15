@@ -19,6 +19,8 @@ using std::endl;
 using std::pair;
 #else
 #include <bits/stdc++.h>
+#include <utility>
+using std::pair;
 #endif
 
 using std::string;
@@ -49,4 +51,5 @@ public:
     pair<ImVec2,ImVec2> generateCords(int animation, int frame, float spriteWidth, float spriteHeight, float imageWidth, float imageHeight);
         // generate coordinates to make animations
         // DO NOT USE FOR CHARACTERS - there are hardcoded values as all NPC and Characters have the save size sprite sheet
+    void cleanUp();
 };

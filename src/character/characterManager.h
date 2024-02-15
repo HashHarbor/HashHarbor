@@ -26,6 +26,7 @@ using std::endl;
 
 #include "../imageHandler/imageHandler.h"
 #include "../imageHandler/imagePath.h"
+#include "characterBuilder.h"
 
 struct character
 {
@@ -38,6 +39,8 @@ public:
     imageHandler* spriteOutfit;
     imageHandler* spriteHair;
     imageHandler* spriteAccessories;
+
+    int dynamicIndex[8] = {0,0,0,0,0,0,0,0};
 
     imageHandler* spriteSheet;
     float spriteWidth;
@@ -120,6 +123,8 @@ public:
     void setMainPlayer(string name);
     // set the main character to animate
     // can be used to change the players character after game started
-    void moveMainCharacter(imageHandler* imgHandler, float frameTimer);
+    void moveMainCharacter(imageHandler* imgHandler, characterBuilder* charBuild,float frameTimer);
     // used to move the main character based on keyboard input
+    void selectMainCharacter(characterBuilder* charBuild);
+    // used to save character item indexes
 };

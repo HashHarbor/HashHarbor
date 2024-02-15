@@ -23,7 +23,7 @@ using std::pair;
 
 #include "../imageHandler/imageHandler.h"
 #include "../imageHandler/imagePath.h"
-#include "characterManager.h"
+//#include "characterManager.h"
 
 
 class characterBuilder
@@ -159,6 +159,7 @@ class characterBuilder
     };
 
     void drawCharacter(imageHandler* imgHandler, float frameTimer);
+        //Internal Character Builder Function, will not and should not draw outside of character builder window
     void drawBodyEyeControl();
     void drawHairControls();
     void drawOutfitControls();
@@ -176,9 +177,15 @@ public:
     ImVec2 drawPos;
 
     characterBuilder(imageHandler* imgHandler);
-        // ONLY CONSTRUCT ONCE BECAUSE IT WILL USE A LOT OF VRAM DUE TO LARGE ASSET AMOUNT BEING LOADED
+        // ONLY CONSTRUCT ONCE BECAUSE IT WILL USE A LOT OF RAM DUE TO LARGE ASSET AMOUNT BEING LOADED
 
     void drawCharacterBuilder(imageHandler* imgHandler, float frameTimer);
 
-    void setAsMainCharacter(character* mainCharacter);
+    int* setAsMainCharacter();
+
+    void drawCharacterAnimation(imageHandler* imgHandler, ImVec2 pos, pair<ImVec2,ImVec2> cords, float scale, int characterIndex[8]);
+        // Character Index 0=Body, 1=Eyes, 2=Outfit, 3=OutfitColor, 4=Hair, 5=HairColor, 6=Accessories, 7=AccessoriesColor
+
+    void cleanUp();
+        // destructor to delete all image textures
 };

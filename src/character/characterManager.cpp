@@ -24,6 +24,7 @@ using std::pair;
 #endif
 
 #include "../imageHandler/imageHandler.h"
+#include "characterBuilder.h"
 
 namespace ImGui { extern ImGuiKeyData* GetKeyData(ImGuiKey key); }
 
@@ -35,18 +36,7 @@ characterManager::characterManager() {}
 
 void characterManager::createCharacter(string name, bool npc, bool fullMovement, imageHandler* imgHandler)
 {
-    imagePath imgPath = imagePath(); // gets access to the class with all file paths
-    auto charPath = imgPath.charIndex.find(name); // get the character to create
-    if(charPath == imgPath.charIndex.end())
-    {
-        cout << "NOT FOUND" << endl;
-        return;
-    }
-    string path = imgPath.absolutePath + charPath->second;
-
     character* newChar = new character(name, fullMovement, 32.f, 64.f); // create the character
-    newChar->spriteSheet = new imageHandler();
-    imgHandler->loadTexture(path.c_str(), newChar->spriteSheet);
 
     if(!npc)
         playerCharacters.emplace(name, newChar);
@@ -80,7 +70,7 @@ void characterManager::setMainPlayer(std::string name)
     mainPlayer = playerCharacters.find(name)->second;
 }
 
-void characterManager::moveMainCharacter(imageHandler* imgHandler, float frameTimer)
+void characterManager::moveMainCharacter(imageHandler* imgHandler, characterBuilder* charBuild,float frameTimer)
 {
 #ifdef IMGUI_DISABLE_OBSOLETE_KEYIO
     struct funcs { static bool IsLegacyNativeDupe(ImGuiKey) { return false; } };
@@ -108,94 +98,19 @@ void characterManager::moveMainCharacter(imageHandler* imgHandler, float frameTi
     switch(keyDown)
     {
         case 1:
-            ImGui::SetCursorPos(drawPos);
-            imgHandler->DrawAnimationFrame(*mainPlayer->spriteBody, cordsWalkUp.at(frameCount_6), factor);
-            ImGui::SetCursorPos(drawPos);
-            imgHandler->DrawAnimationFrame(*mainPlayer->spriteEyes, cordsWalkUp.at(frameCount_6), factor);
-            ImGui::SetCursorPos(drawPos);
-            imgHandler->DrawAnimationFrame(*mainPlayer->spriteOutfit, cordsWalkUp.at(frameCount_6), factor);
-            if(mainPlayer->spriteHair != nullptr)
-            {
-                ImGui::SetCursorPos(drawPos);
-                imgHandler->DrawAnimationFrame(*mainPlayer->spriteHair, cordsWalkUp.at(frameCount_6), factor);
-            }
-            if(mainPlayer->spriteAccessories != nullptr)
-            {
-                ImGui::SetCursorPos(drawPos);
-                imgHandler->DrawAnimationFrame(*mainPlayer->spriteAccessories, cordsWalkUp.at(frameCount_6), factor);
-            }
+            charBuild->drawCharacterAnimation(imgHandler,drawPos,cordsWalkUp.at(frameCount_6),factor,mainPlayer->dynamicIndex);
             break;
         case 2:
-            ImGui::SetCursorPos(drawPos);
-            imgHandler->DrawAnimationFrame(*mainPlayer->spriteBody, cordsWalkDown.at(frameCount_6), factor);
-            ImGui::SetCursorPos(drawPos);
-            imgHandler->DrawAnimationFrame(*mainPlayer->spriteEyes, cordsWalkDown.at(frameCount_6), factor);
-            ImGui::SetCursorPos(drawPos);
-            imgHandler->DrawAnimationFrame(*mainPlayer->spriteOutfit, cordsWalkDown.at(frameCount_6), factor);
-            if(mainPlayer->spriteHair != nullptr)
-            {
-                ImGui::SetCursorPos(drawPos);
-                imgHandler->DrawAnimationFrame(*mainPlayer->spriteHair, cordsWalkDown.at(frameCount_6), factor);
-            }
-            if(mainPlayer->spriteAccessories != nullptr)
-            {
-                ImGui::SetCursorPos(drawPos);
-                imgHandler->DrawAnimationFrame(*mainPlayer->spriteAccessories, cordsWalkDown.at(frameCount_6), factor);
-            }
+            charBuild->drawCharacterAnimation(imgHandler,drawPos,cordsWalkDown.at(frameCount_6),factor,mainPlayer->dynamicIndex);
             break;
         case 3:
-            ImGui::SetCursorPos(drawPos);
-            imgHandler->DrawAnimationFrame(*mainPlayer->spriteBody, cordsWalkRight.at(frameCount_6), factor);
-            ImGui::SetCursorPos(drawPos);
-            imgHandler->DrawAnimationFrame(*mainPlayer->spriteEyes, cordsWalkRight.at(frameCount_6), factor);
-            ImGui::SetCursorPos(drawPos);
-            imgHandler->DrawAnimationFrame(*mainPlayer->spriteOutfit, cordsWalkRight.at(frameCount_6), factor);
-            if(mainPlayer->spriteHair != nullptr)
-            {
-                ImGui::SetCursorPos(drawPos);
-                imgHandler->DrawAnimationFrame(*mainPlayer->spriteHair, cordsWalkRight.at(frameCount_6), factor);
-            }
-            if(mainPlayer->spriteAccessories != nullptr)
-            {
-                ImGui::SetCursorPos(drawPos);
-                imgHandler->DrawAnimationFrame(*mainPlayer->spriteAccessories, cordsWalkRight.at(frameCount_6), factor);
-            }
+            charBuild->drawCharacterAnimation(imgHandler,drawPos,cordsWalkRight.at(frameCount_6),factor,mainPlayer->dynamicIndex);
             break;
         case 4:
-            ImGui::SetCursorPos(drawPos);
-            imgHandler->DrawAnimationFrame(*mainPlayer->spriteBody, cordsWalkLeft.at(frameCount_6), factor);
-            ImGui::SetCursorPos(drawPos);
-            imgHandler->DrawAnimationFrame(*mainPlayer->spriteEyes, cordsWalkLeft.at(frameCount_6), factor);
-            ImGui::SetCursorPos(drawPos);
-            imgHandler->DrawAnimationFrame(*mainPlayer->spriteOutfit, cordsWalkLeft.at(frameCount_6), factor);
-            if(mainPlayer->spriteHair != nullptr)
-            {
-                ImGui::SetCursorPos(drawPos);
-                imgHandler->DrawAnimationFrame(*mainPlayer->spriteHair, cordsWalkLeft.at(frameCount_6), factor);
-            }
-            if(mainPlayer->spriteAccessories != nullptr)
-            {
-                ImGui::SetCursorPos(drawPos);
-                imgHandler->DrawAnimationFrame(*mainPlayer->spriteAccessories, cordsWalkLeft.at(frameCount_6), factor);
-            }
+            charBuild->drawCharacterAnimation(imgHandler,drawPos,cordsWalkLeft.at(frameCount_6),factor,mainPlayer->dynamicIndex);
             break;
         default:
-            ImGui::SetCursorPos(drawPos);
-            imgHandler->DrawAnimationFrame(*mainPlayer->spriteBody, cordsIdle.at(frameCount_6), factor);
-            ImGui::SetCursorPos(drawPos);
-            imgHandler->DrawAnimationFrame(*mainPlayer->spriteEyes, cordsIdle.at(frameCount_6), factor);
-            ImGui::SetCursorPos(drawPos);
-            imgHandler->DrawAnimationFrame(*mainPlayer->spriteOutfit, cordsIdle.at(frameCount_6), factor);
-            if(mainPlayer->spriteHair != nullptr)
-            {
-                ImGui::SetCursorPos(drawPos);
-                imgHandler->DrawAnimationFrame(*mainPlayer->spriteHair, cordsIdle.at(frameCount_6), factor);
-            }
-            if(mainPlayer->spriteAccessories != nullptr)
-            {
-                ImGui::SetCursorPos(drawPos);
-                imgHandler->DrawAnimationFrame(*mainPlayer->spriteAccessories, cordsIdle.at(frameCount_6), factor);
-            }
+            charBuild->drawCharacterAnimation(imgHandler,drawPos,cordsIdle.at(frameCount_6),factor,mainPlayer->dynamicIndex);
             break;
     }
 
@@ -205,5 +120,15 @@ void characterManager::moveMainCharacter(imageHandler* imgHandler, float frameTi
         frameCount_6 ++;
         if (frameCount_4 % 4 == 0) frameCount_4=0;
         if (frameCount_6 % 6 == 0) frameCount_6=0;
+    }
+}
+
+void characterManager::selectMainCharacter(characterBuilder* charBuild)
+{
+    int* temp = charBuild->setAsMainCharacter();
+
+    for(int i = 0; i < 8; i++)
+    {
+        mainPlayer->dynamicIndex[i] = temp[i];
     }
 }

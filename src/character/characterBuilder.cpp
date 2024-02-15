@@ -1,7 +1,6 @@
 #include "characterBuilder.h"
 #include "../imageHandler/imageHandler.h"
 #include "../imageHandler/imagePath.h"
-#include "characterManager.h"
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
@@ -465,6 +464,7 @@ void characterBuilder::drawAccessoriesControl()
 
 void characterBuilder::drawCharacterBuilder(imageHandler* imgHandler, float frameTimer)
 {
+    cout << indexBody << " || " << indexEyes << " || " << indexOutfit << " | " << indexOutfitColor << " || " << indexHair << " | " << indexHairColor << " || " << indexAccessories << " | " << indexAccessoriesColor << " ||||" << endl;
     drawCharacter(imgHandler,frameTimer);
     drawAccessoriesControl();
     drawBodyEyeControl();
@@ -472,25 +472,74 @@ void characterBuilder::drawCharacterBuilder(imageHandler* imgHandler, float fram
     drawHairControls();
 }
 
-void characterBuilder::setAsMainCharacter(character *mainCharacter)
+int* characterBuilder::setAsMainCharacter()
 {
-    mainCharacter->spriteBody = body.at(indexBody);
-    mainCharacter->spriteEyes = eyes.at(indexEyes);
-    mainCharacter->spriteOutfit = outfit.at(indexOutfit).at(indexOutfitColor);
+    int setChar[8] = {indexBody, indexEyes, indexOutfit, indexOutfitColor, indexHair, indexHairColor, indexAccessories, indexAccessoriesColor};
+    return setChar;
+}
+void characterBuilder::cleanUp()
+{
+    for(auto iter : body)
+    {
+        iter->cleanUp();
+    }
+    body.clear();
+    for(auto iter : eyes)
+    {
+        iter->cleanUp();
+    }
+    eyes.clear();
+    for(auto iter : outfit)
+    {
+        for(auto jter : iter)
+        {
+            jter->cleanUp();
+        }
+        iter.clear();
+    }
+    outfit.clear();
+    for(auto iter : hair)
+    {
+        for(auto jter : iter)
+        {
+            jter->cleanUp();
+        }
+        iter.clear();
+    }
+    hair.clear();
+    for(auto iter : accessories)
+    {
+        for(auto jter : iter)
+        {
+            jter->cleanUp();
+        }
+        iter.clear();
+    }
+    accessories.clear();
+
+    cout << body.size() << ", " << eyes.size() << ", " << outfit.size() << ", " << hair.size() << ", " << accessories.size() << endl;
+}
+
+void
+characterBuilder::drawCharacterAnimation(imageHandler *imgHandler, ImVec2 pos, pair<ImVec2, ImVec2> cords, float scale,int *characterIndex)
+{
+    ImGui::SetCursorPos(pos);
+    imgHandler->DrawAnimationFrame(*body[characterIndex[0]], cords, scale);
+
+    ImGui::SetCursorPos(pos);
+    imgHandler->DrawAnimationFrame(*eyes[characterIndex[1]], cords, scale);
+
+    ImGui::SetCursorPos(pos);
+    imgHandler->DrawAnimationFrame(*outfit[characterIndex[2]][characterIndex[3]], cords, scale);
+
     if(indexHair != hair.size())
     {
-        mainCharacter->spriteHair = hair.at(indexHair).at(indexHairColor);
-    }
-    else
-    {
-        mainCharacter->spriteHair = nullptr;
+        ImGui::SetCursorPos(pos);
+        imgHandler->DrawAnimationFrame(*hair[characterIndex[4]][characterIndex[5]], cords, scale);
     }
     if(indexAccessories != accessories.size())
     {
-        mainCharacter->spriteAccessories = accessories.at(indexAccessories).at(indexAccessoriesColor);
-    }
-    else
-    {
-        mainCharacter->spriteAccessories = nullptr;
+        ImGui::SetCursorPos(pos);
+        imgHandler->DrawAnimationFrame(*accessories[characterIndex[6]][characterIndex[7]], cords, scale);
     }
 }

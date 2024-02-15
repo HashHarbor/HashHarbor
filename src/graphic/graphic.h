@@ -21,7 +21,7 @@ public:
 
     //graphic functions
     void setup();
-    void makeDisplay(imageHandler& image, characterManager &character);
+    void makeDisplay(imageHandler& image, characterManager &character, characterBuilder& charBuild);
     void makeProcess();
     void makeConfig();
     void makeCharacterSelector(imageHandler& image, characterManager &character, characterBuilder& charBuild);

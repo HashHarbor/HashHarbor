@@ -106,3 +106,7 @@ pair<ImVec2, ImVec2> imageHandler::generateCords(int animation, int frame, float
     // Example if character: imgHandler->generateCords(1,frameCount_6,32.f,64.f,192.f,320.f)
 }
 
+void imageHandler::cleanUp()
+{
+    glDeleteTextures(1, &texture);
+}
