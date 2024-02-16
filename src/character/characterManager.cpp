@@ -125,10 +125,5 @@ void characterManager::moveMainCharacter(imageHandler* imgHandler, characterBuil
 
 void characterManager::selectMainCharacter(characterBuilder* charBuild)
 {
-    int* temp = charBuild->setAsMainCharacter();
-
-    for(int i = 0; i < 8; i++)
-    {
-        mainPlayer->dynamicIndex[i] = temp[i];
-    }
+    charBuild->setAsMainCharacter(mainPlayer->dynamicIndex);
 }

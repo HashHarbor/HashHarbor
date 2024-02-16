@@ -109,7 +109,7 @@ void graphic::setup(){
                 done = true;
         }
 
-        cout << show_display << " | "<< show_process<< " | " << show_config<< " | " << show_charSelector << endl;
+        //cout << show_display << " | "<< show_process<< " | " << show_config<< " | " << show_charSelector << endl;
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
@@ -134,7 +134,9 @@ void graphic::setup(){
 
         if(ImGui::IsKeyDown(ImGuiKey_Escape))
         {
+            //todo move settings menu when created
             show_charSelector = true;
+            characterCreated = false;
         }
 
         // if(emulate){
@@ -153,18 +155,13 @@ void graphic::setup(){
     }
 
     // Cleanup
-    cout << "---------------CLEAN UP" << endl;
     builder.cleanUp();
     ImGui_ImplOpenGL3_Shutdown();
-    cout << "---------------1" << endl;
     ImGui_ImplSDL2_Shutdown();
-    cout << "---------------2" << endl;
     ImGui::DestroyContext();
 
     SDL_GL_DeleteContext(gl_context);
-    cout << "---------------3" << endl;
     SDL_DestroyWindow(window);
-    cout << "---------------4" << endl;
     SDL_Quit();
 }
 
@@ -195,7 +192,6 @@ void graphic::makeDisplay(imageHandler& image, characterManager &character, char
                 frameTimer = 2.5f / 10.f;
             }
         }
-        
     }
     ImGui::End();
 }
@@ -223,7 +219,7 @@ void graphic::makeCharacterSelector(imageHandler& image, characterManager &chara
     static float frameTimer = frameLength;
 
     // Window - Config
-    ImGui::Begin("Character Selector", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar);
+    ImGui::Begin("Character Selector", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoNav);
     {
         frameTimer -= ImGui::GetIO().DeltaTime;
         ImVec2 characterPos = ImVec2((ImGui::GetContentRegionAvail() - ImVec2((32.f * factor), (64.f * factor))) * 0.25f);
@@ -243,8 +239,6 @@ void graphic::makeCharacterSelector(imageHandler& image, characterManager &chara
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
         if(ImGui::Button("Select Character", ImVec2(150.f, 40.f)))
         {
-            cout << "SELECT CHAR" << endl;
-            //charBuild.setAsMainCharacter(character.getMainPlayer());
             character.selectMainCharacter(&charBuild);
             characterCreated = true;
             show_charSelector = false;

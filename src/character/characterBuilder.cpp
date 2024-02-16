@@ -201,7 +201,7 @@ void characterBuilder::changeAccessories(int i)
             indexAccessories = accessories.size();
         }
     }
-    else if(i ==1)
+    else if(i == 1)
     {
         indexAccessories ++;
         if(indexAccessories > accessories.size())
@@ -464,7 +464,7 @@ void characterBuilder::drawAccessoriesControl()
 
 void characterBuilder::drawCharacterBuilder(imageHandler* imgHandler, float frameTimer)
 {
-    cout << indexBody << " || " << indexEyes << " || " << indexOutfit << " | " << indexOutfitColor << " || " << indexHair << " | " << indexHairColor << " || " << indexAccessories << " | " << indexAccessoriesColor << " ||||" << endl;
+    //cout << indexBody << " || " << indexEyes << " || " << indexOutfit << " | " << indexOutfitColor << " || " << indexHair << " | " << indexHairColor << " || " << indexAccessories << " | " << indexAccessoriesColor << " ||||" << endl;
     drawCharacter(imgHandler,frameTimer);
     drawAccessoriesControl();
     drawBodyEyeControl();
@@ -472,10 +472,16 @@ void characterBuilder::drawCharacterBuilder(imageHandler* imgHandler, float fram
     drawHairControls();
 }
 
-int* characterBuilder::setAsMainCharacter()
+void characterBuilder::setAsMainCharacter(vector<int>& index)
 {
-    int setChar[8] = {indexBody, indexEyes, indexOutfit, indexOutfitColor, indexHair, indexHairColor, indexAccessories, indexAccessoriesColor};
-    return setChar;
+    index[0] = indexBody;
+    index[1] = indexEyes;
+    index[2] = indexOutfit;
+    index[3] = indexOutfitColor;
+    index[4] = indexHair;
+    index[5] = indexHairColor;
+    index[6] = indexAccessories;
+    index[7] = indexAccessoriesColor;
 }
 void characterBuilder::cleanUp()
 {
@@ -517,11 +523,11 @@ void characterBuilder::cleanUp()
     }
     accessories.clear();
 
-    cout << body.size() << ", " << eyes.size() << ", " << outfit.size() << ", " << hair.size() << ", " << accessories.size() << endl;
+   // cout << body.size() << ", " << eyes.size() << ", " << outfit.size() << ", " << hair.size() << ", " << accessories.size() << endl;
 }
 
 void
-characterBuilder::drawCharacterAnimation(imageHandler *imgHandler, ImVec2 pos, pair<ImVec2, ImVec2> cords, float scale,int *characterIndex)
+characterBuilder::drawCharacterAnimation(imageHandler *imgHandler, ImVec2 pos, pair<ImVec2, ImVec2> cords, float scale,vector<int>& characterIndex)
 {
     ImGui::SetCursorPos(pos);
     imgHandler->DrawAnimationFrame(*body[characterIndex[0]], cords, scale);
