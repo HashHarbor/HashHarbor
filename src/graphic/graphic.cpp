@@ -18,6 +18,7 @@ using std::string;
 using std::vector;
 using std::cout;
 using std::endl;
+using std::pair;
 #else
 #include <bits/stdc++.h>
 #endif
@@ -26,6 +27,7 @@ using std::endl;
 
 #include "../imageHandler/imageHandler.h"
 #include "../character/characterManager.h"
+#include "../character/characterBuilder.h"
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui_internal.h"
@@ -81,12 +83,13 @@ void graphic::setup(){
 
     imageHandler image = imageHandler();
     characterManager character = characterManager();
+    characterBuilder builder = characterBuilder(&image);
 
-    character.createCharacter("Bob", false, true, &image);
-    character.setMainPlayer("Bob");
 
-    
-    
+    character.createCharacter("main", false, true, &image);
+    character.setMainPlayer("main");
+
+
     // Main loop
     bool done = false;
     while (!done)
@@ -106,13 +109,14 @@ void graphic::setup(){
                 done = true;
         }
 
+        //cout << show_display << " | "<< show_process<< " | " << show_config<< " | " << show_charSelector << endl;
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
 
         if(show_display){
-            makeDisplay(image, character);
+            makeDisplay(image, character, builder);
         }
         
         if(show_process){
@@ -121,6 +125,18 @@ void graphic::setup(){
 
         if(show_config){
             makeConfig();
+        }
+
+        if(show_charSelector)
+        {
+            makeCharacterSelector(image, character, builder);
+        }
+
+        if(ImGui::IsKeyDown(ImGuiKey_Escape))
+        {
+            //todo move settings menu when created
+            show_charSelector = true;
+            characterCreated = false;
         }
 
         // if(emulate){
@@ -139,6 +155,7 @@ void graphic::setup(){
     }
 
     // Cleanup
+    builder.cleanUp();
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
@@ -148,29 +165,33 @@ void graphic::setup(){
     SDL_Quit();
 }
 
-void graphic::makeDisplay(imageHandler image, characterManager &character){
+void graphic::makeDisplay(imageHandler& image, characterManager &character, characterBuilder& charBuild)
+{
     // Graphics window calculation
     ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
     ImGui::SetNextWindowPos({0, 0});
 
-    const float frameLength = 2.5f / 10.f; // In seconds, so 4 FPS
+    const float frameLength = 1.f / 10.f; // In seconds, so  FPS
     static float frameTimer = frameLength;
 
     // Window - Graphics
     ImGui::Begin("Graphics", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
     {
-        frameTimer -= ImGui::GetIO().DeltaTime;
-
-        ImVec2 characterPos = ImVec2((ImGui::GetContentRegionAvail() - ImVec2(32, 64)) * 0.5f);
-
-        ImGui::SetCursorPos(characterPos);
-        character.moveMainCharacter(&image, frameTimer);
-
-        if (frameTimer <= 0.f)
+        if(characterCreated)
         {
-            frameTimer = 2.5f / 10.f;
+            frameTimer -= ImGui::GetIO().DeltaTime;
+
+            ImVec2 characterPos = ImVec2((ImGui::GetContentRegionAvail() - ImVec2(32, 64)) * 0.5f);
+            character.drawPos = characterPos;
+
+            ImGui::SetCursorPos(characterPos);
+            character.moveMainCharacter(&image, &charBuild, frameTimer);
+
+            if (frameTimer <= 0.f)
+            {
+                frameTimer = 2.5f / 10.f;
+            }
         }
-        
     }
     ImGui::End();
 }
@@ -184,6 +205,46 @@ void graphic::makeProcess(){
     ImGui::Begin("Processor Information", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
     {
  
+    }
+    ImGui::End();
+}
+
+void graphic::makeCharacterSelector(imageHandler& image, characterManager &character, characterBuilder& charBuild)
+{
+    ImGui::SetNextWindowSize({ImGui::GetIO().DisplaySize.x-550.f, ImGui::GetIO().DisplaySize.y-200.f});
+    ImGui::SetNextWindowPos({275.f,100.f});
+
+    float factor = 4.f;
+    const float frameLength = 5.f / 10.f; // In seconds, so  FPS
+    static float frameTimer = frameLength;
+
+    // Window - Config
+    ImGui::Begin("Character Selector", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoNav);
+    {
+        frameTimer -= ImGui::GetIO().DeltaTime;
+        ImVec2 characterPos = ImVec2((ImGui::GetContentRegionAvail() - ImVec2((32.f * factor), (64.f * factor))) * 0.25f);
+        charBuild.drawPos = ImVec2(characterPos.x * 3.f, characterPos.y * 2.f);
+        charBuild.drawCharacterBuilder(&image, frameTimer);
+
+        if (frameTimer <= 0.f)
+        {
+            frameTimer = 5.f / 10.f;
+        }
+
+        //---setchar
+        ImGui::SetCursorPos(ImVec2(290.f,390.f));
+        ImGui::PushID(8);
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
+        if(ImGui::Button("Select Character", ImVec2(150.f, 40.f)))
+        {
+            character.selectMainCharacter(&charBuild);
+            characterCreated = true;
+            show_charSelector = false;
+        }
+        ImGui::PopStyleColor(3);
+        ImGui::PopID();
     }
     ImGui::End();
 }

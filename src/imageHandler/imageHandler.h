@@ -16,8 +16,11 @@
 #include <vector>
 using std::cout;
 using std::endl;
+using std::pair;
 #else
 #include <bits/stdc++.h>
+#include <utility>
+using std::pair;
 #endif
 
 using std::string;
@@ -38,6 +41,15 @@ public:
     imageHandler(GLuint texture, int width, int height);
 
     bool loadTexture(const char *filename, imageHandler* image);
-    bool CreateAnimation(vector<string>& paths, vector <imageHandler*> &frames);
+        // load images from file and store as texture
     void DrawImage(imageHandler _image);
+        // draw the whole image as loaded
+    void DrawImage(imageHandler& _image, float scaleFactor);
+        // draw image as stored but alter the scale drawn on the screen
+    void DrawAnimationFrame(imageHandler _image, pair<ImVec2,ImVec2> cords, float scaleFactor);
+        // used for drawing animations from sprite sheet by drawing only a portion of the loaded image
+    pair<ImVec2,ImVec2> generateCords(int animation, int frame, float spriteWidth, float spriteHeight, float imageWidth, float imageHeight);
+        // generate coordinates to make animations
+        // DO NOT USE FOR CHARACTERS - there are hardcoded values as all NPC and Characters have the save size sprite sheet
+    void cleanUp();
 };
