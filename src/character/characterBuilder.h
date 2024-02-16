@@ -152,10 +152,10 @@ class characterBuilder
     int frameCount_4 = 0;
 
     vector<pair<ImVec2,ImVec2>> cordsAnim = {
-            {ImVec2(0.f / 192.f, 0.f/320.f),ImVec2(32.f/192.f, 64.f/320.f)},
-            {ImVec2(160.f / 192.f, 256.f/320.f),ImVec2(192.f/192.f, 320.f/320.f)},
-            {ImVec2(64.f / 192.f, 64.f/320.f),ImVec2(96.f/192.f, 128.f/320.f)},
-            {ImVec2(160.f / 192.f, 192.f/320.f),ImVec2(192.f/192.f, 256.f/320.f)}
+            {ImVec2(0.1f / 192.f, 0.1f/320.f),ImVec2(32.1f/192.f, 64.f/320.f)},
+            {ImVec2(160.1f / 192.f, 256.1f/320.f),ImVec2(192.1f/192.f, 320.f/320.f)},
+            {ImVec2(64.1f / 192.f, 64.1f/320.f),ImVec2(96.1f/192.f, 128.f/320.f)},
+            {ImVec2(160.1f / 192.f, 192.1f/320.f),ImVec2(192.1f/192.f, 256.f/320.f)}
     };
 
     void drawCharacter(imageHandler* imgHandler, float frameTimer);

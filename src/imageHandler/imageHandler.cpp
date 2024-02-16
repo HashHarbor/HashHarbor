@@ -102,6 +102,9 @@ pair<ImVec2, ImVec2> imageHandler::generateCords(int animation, int frame, float
     minX /= imageWidth;
     minY /= imageHeight;
 
+    minX += 0.1f;
+    minY += 0.1f;
+    maxX += 0.1f;
     return make_pair(ImVec2(minX,minY), ImVec2(maxX,maxY));
     // Example if character: imgHandler->generateCords(1,frameCount_6,32.f,64.f,192.f,320.f)
 }
