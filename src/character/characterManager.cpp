@@ -19,8 +19,10 @@ using std::vector;
 using std::cout;
 using std::endl;
 using std::pair;
+string absoluteAudioPath = "/Users/lucaspereira/CLionProjects/hash_audio/HashHarbor-main-audio/assets/sound/";
 #else
 #include <bits/stdc++.h>
+string absoluteAudioPath = "../assets/sound/";
 #endif
 
 #include "../imageHandler/imageHandler.h"
@@ -83,6 +85,8 @@ void characterManager::moveMainCharacter(imageHandler* imgHandler, characterBuil
 #endif
 
     int keyDown = 0; // used to identify which direction the character is moving
+    mainPlayer->isMoving = true; // set flag for character in motion
+
     for (ImGuiKey key = key_first; key < ImGuiKey_COUNT; key++)
     {
         if (funcs::IsLegacyNativeDupe(key)) continue;
@@ -111,6 +115,7 @@ void characterManager::moveMainCharacter(imageHandler* imgHandler, characterBuil
             break;
         default:
             charBuild->drawCharacterAnimation(imgHandler,drawPos,cordsIdle.at(frameCount_6),factor,mainPlayer->dynamicIndex);
+            mainPlayer->isMoving = false; // default motion flag sets to false
             break;
     }
 
@@ -126,4 +131,24 @@ void characterManager::moveMainCharacter(imageHandler* imgHandler, characterBuil
 void characterManager::selectMainCharacter(characterBuilder* charBuild)
 {
     charBuild->setAsMainCharacter(mainPlayer->dynamicIndex);
+}
+
+// currently only set up for main character walking SFX
+void characterManager::runMainSFX() {
+
+    if(mainPlayer->isMoving && !mainPlayer->soundEffect.getPlayStatus()){
+
+        // WAV FILE PATH IS HARDCODED ON MAC, MAY BE INCORRECT ON WINDOWS/LINUX
+        string path = absoluteAudioPath + "walking_on_grass.wav";
+
+        if(mainPlayer->soundEffect.load(path)){
+            mainPlayer->soundEffect.play();
+            // Play walking audio
+        }
+    }
+    else if(!mainPlayer->isMoving && mainPlayer->soundEffect.getPlayStatus()){
+        mainPlayer->soundEffect.stop();
+        // Stop current audio if player not moving
+    }
+
 }
