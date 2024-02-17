@@ -6,6 +6,7 @@
 //#include "../backends/imgui_impl_glfw.h"
 #include "SDL2/SDL.h"
 #include "../../backends/imgui_impl_opengl3.h"
+#include "../audio/audio.h"
 
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
@@ -33,6 +34,8 @@ struct character
 public:
     string name; // character name used for identification
     bool fullMovement; // used to differentiate player or npc that needs all animations and npc that just idles
+    audio soundEffect; // will likely expand this to a vector to hold multiple audio sample paths
+    bool isMoving; // indicates if key is pressed for character movement
 
     vector<int> dynamicIndex = {0,0,0,0,0,0,0,0};
 
@@ -121,4 +124,6 @@ public:
     // used to move the main character based on keyboard input
     void selectMainCharacter(characterBuilder* charBuild);
     // used to save character item indexes
+    void runMainSFX();
+    // used to play the main character's sound effects
 };
