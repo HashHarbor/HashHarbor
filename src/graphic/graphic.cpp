@@ -186,6 +186,7 @@ void graphic::makeDisplay(imageHandler& image, characterManager &character, char
 
             ImGui::SetCursorPos(characterPos);
             character.moveMainCharacter(&image, &charBuild, frameTimer);
+            character.runMainSFX();
 
             if (frameTimer <= 0.f)
             {
