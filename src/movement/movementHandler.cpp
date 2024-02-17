@@ -62,23 +62,29 @@ std::vector<std::vector<int>> movementHandler::getGrid(){
     return this->grid;
 }
 
-void movementHandler::mapMovement(int key, imageHandler map, int &gridX, int &gridY){
-    switch(key)
-    {
-        case 1:
-            gridY--;
-            break;
-        case 2:
-            gridY++;
-            break;
-        case 3:
-            gridX++;
-            break;
-        case 4:
-            gridX--;
-            break;
-    }
+void movementHandler::mapMovement(int key, imageHandler map, float &gridX, float &gridY){
+    
+    static float delta = ImGui::GetIO().DeltaTime;
 
+    //static int frameTimerMap = 0;
+    //if(frameTimerMap % 10 == 0) {
+        switch(key)
+        {
+            case 1:
+                gridY = gridY - (14.0f * delta);
+                break;
+            case 2:
+                gridY = gridY + (14.0f * delta);
+                break;
+            case 3:
+                gridX = gridX + (14.0f * delta);
+                break;
+            case 4:
+                gridX = gridX - (14.0f * delta);
+                break;
+        }
+    //}
     map.DrawMap(map, gridX, gridY, 960, 544);
+    //frameTimerMap++;
 
 }

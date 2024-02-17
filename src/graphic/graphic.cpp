@@ -79,8 +79,8 @@ void graphic::setup(){
     //     cout << endl;
     // }
 
-    int mapGridX = 15;
-    int mapGridY = 8;
+    float mapGridX = 15.0f;
+    float mapGridY = 8.0f;
     
     // Main loop
     bool done = false;
@@ -144,7 +144,7 @@ void graphic::setup(){
     SDL_Quit();
 }
 
-void graphic::makeBackground(imageHandler background, movementHandler move, int &gridX, int &gridY){
+void graphic::makeBackground(imageHandler background, movementHandler move, float &gridX, float &gridY){
     ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
     ImGui::SetNextWindowPos({0, 0});
 

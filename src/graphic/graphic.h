@@ -19,7 +19,7 @@ public:
     //graphic functions
     void setup();
     void makeDisplay(imageHandler image, characterManager &character);
-    void makeBackground(imageHandler background, movementHandler move, int &gridX, int &gridY);
+    void makeBackground(imageHandler background, movementHandler move, float &gridX, float &gridY);
     void makeProcess();
     void makeConfig();
 

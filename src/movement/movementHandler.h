@@ -29,7 +29,7 @@ public:
 
     movementHandler(string filepath);
     std::vector<std::vector<int>> getGrid();
-    void mapMovement(int key, imageHandler image, int &gridX, int &gridY);
+    void mapMovement(int key, imageHandler image, float &gridX, float &gridY);
 
 private:
     
