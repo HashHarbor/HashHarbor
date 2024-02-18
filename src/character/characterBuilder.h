@@ -112,6 +112,13 @@ class characterBuilder
     // ImColor::HSV(0.f / 360.f,0.f,0.f), ImColor::HSV(0.f / 360.f,0.f,0.f), ImColor::HSV(0.f / 360.f,0.f,0.f)
 
     vector<vector<ImColor>> accessoriesButtonColor = {
+            // Bow
+            {ImColor::HSV(189.f / 360.f,1.0f,0.87f), ImColor::HSV(188.f / 360.f,0.74f,0.91f), ImColor::HSV(188.f / 360.f,1.0f,0.8f),
+             ImColor::HSV(339.f / 360.f,0.39f,0.91f), ImColor::HSV(344.f / 360.f,0.31f,0.93f), ImColor::HSV(339.f / 360.f,0.48f,0.87f),
+             ImColor::HSV(149.f / 360.f,0.66f,0.69f), ImColor::HSV(142.f / 360.f,0.53f,0.78f), ImColor::HSV(149.f / 360.f,0.75f,0.57f),
+             ImColor::HSV(54.f / 360.f,0.89f,0.85f), ImColor::HSV(54.f / 360.f,0.68f,0.91f), ImColor::HSV(54.f / 360.f,0.98f,0.79f),
+             ImColor::HSV(282.f / 360.f,0.70f,0.93f), ImColor::HSV(282.f / 360.f,0.51f,0.99f), ImColor::HSV(282.f / 360.f,0.71f,0.82f),
+             ImColor::HSV(0.f / 360.f,0.1f,0.87f), ImColor::HSV(0.f / 360.f,0.f,0.94f), ImColor::HSV(0.f / 360.f,0.f,0.77f)},
             // backpack
             {ImColor::HSV(30.f / 360.f,0.289f,0.624f), ImColor::HSV(39.f / 360.f,0.25f,0.816f), ImColor::HSV(18.f / 360.f,0.376f,0.49f), // 1
              ImColor::HSV(55.f / 360.f,0.37f,0.784f), ImColor::HSV(37.f / 360.f,0.533f,0.706f), ImColor::HSV(18.f / 360.f,0.376f,0.49f), // 2
@@ -152,10 +159,10 @@ class characterBuilder
     int frameCount_4 = 0;
 
     vector<pair<ImVec2,ImVec2>> cordsAnim = {
-            {ImVec2(0.1f / 192.f, 0.1f/320.f),ImVec2(32.1f/192.f, 64.f/320.f)},
-            {ImVec2(160.1f / 192.f, 256.1f/320.f),ImVec2(192.1f/192.f, 320.f/320.f)},
-            {ImVec2(64.1f / 192.f, 64.1f/320.f),ImVec2(96.1f/192.f, 128.f/320.f)},
-            {ImVec2(160.1f / 192.f, 192.1f/320.f),ImVec2(192.1f/192.f, 256.f/320.f)}
+            {ImVec2(0.1f / 192.f, 0.1f/320.f),ImVec2(31.99f/192.f, 64.f/320.f)},
+            {ImVec2(160.1f / 192.f, 256.1f/320.f),ImVec2(191.99f/192.f, 320.f/320.f)},
+            {ImVec2(64.1f / 192.f, 64.1f/320.f),ImVec2(95.99f/192.f, 128.f/320.f)},
+            {ImVec2(160.1f / 192.f, 192.1f/320.f),ImVec2(191.99f/192.f, 256.f/320.f)}
     };
 
     void drawCharacter(imageHandler* imgHandler, float frameTimer);
