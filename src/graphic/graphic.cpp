@@ -133,8 +133,9 @@ void graphic::setup(){
         ImGui::NewFrame();
 
         if(show_display){
-            makeDisplay(image, character, builder);
             makeBackground(background, move, mapGridX, mapGridY);
+            makeDisplay(image, character, builder);
+            
 
         }
         
@@ -197,7 +198,7 @@ void graphic::makeDisplay(imageHandler& image, characterManager &character, char
     static float frameTimer = frameLength;
 
     // Window - Graphics
-    ImGui::Begin("Graphics", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
+    ImGui::Begin("Graphics", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
     {
         if(characterCreated)
         {
@@ -266,9 +267,13 @@ void graphic::makeCharacterSelector(imageHandler& image, characterManager &chara
             show_charSelector = false;
         }
         ImGui::PopStyleColor(3);
+        
         ImGui::PopID();
     }
-  
+    ImGui::End();
+}
+
+
 void graphic::makeBackground(imageHandler background, movementHandler move, float &gridX, float &gridY){
     ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
     ImGui::SetNextWindowPos({0, 0});
