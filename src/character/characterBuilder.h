@@ -112,6 +112,13 @@ class characterBuilder
     // ImColor::HSV(0.f / 360.f,0.f,0.f), ImColor::HSV(0.f / 360.f,0.f,0.f), ImColor::HSV(0.f / 360.f,0.f,0.f)
 
     vector<vector<ImColor>> accessoriesButtonColor = {
+            // Bow
+            {ImColor::HSV(189.f / 360.f,1.0f,0.87f), ImColor::HSV(188.f / 360.f,0.74f,0.91f), ImColor::HSV(188.f / 360.f,1.0f,0.8f),
+             ImColor::HSV(339.f / 360.f,0.39f,0.91f), ImColor::HSV(344.f / 360.f,0.31f,0.93f), ImColor::HSV(339.f / 360.f,0.48f,0.87f),
+             ImColor::HSV(149.f / 360.f,0.66f,0.69f), ImColor::HSV(142.f / 360.f,0.53f,0.78f), ImColor::HSV(149.f / 360.f,0.75f,0.57f),
+             ImColor::HSV(54.f / 360.f,0.89f,0.85f), ImColor::HSV(54.f / 360.f,0.68f,0.91f), ImColor::HSV(54.f / 360.f,0.98f,0.79f),
+             ImColor::HSV(282.f / 360.f,0.70f,0.93f), ImColor::HSV(282.f / 360.f,0.51f,0.99f), ImColor::HSV(282.f / 360.f,0.71f,0.82f),
+             ImColor::HSV(0.f / 360.f,0.1f,0.87f), ImColor::HSV(0.f / 360.f,0.f,0.94f), ImColor::HSV(0.f / 360.f,0.f,0.77f)},
             // backpack
             {ImColor::HSV(30.f / 360.f,0.289f,0.624f), ImColor::HSV(39.f / 360.f,0.25f,0.816f), ImColor::HSV(18.f / 360.f,0.376f,0.49f), // 1
              ImColor::HSV(55.f / 360.f,0.37f,0.784f), ImColor::HSV(37.f / 360.f,0.533f,0.706f), ImColor::HSV(18.f / 360.f,0.376f,0.49f), // 2
@@ -137,25 +144,46 @@ class characterBuilder
             {ImColor::HSV(8.f / 360.f,0.525f,0.627f), ImColor::HSV(0.f / 360.f,0.423f,0.557f), ImColor::HSV(349.f / 360.f,0.432f,0.49f)}
     };
 
-    int indexBody = 0;
-    int indexEyes = 0;
+    vector<ImColor> bodyColors = {
+            ImColor::HSV(16.f / 360.f,0.37f,0.75f), ImColor::HSV(23.f / 360.f,0.32f,0.77f), ImColor::HSV(6.f / 360.f,0.37f,0.71f),
+            ImColor::HSV(21.f / 360.f,0.31f,1.f), ImColor::HSV(10.f / 360.f,0.35f,0.96f), ImColor::HSV(29.f / 360.f,0.27f,1.f),
+            ImColor::HSV(21.f / 360.f,0.42f,1.f), ImColor::HSV(10.f / 360.f,0.46f,0.96f), ImColor::HSV(25.f / 360.f,0.34f,1.f),
+            ImColor::HSV(25.f / 360.f,0.51f,0.73f), ImColor::HSV(18.f / 360.f,0.54f,0.72f), ImColor::HSV(30.f / 360.f,0.48f,0.76f),
+            ImColor::HSV(43.f / 360.f,0.40f,0.80f), ImColor::HSV(51.f / 360.f,0.34f,0.89f), ImColor::HSV(35.f / 360.f,0.48f,0.77f),
+            ImColor::HSV(36.f / 360.f,0.12f,0.83f), ImColor::HSV(27.f / 360.f,0.17f,0.78f), ImColor::HSV(32.f / 360.f,0.17f,0.91f),
+            ImColor::HSV(25.f / 360.f,0.47f,0.94f), ImColor::HSV(31.f / 360.f,0.39f,0.96f), ImColor::HSV(21.f / 360.f,0.53f,0.90f),
+            ImColor::HSV(320.f / 360.f,0.20f,0.90f), ImColor::HSV(313.f / 360.f,0.29f,0.85f), ImColor::HSV(327.f / 360.f,0.18f,0.96f),
+            ImColor::HSV(244.f / 360.f,0.14f,0.84f), ImColor::HSV(228.f / 360.f,0.26f,0.84f), ImColor::HSV(252.f / 360.f,0.17f,0.93f)
+    };
+    vector<ImColor> eyeColors = {
+            ImColor::HSV(8.f / 360.f,0.29f,0.40f), ImColor::HSV(8.f / 360.f,0.29f,0.73f), ImColor::HSV(8.f / 360.f,0.11f,0.26f),
+            ImColor::HSV(132.f / 360.f,0.39f,0.55f), ImColor::HSV(132.f / 360.f,0.55f,0.77f), ImColor::HSV(132.f / 360.f,0.67f,0.44f),
+            ImColor::HSV(67.f / 360.f,0.44f,0.62f), ImColor::HSV(67.f / 360.f,0.44f,0.80f), ImColor::HSV(67.f / 360.f,0.73f,0.44f),
+            ImColor::HSV(235.f / 360.f,0.19f,0.52f), ImColor::HSV(235.f / 360.f,0.19f,0.76f), ImColor::HSV(235.f / 360.f,0.19f,0.31f),
+            ImColor::HSV(33.f / 360.f,0.79f,0.58f), ImColor::HSV(33.f / 360.f,0.79f,0.80f), ImColor::HSV(33.f / 360.f,0.79f,0.40f),
+            ImColor::HSV(203.f / 360.f,0.64f,0.64f), ImColor::HSV(203.f / 360.f,0.64f,0.84f), ImColor::HSV(203.f / 360.f,0.64f,0.44f),
+            ImColor::HSV(181.f / 360.f,0.61f,0.95f), ImColor::HSV(181.f / 360.f,0.25f,0.95f), ImColor::HSV(181.f / 360.f,0.61f,0.64f)
+    };
 
-    int indexOutfit = 0;
+    int indexBody = 0;
+    int indexEyes = 5;
+
+    int indexOutfit = 8;
     int indexOutfitColor = 0;
 
-    int indexHair = 0;
-    int indexHairColor = 0;
+    int indexHair = 2;
+    int indexHairColor = 2;
 
     int indexAccessories = 0;
-    int indexAccessoriesColor = 0;
+    int indexAccessoriesColor = 1;
 
     int frameCount_4 = 0;
 
     vector<pair<ImVec2,ImVec2>> cordsAnim = {
-            {ImVec2(0.1f / 192.f, 0.1f/320.f),ImVec2(32.1f/192.f, 64.f/320.f)},
-            {ImVec2(160.1f / 192.f, 256.1f/320.f),ImVec2(192.1f/192.f, 320.f/320.f)},
-            {ImVec2(64.1f / 192.f, 64.1f/320.f),ImVec2(96.1f/192.f, 128.f/320.f)},
-            {ImVec2(160.1f / 192.f, 192.1f/320.f),ImVec2(192.1f/192.f, 256.f/320.f)}
+            {ImVec2(0.1f / 192.f, 0.1f/320.f),ImVec2(31.99f/192.f, 64.f/320.f)},
+            {ImVec2(160.1f / 192.f, 256.1f/320.f),ImVec2(191.99f/192.f, 320.f/320.f)},
+            {ImVec2(64.1f / 192.f, 64.1f/320.f),ImVec2(95.99f/192.f, 128.f/320.f)},
+            {ImVec2(160.1f / 192.f, 192.1f/320.f),ImVec2(191.99f/192.f, 256.f/320.f)}
     };
 
     void drawCharacter(imageHandler* imgHandler, float frameTimer);

@@ -3,6 +3,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <unordered_map>
 
 using namespace std;
 
@@ -49,8 +50,16 @@ public:
             {"23", "assets/npc/23.png"},
     };
 
-    map<string, vector<string>> accessories ={
-            {"backpack",{"assets/characters/accessories/backpack_1.png",
+    map<int, vector<string>> accessories ={
+            // bow
+            {1, {"assets/characters/accessories/bow_1.png",
+                        "assets/characters/accessories/bow_2.png",
+                        "assets/characters/accessories/bow_3.png",
+                        "assets/characters/accessories/bow_4.png",
+                        "assets/characters/accessories/bow_5.png",
+                        "assets/characters/accessories/bow_6.png"}},
+            //backpack
+            {2,{"assets/characters/accessories/backpack_1.png",
                                 "assets/characters/accessories/backpack_2.png",
                                 "assets/characters/accessories/backpack_3.png",
                                 "assets/characters/accessories/backpack_4.png",
@@ -60,14 +69,18 @@ public:
                                 "assets/characters/accessories/backpack_8.png",
                                 "assets/characters/accessories/backpack_9.png",
                                 "assets/characters/accessories/backpack_10.png"}},
-            {"beanie", {"assets/characters/accessories/beanie_1.png",
+            // beanie
+            {3, {"assets/characters/accessories/beanie_1.png",
                                "assets/characters/accessories/beanie_2.png",
                                "assets/characters/accessories/beanie_3.png",
                                "assets/characters/accessories/beanie_4.png",
                                "assets/characters/accessories/beanie_5.png"}},
-            {"beard", {"assets/characters/accessories/beard_1.png"}},
-            {"chef", {"assets/characters/accessories/chef_1.png"}},
-            {"dinohat", {"assets/characters/accessories/dinohat_3.png"}}
+            // beard
+            {4, {"assets/characters/accessories/beard_1.png"}},
+            // chef
+            {5, {"assets/characters/accessories/chef_1.png"}},
+            // dino hat
+            {6, {"assets/characters/accessories/dinohat_3.png"}}
     };
     vector<string> body ={
             {"assets/characters/body/body_1.png"},
