@@ -24,7 +24,6 @@ using std::pair;
 #endif
 
 #include "graphic.h"
-
 #include "../imageHandler/imageHandler.h"
 #include "../character/characterManager.h"
 #include "../character/characterBuilder.h"
@@ -135,8 +134,6 @@ void graphic::setup(){
         if(show_display){
             makeBackground(background, move, mapGridX, mapGridY);
             makeDisplay(image, character, builder);
-            
-
         }
         
         if(show_process){

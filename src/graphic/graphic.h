@@ -9,7 +9,7 @@
 class graphic {
 public:
     int width_px = 1920;
-    int height_px = 1072;
+    int height_px = 1080;
 
     bool show_display = true;
     bool show_process = true;
