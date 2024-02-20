@@ -1,17 +1,28 @@
 #include "imageHandler.h"
 #include "imagePath.h"
 #include <stdio.h>
+
+#if defined(__APPLE__)
+#include <iostream>
+using std::string;
+using std::vector;
+using std::cout;
+using std::endl;
+#else
 #include <bits/stdc++.h>
+#endif
+
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
-#include <SDL.h>
+
+#include <SDL2/SDL.h>
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <SDL_opengles2.h>
 #else
-#include <SDL_opengl.h>
+#include <SDL2/SDL_opengl.h>
 #endif
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -35,7 +46,10 @@ bool imageHandler::loadTexture(const char *filename, imageHandler* image){
     int image_channel = 0;
     auto image_data = stbi_load(filename, &image_width, &image_height, &image_channel, 0);
     
-    if(image_data == NULL){
+    if(image_data == NULL)
+    {
+        cout << filename << endl;
+        printf("Error loading image: %s\n", stbi_failure_reason());
         return false;
     }
 
@@ -45,8 +59,8 @@ bool imageHandler::loadTexture(const char *filename, imageHandler* image){
     glBindTexture(GL_TEXTURE_2D, image_texture);
 
     // Setup filtering parameters for display
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); // This is required on WebGL for non power-of-two textures
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // Same
 
@@ -62,26 +76,6 @@ bool imageHandler::loadTexture(const char *filename, imageHandler* image){
     image->height = image_height;
 
     return true;
-
-}
-
-bool imageHandler::CreateAnimation(vector<string>& paths, vector<imageHandler*> &frames)
-{
-    imagePath abs = imagePath();
-    for(uint i = 0; i < paths.size(); i++)
-    {
-        imageHandler* frame = new imageHandler();
-
-        string absolute = abs.absolutePath + paths.at(i);
-
-        //cout << absolute << endl;
-
-        bool ret = imageHandler::loadTexture(absolute.c_str(), frame);
-        IM_ASSERT(ret);
-
-        frames.push_back(frame);
-    }
-    return true;
 }
 
 void imageHandler::DrawImage(imageHandler _image)
@@ -89,6 +83,37 @@ void imageHandler::DrawImage(imageHandler _image)
     ImGui::Image((void*)(intptr_t)_image.texture, ImVec2(_image.width, _image.height));
 }
 
+void imageHandler::DrawImage(imageHandler& _image, float scaleFactor)
+{
+    ImGui::Image((void*)(intptr_t)_image.texture, ImVec2((_image.width * scaleFactor), (_image.height * scaleFactor)));
+}
+
+void imageHandler::DrawAnimationFrame(imageHandler _image, pair<ImVec2,ImVec2> cords, float scaleFactor)
+{
+    ImGui::Image((void*)(intptr_t)_image.texture, ImVec2((32.f * scaleFactor), (64.f * scaleFactor)),cords.first, cords.second);
+}
+
+pair<ImVec2, ImVec2> imageHandler::generateCords(int animation, int frame, float spriteWidth, float spriteHeight, float imageWidth, float imageHeight)
+{
+    float minX = ((float)frame * spriteWidth);
+    float minY = ((float)animation * spriteHeight);
+    float maxX = (minX + spriteWidth) / imageWidth;
+    float maxY = (minY + spriteHeight) / imageHeight;
+
+    minX /= imageWidth;
+    minY /= imageHeight;
+
+    minX += 0.1f;
+    minY += 0.1f;
+    maxX += 0.1f;
+    return make_pair(ImVec2(minX,minY), ImVec2(maxX,maxY));
+    // Example if character: imgHandler->generateCords(1,frameCount_6,32.f,64.f,192.f,320.f)
+}
+
+void imageHandler::cleanUp()
+{
+    glDeleteTextures(1, &texture);
+}
 void imageHandler::DrawMap(imageHandler _image, int tileX, int tileY, float width, float height){
     //ImGui::Image((void*)(intptr_t)_image.texture, ImVec2(_image.width, _image.height));
 

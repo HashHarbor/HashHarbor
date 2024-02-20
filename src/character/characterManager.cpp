@@ -1,26 +1,33 @@
-#include <stdio.h>
-
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
-
-#include <SDL.h>
+#include <stdio.h>
+#include <SDL2/SDL.h>
 #if defined(IMGUI_IMPL_OPENGL_ES2)
-#include <SDL_opengles2.h>
+#include <SDL2/SDL_opengles2.h>
 #else
-#include <SDL_opengl.h>
+#include <SDL2/SDL_opengl.h>
 #endif
 
+#if defined(__APPLE__)
 #include <iostream>
 #include <vector>
+#include <vector>
 #include <map>
+using std::string;
+using std::vector;
+using std::cout;
+using std::endl;
+using std::pair;
+#else
+#include <bits/stdc++.h>
+#endif
+
+#include "../imageHandler/imageHandler.h"
+#include "characterBuilder.h"
 
 namespace ImGui { extern ImGuiKeyData* GetKeyData(ImGuiKey key); }
 
-using std::vector;
-using std::string;
-using std::cout;
-using std::endl;
 
 #include "../imageHandler/imageHandler.h"
 #include "../imageHandler/imagePath.h"
@@ -28,26 +35,11 @@ using std::endl;
 
 characterManager::characterManager() {}
 
-void characterManager::createCharacter(std::string name, bool npc, bool fullMovement, imageHandler* imgHandler)
+
+void characterManager::createCharacter(string name, bool npc, bool fullMovement, imageHandler* imgHandler)
 {
-    imagePath paths = imagePath(); // gets access to the class with all file paths
-    auto charPath = paths.index.find(name); // get the character to create
-    if(charPath == paths.index.end())
-    {
-        return;
-    }
+    character* newChar = new character(name, fullMovement, 32.f, 64.f); // create the character
 
-    character* newChar = new character(name, fullMovement); // create the character
-
-    imgHandler->CreateAnimation(charPath->second.find("Idle")->second, newChar->idle);
-
-    if(fullMovement) // if character has full movement create the animations
-    {
-        imgHandler->CreateAnimation(charPath->second.find("Up")->second, newChar->walkUp);
-        imgHandler->CreateAnimation(charPath->second.find("Down")->second, newChar->walkDown);
-        imgHandler->CreateAnimation(charPath->second.find("Right")->second, newChar->walkRight);
-        imgHandler->CreateAnimation(charPath->second.find("Left")->second, newChar->walkLeft);
-    }
 
     if(!npc)
         playerCharacters.emplace(name, newChar);
@@ -62,7 +54,6 @@ character* characterManager::getPlayerCharacter(string name)
     { //todo - delete print statement
         std::cout << "FAIL TO FIND BOB" << std::endl;
     }
-    cout << "I: " << find->idle.size()  << " |||| " << find->name<< endl;
     return find;
 }
 
@@ -82,7 +73,9 @@ void characterManager::setMainPlayer(std::string name)
     mainPlayer = playerCharacters.find(name)->second;
 }
 
-void characterManager::moveMainCharacter(imageHandler* imgHandler, float frameTimer)
+
+void characterManager::moveMainCharacter(imageHandler* imgHandler, characterBuilder* charBuild,float frameTimer)
+
 {
 #ifdef IMGUI_DISABLE_OBSOLETE_KEYIO
     struct funcs { static bool IsLegacyNativeDupe(ImGuiKey) { return false; } };
@@ -105,23 +98,26 @@ void characterManager::moveMainCharacter(imageHandler* imgHandler, float frameTi
         else { keyDown = 0; }
     }
 
+
+    float factor = 1.f;
+    //Draw Order: Body -> Eyes -> Outfit -> Hair -> Accessories
     switch(keyDown)
     {
-        
         case 1:
-            imgHandler->DrawImage(*mainPlayer->walkUp.at(frameCount_6));
+            charBuild->drawCharacterAnimation(imgHandler,drawPos,cordsWalkUp.at(frameCount_6),factor,mainPlayer->dynamicIndex);
             break;
         case 2:
-            imgHandler->DrawImage(*mainPlayer->walkDown.at(frameCount_6));
+            charBuild->drawCharacterAnimation(imgHandler,drawPos,cordsWalkDown.at(frameCount_6),factor,mainPlayer->dynamicIndex);
             break;
         case 3:
-            imgHandler->DrawImage(*mainPlayer->walkRight.at(frameCount_6));
+            charBuild->drawCharacterAnimation(imgHandler,drawPos,cordsWalkRight.at(frameCount_6),factor,mainPlayer->dynamicIndex);
             break;
         case 4:
-            imgHandler->DrawImage(*mainPlayer->walkLeft.at(frameCount_6));
+            charBuild->drawCharacterAnimation(imgHandler,drawPos,cordsWalkLeft.at(frameCount_6),factor,mainPlayer->dynamicIndex);
             break;
         default:
-            imgHandler->DrawImage(*mainPlayer->idle.at(frameCount_4));
+            charBuild->drawCharacterAnimation(imgHandler,drawPos,cordsIdle.at(frameCount_6),factor,mainPlayer->dynamicIndex);
+
             break;
     }
 
@@ -133,6 +129,10 @@ void characterManager::moveMainCharacter(imageHandler* imgHandler, float frameTi
         if (frameCount_6 % 6 == 0) frameCount_6=0;
     }
 
-    //todo - remove on screen key printout
-    //ImGui::Text("Keys down:"); for (ImGuiKey key = key_first; key < ImGuiKey_COUNT; key++) { if (funcs::IsLegacyNativeDupe(key)) continue; if (ImGui::IsKeyDown(key)) { ImGui::SameLine(); ImGui::Text("\"%s\" %d (%.02f secs)", ImGui::GetKeyName(key), key, ImGui::GetKeyData(key)->DownDuration); } }
+}
+
+void characterManager::selectMainCharacter(characterBuilder* charBuild)
+{
+    charBuild->setAsMainCharacter(mainPlayer->dynamicIndex);
+
 }

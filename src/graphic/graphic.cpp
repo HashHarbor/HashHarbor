@@ -3,20 +3,31 @@
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
 
-#include <SDL.h>
 #include <SDL2/SDL.h>
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <SDL_opengles2.h>
 #else
-#include <SDL_opengl.h>
+
+#include <SDL2/SDL_opengl.h>
 #endif
 
+#if defined(__APPLE__)
+#include <iostream>
+#include <vector>
+using std::string;
+using std::vector;
+using std::cout;
+using std::endl;
+using std::pair;
+#else
 #include <bits/stdc++.h>
+#endif
 
 #include "graphic.h"
 
 #include "../imageHandler/imageHandler.h"
 #include "../character/characterManager.h"
+#include "../character/characterBuilder.h"
 #include "../movement/movementHandler.h"
 
 #define IMGUI_DEFINE_MATH_OPERATORS
@@ -30,11 +41,23 @@ void graphic::setup(){
     }
 
     // GL 3.0 + GLSL 130
-    const char* glsl_version = "#version 130";
+    const char* glsl_version;
+#if defined(__APPLE__)
+    // GL 3.2 Core + GLSL 150
+    glsl_version = "#version 150";
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG); // Always required on Mac
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+#else
+    glsl_version = "#version 130";
+
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+#endif
+
 
     // Create window with graphics context
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
@@ -62,10 +85,12 @@ void graphic::setup(){
     ImGui_ImplOpenGL3_Init(glsl_version);
 
     imageHandler image = imageHandler();
-    imageHandler background = imageHandler("../src/abc.png");
-    background.loadTexture(background.filepath, &background);
 
     characterManager character = characterManager();
+    characterBuilder builder = characterBuilder(&image);
+
+    imageHandler background = imageHandler("../src/abc.png");
+    background.loadTexture(background.filepath, &background);
 
     character.createCharacter("Bob", false, true, &image);
     character.setMainPlayer("Bob");
@@ -101,6 +126,7 @@ void graphic::setup(){
                 done = true;
         }
 
+
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
@@ -108,7 +134,9 @@ void graphic::setup(){
 
         if(show_display){
             makeBackground(background, move, mapGridX, mapGridY);
-            makeDisplay(image, character);
+            makeDisplay(image, character, builder);
+            
+
         }
         
         if(show_process){
@@ -118,6 +146,19 @@ void graphic::setup(){
         if(show_config){
             makeConfig();
         }
+
+        if(show_charSelector)
+        {
+            makeCharacterSelector(image, character, builder);
+        }
+
+        if(ImGui::IsKeyDown(ImGuiKey_Escape))
+        {
+            //todo move settings menu when created
+            show_charSelector = true;
+            characterCreated = false;
+        }
+
 
         // if(emulate){
         //     while(chip.pc < sizeof(chip.memory)){
@@ -135,6 +176,8 @@ void graphic::setup(){
     }
 
     // Cleanup
+
+    builder.cleanUp();
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
@@ -143,6 +186,93 @@ void graphic::setup(){
     SDL_DestroyWindow(window);
     SDL_Quit();
 }
+
+
+void graphic::makeDisplay(imageHandler& image, characterManager &character, characterBuilder& charBuild)
+{
+    // Graphics window calculation
+    ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
+    ImGui::SetNextWindowPos({0, 0});
+
+    const float frameLength = 1.f / 10.f; // In seconds, so  FPS
+    static float frameTimer = frameLength;
+
+    // Window - Graphics
+    ImGui::Begin("Graphics", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
+    {
+        if(characterCreated)
+        {
+            frameTimer -= ImGui::GetIO().DeltaTime;
+
+            ImVec2 characterPos = ImVec2((ImGui::GetContentRegionAvail() - ImVec2(32, 64)) * 0.5f);
+            character.drawPos = characterPos;
+
+            ImGui::SetCursorPos(characterPos);
+            character.moveMainCharacter(&image, &charBuild, frameTimer);
+
+            if (frameTimer <= 0.f)
+            {
+                frameTimer = 2.5f / 10.f;
+            }
+        }
+    }
+    ImGui::End();
+}
+
+void graphic::makeProcess(){
+    // Processor information window calculation
+    ImGui::SetNextWindowSize({(float)width_px / 2, (float)height_px});
+    ImGui::SetNextWindowPos({(float)width_px / 2, 0});
+
+    // Window - Processor Information
+    ImGui::Begin("Processor Information", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+    {
+ 
+    }
+    ImGui::End();
+}
+
+void graphic::makeCharacterSelector(imageHandler& image, characterManager &character, characterBuilder& charBuild)
+{
+    ImGui::SetNextWindowSize({ImGui::GetIO().DisplaySize.x-550.f, ImGui::GetIO().DisplaySize.y-200.f});
+    ImGui::SetNextWindowPos({275.f,100.f});
+
+    float factor = 4.f;
+    const float frameLength = 5.f / 10.f; // In seconds, so  FPS
+    static float frameTimer = frameLength;
+
+    // Window - Config
+    ImGui::Begin("Character Selector", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoNav);
+    {
+        frameTimer -= ImGui::GetIO().DeltaTime;
+        ImVec2 characterPos = ImVec2((ImGui::GetContentRegionAvail() - ImVec2((32.f * factor), (64.f * factor))) * 0.25f);
+        charBuild.drawPos = ImVec2(characterPos.x * 3.f, characterPos.y * 2.f);
+        charBuild.drawCharacterBuilder(&image, frameTimer);
+
+        if (frameTimer <= 0.f)
+        {
+            frameTimer = 5.f / 10.f;
+        }
+
+        //---setchar
+        ImGui::SetCursorPos(ImVec2(290.f,390.f));
+        ImGui::PushID(8);
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
+        if(ImGui::Button("Select Character", ImVec2(150.f, 40.f)))
+        {
+            character.selectMainCharacter(&charBuild);
+            characterCreated = true;
+            show_charSelector = false;
+        }
+        ImGui::PopStyleColor(3);
+        
+        ImGui::PopID();
+    }
+    ImGui::End();
+}
+
 
 void graphic::makeBackground(imageHandler background, movementHandler move, float &gridX, float &gridY){
     ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
@@ -190,49 +320,11 @@ void graphic::makeBackground(imageHandler background, movementHandler move, floa
     ImGui::End();
 }
 
-void graphic::makeDisplay(imageHandler image, characterManager &character){
-    // Graphics window calculation
-    ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
-    ImGui::SetNextWindowPos({0, 0});
-
-    const float frameLength = 2.5f / 10.f; // In seconds, so 4 FPS
-    static float frameTimer = frameLength;
-
-    // Window - Graphics
-    ImGui::Begin("Graphics", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
-    {
-        frameTimer -= ImGui::GetIO().DeltaTime;
-
-        ImVec2 characterPos = ImVec2((ImGui::GetContentRegionAvail() - ImVec2(32, 64)) * 0.5f);
-
-        ImGui::SetCursorPos(characterPos);
-        character.moveMainCharacter(&image, frameTimer);
-
-        if (frameTimer <= 0.f)
-        {
-            frameTimer = 2.5f / 10.f;
-        }
-        
-    }
-    ImGui::End();
-}
-
-void graphic::makeProcess(){
-    // Processor information window calculation
-    ImGui::SetNextWindowSize({(float)width_px / 2, (float)height_px});
-    ImGui::SetNextWindowPos({(float)width_px / 2, 0});
-
-    // Window - Processor Information
-    ImGui::Begin("Processor Information", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
-    {
- 
-    }
-    ImGui::End();
-}
 
 void graphic::makeConfig(){
     // Config window calculation
     ImGui::SetNextWindowSize({(float)width_px / 2, (float)height_px / 2});
+
     ImGui::SetNextWindowPos({0, (float)height_px/2});
 
     // Window - Config
