@@ -28,6 +28,7 @@ using std::endl;
 #include "../imageHandler/imagePath.h"
 #include "characterBuilder.h"
 
+
 struct character
 {
 public:
@@ -46,6 +47,7 @@ public:
         this->fullMovement = fullMovement;
         this->spriteWidth = width;
         this->spriteHeight = height;
+
     }
 };
 

@@ -3,11 +3,11 @@
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
 
-//#include <SDL.h>
 #include <SDL2/SDL.h>
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <SDL_opengles2.h>
 #else
+
 #include <SDL2/SDL_opengl.h>
 #endif
 
@@ -28,6 +28,7 @@ using std::pair;
 #include "../imageHandler/imageHandler.h"
 #include "../character/characterManager.h"
 #include "../character/characterBuilder.h"
+#include "../movement/movementHandler.h"
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui_internal.h"
@@ -50,11 +51,13 @@ void graphic::setup(){
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 #else
     glsl_version = "#version 130";
+
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 #endif
+
 
     // Create window with graphics context
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
@@ -82,14 +85,28 @@ void graphic::setup(){
     ImGui_ImplOpenGL3_Init(glsl_version);
 
     imageHandler image = imageHandler();
+
     characterManager character = characterManager();
     characterBuilder builder = characterBuilder(&image);
 
+    imageHandler background = imageHandler("../src/abc.png");
+    background.loadTexture(background.filepath, &background);
 
-    character.createCharacter("main", false, true, &image);
-    character.setMainPlayer("main");
+    character.createCharacter("Bob", false, true, &image);
+    character.setMainPlayer("Bob");
 
+    movementHandler move = movementHandler("../src/abc.png");
+    // auto gr = obs.getGrid();
+    // for(uint i = 0; i < gr.size(); i++){
+    //     for(uint j = 0; j < gr[0].size(); j++){
+    //         cout << gr[i][j] << " ";
+    //     }
+    //     cout << endl;
+    // }
 
+    float mapGridX = 15.0f;
+    float mapGridY = 8.0f;
+    
     // Main loop
     bool done = false;
     while (!done)
@@ -109,7 +126,7 @@ void graphic::setup(){
                 done = true;
         }
 
-        //cout << show_display << " | "<< show_process<< " | " << show_config<< " | " << show_charSelector << endl;
+
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
@@ -117,6 +134,8 @@ void graphic::setup(){
 
         if(show_display){
             makeDisplay(image, character, builder);
+            makeBackground(background, move, mapGridX, mapGridY);
+
         }
         
         if(show_process){
@@ -139,6 +158,7 @@ void graphic::setup(){
             characterCreated = false;
         }
 
+
         // if(emulate){
         //     while(chip.pc < sizeof(chip.memory)){
         //         chip.emulate_cycle();
@@ -155,6 +175,7 @@ void graphic::setup(){
     }
 
     // Cleanup
+
     builder.cleanUp();
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
@@ -164,6 +185,7 @@ void graphic::setup(){
     SDL_DestroyWindow(window);
     SDL_Quit();
 }
+
 
 void graphic::makeDisplay(imageHandler& image, characterManager &character, characterBuilder& charBuild)
 {
@@ -246,13 +268,59 @@ void graphic::makeCharacterSelector(imageHandler& image, characterManager &chara
         ImGui::PopStyleColor(3);
         ImGui::PopID();
     }
+  
+void graphic::makeBackground(imageHandler background, movementHandler move, float &gridX, float &gridY){
+    ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
+    ImGui::SetNextWindowPos({0, 0});
+
+    static auto lastKeyEventTime = std::chrono::steady_clock::now();
+
+    // Get the current time
+    auto currentTime = std::chrono::steady_clock::now();
+
+    // Calculate the time elapsed since the last key event
+    auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastKeyEventTime).count();
+
+    // Define the cooldown duration between key events in milliseconds
+    const int cooldownMilliseconds = 1000; // 1 second cooldown
+
+
+    #ifdef IMGUI_DISABLE_OBSOLETE_KEYIO
+    struct funcs { static bool IsLegacyNativeDupe(ImGuiKey) { return false; } };
+            const ImGuiKey key_first = ImGuiKey_NamedKey_BEGIN;
+    #else
+        struct funcs { static bool IsLegacyNativeDupe(ImGuiKey key) { return key < 512 && ImGui::GetIO().KeyMap[key] != -1; } };
+        const ImGuiKey key_first = 0;
+    #endif
+
+    int keyDown = 0; // used to identify which direction the character is moving
+    for (ImGuiKey key = key_first; key < ImGuiKey_COUNT; key++)
+    {
+        if (elapsedTime >= cooldownMilliseconds) {
+            if (funcs::IsLegacyNativeDupe(key)) continue;
+
+            if(ImGui::IsKeyDown(ImGuiKey_UpArrow) || ImGui::IsKeyDown(ImGuiKey_W)) { keyDown = 1; }
+            else if(ImGui::IsKeyDown(ImGuiKey_DownArrow) || ImGui::IsKeyDown(ImGuiKey_S)) { keyDown = 2; }
+            else if(ImGui::IsKeyDown(ImGuiKey_RightArrow) || ImGui::IsKeyDown(ImGuiKey_D)) { keyDown = 3; }
+            else if(ImGui::IsKeyDown(ImGuiKey_LeftArrow) || ImGui::IsKeyDown(ImGuiKey_A)) { keyDown = 4; }
+            
+        }
+    }
+
+    ImGui::Begin("Background", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);
+    {
+        move.mapMovement(keyDown, background, gridX, gridY);
+    }
+
     ImGui::End();
 }
+
 
 void graphic::makeConfig(){
     // Config window calculation
     ImGui::SetNextWindowSize({(float)width_px / 2, (float)height_px / 2});
-    ImGui::SetNextWindowPos({0, 320});
+
+    ImGui::SetNextWindowPos({0, (float)height_px/2});
 
     // Window - Config
     ImGui::Begin("Config", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);

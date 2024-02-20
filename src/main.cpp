@@ -21,6 +21,7 @@ using std::endl;
 
 #include "graphic/graphic.h"
 
+#include <opencv2/opencv.hpp>
 
 int main(int argc, char **argv) 
 {
