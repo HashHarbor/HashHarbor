@@ -28,15 +28,18 @@ using std::pair;
 
 namespace ImGui { extern ImGuiKeyData* GetKeyData(ImGuiKey key); }
 
+
 #include "../imageHandler/imageHandler.h"
 #include "../imageHandler/imagePath.h"
 #include "characterManager.h"
 
 characterManager::characterManager() {}
 
+
 void characterManager::createCharacter(string name, bool npc, bool fullMovement, imageHandler* imgHandler)
 {
     character* newChar = new character(name, fullMovement, 32.f, 64.f); // create the character
+
 
     if(!npc)
         playerCharacters.emplace(name, newChar);
@@ -70,7 +73,9 @@ void characterManager::setMainPlayer(std::string name)
     mainPlayer = playerCharacters.find(name)->second;
 }
 
+
 void characterManager::moveMainCharacter(imageHandler* imgHandler, characterBuilder* charBuild,float frameTimer)
+
 {
 #ifdef IMGUI_DISABLE_OBSOLETE_KEYIO
     struct funcs { static bool IsLegacyNativeDupe(ImGuiKey) { return false; } };
@@ -93,6 +98,7 @@ void characterManager::moveMainCharacter(imageHandler* imgHandler, characterBuil
         else { keyDown = 0; }
     }
 
+
     float factor = 1.f;
     //Draw Order: Body -> Eyes -> Outfit -> Hair -> Accessories
     switch(keyDown)
@@ -111,6 +117,7 @@ void characterManager::moveMainCharacter(imageHandler* imgHandler, characterBuil
             break;
         default:
             charBuild->drawCharacterAnimation(imgHandler,drawPos,cordsIdle.at(frameCount_6),factor,mainPlayer->dynamicIndex);
+
             break;
     }
 
@@ -121,9 +128,11 @@ void characterManager::moveMainCharacter(imageHandler* imgHandler, characterBuil
         if (frameCount_4 % 4 == 0) frameCount_4=0;
         if (frameCount_6 % 6 == 0) frameCount_6=0;
     }
+
 }
 
 void characterManager::selectMainCharacter(characterBuilder* charBuild)
 {
     charBuild->setAsMainCharacter(mainPlayer->dynamicIndex);
+
 }

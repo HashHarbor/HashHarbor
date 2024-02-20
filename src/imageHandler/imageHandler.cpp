@@ -17,6 +17,7 @@ using std::endl;
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
+
 #include <SDL2/SDL.h>
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <SDL_opengles2.h>
@@ -112,4 +113,17 @@ pair<ImVec2, ImVec2> imageHandler::generateCords(int animation, int frame, float
 void imageHandler::cleanUp()
 {
     glDeleteTextures(1, &texture);
+}
+void imageHandler::DrawMap(imageHandler _image, int tileX, int tileY, float width, float height){
+    //ImGui::Image((void*)(intptr_t)_image.texture, ImVec2(_image.width, _image.height));
+
+    float topLeft = (float)(tileX - 15)/ 42;
+    float topRight = (float)(tileY - 8) / 28;
+
+    float botLeft = (float)(tileX + 15)/ 42;
+    float botRight = (float)(tileY + 8) / 28;
+
+    ImGui::Image((void*)(intptr_t)_image.texture, ImVec2(width, height), ImVec2(topLeft, topRight), ImVec2(botLeft, botRight));
+
+    cout << botLeft << " " << botRight << endl;
 }
