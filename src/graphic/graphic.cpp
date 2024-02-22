@@ -88,13 +88,19 @@ void graphic::setup(){
     characterManager character = characterManager();
     characterBuilder builder = characterBuilder(&image);
 
-    imageHandler background = imageHandler("../src/abc.png");
+    string pathMap;
+#if defined(__APPLE__)
+    pathMap = "/Users/david/CLionProjects/HashHarbor/src/abc.png";
+#else
+    pathMap = "../src/abc.png";
+#endif
+    imageHandler background = imageHandler(pathMap.c_str());
     background.loadTexture(background.filepath, &background);
 
     character.createCharacter("Bob", false, true, &image);
     character.setMainPlayer("Bob");
 
-    movementHandler move = movementHandler("../src/abc.png");
+    movementHandler move = movementHandler(pathMap);
     // auto gr = obs.getGrid();
     // for(uint i = 0; i < gr.size(); i++){
     //     for(uint j = 0; j < gr[0].size(); j++){

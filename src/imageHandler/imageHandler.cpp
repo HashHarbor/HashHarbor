@@ -128,5 +128,5 @@ void imageHandler::DrawMap(imageHandler _image, int tileX, int tileY, float widt
 
     ImGui::Image((void*)(intptr_t)_image.texture, ImVec2(width, height), ImVec2(topLeft, topRight), ImVec2(botLeft, botRight));
 
-    cout << botLeft << " " << botRight << endl;
+    //cout << botLeft << " " << botRight << endl;
 }

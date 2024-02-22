@@ -8,8 +8,8 @@
 
 class graphic {
 public:
-    int width_px = 1920;
-    int height_px = 1080;
+    int width_px = 1280;
+    int height_px = 720;
 
     bool show_display = true;
     bool show_process = true;
