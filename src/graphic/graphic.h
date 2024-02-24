@@ -5,6 +5,7 @@
 #include "../character/characterManager.h"
 #include "../character/characterBuilder.h"
 #include "../movement/movementHandler.h"
+#include "textEditor/TextEditor.h"
 
 class graphic {
 public:
@@ -24,10 +25,11 @@ public:
     void setup();
 
     void makeDisplay(imageHandler& image, characterManager &character, characterBuilder& charBuild);
-    void makeProcess();
     void makeConfig();
+    void makeProcess(TextEditor &editor, const char* fileToEdit);
     void makeCharacterSelector(imageHandler& image, characterManager &character, characterBuilder& charBuild);
     void makeBackground(imageHandler background, movementHandler move, float &gridX, float &gridY);
+    string executeCPP(string code);
 
 private:
 

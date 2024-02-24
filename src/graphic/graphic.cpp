@@ -24,6 +24,7 @@ using std::pair;
 #endif
 
 #include "graphic.h"
+#include "textEditor/TextEditor.h"
 #include "../imageHandler/imageHandler.h"
 #include "../character/characterManager.h"
 #include "../character/characterBuilder.h"
@@ -33,6 +34,75 @@ using std::pair;
 #include "imgui_internal.h"
 
 void graphic::setup(){
+        TextEditor editor;
+	auto lang = TextEditor::LanguageDefinition::CPlusPlus();
+
+	// set your own known preprocessor symbols...
+	static const char* ppnames[] = { "NULL", "PM_REMOVE",
+		"ZeroMemory", "DXGI_SWAP_EFFECT_DISCARD", "D3D_FEATURE_LEVEL", "D3D_DRIVER_TYPE_HARDWARE", "WINAPI","D3D11_SDK_VERSION", "assert" };
+	// ... and their corresponding values
+	static const char* ppvalues[] = { 
+		"#define NULL ((void*)0)", 
+		"#define PM_REMOVE (0x0001)",
+		"Microsoft's own memory zapper function\n(which is a macro actually)\nvoid ZeroMemory(\n\t[in] PVOID  Destination,\n\t[in] SIZE_T Length\n); ", 
+		"enum DXGI_SWAP_EFFECT::DXGI_SWAP_EFFECT_DISCARD = 0", 
+		"enum D3D_FEATURE_LEVEL", 
+		"enum D3D_DRIVER_TYPE::D3D_DRIVER_TYPE_HARDWARE  = ( D3D_DRIVER_TYPE_UNKNOWN + 1 )",
+		"#define WINAPI __stdcall",
+		"#define D3D11_SDK_VERSION (7)",
+		" #define assert(expression) (void)(                                                  \n"
+        "    (!!(expression)) ||                                                              \n"
+        "    (_wassert(_CRT_WIDE(#expression), _CRT_WIDE(__FILE__), (unsigned)(__LINE__)), 0) \n"
+        " )"
+		};
+
+	for (long unsigned int i = 0; i < sizeof(ppnames) / sizeof(ppnames[0]); ++i)
+	{
+		TextEditor::Identifier id;
+		id.mDeclaration = ppvalues[i];
+		lang.mPreprocIdentifiers.insert(std::make_pair(std::string(ppnames[i]), id));
+	}
+
+	// set your own identifiers
+	static const char* identifiers[] = {
+		"HWND", "HRESULT", "LPRESULT","D3D11_RENDER_TARGET_VIEW_DESC", "DXGI_SWAP_CHAIN_DESC","MSG","LRESULT","WPARAM", "LPARAM","UINT","LPVOID",
+		"ID3D11Device", "ID3D11DeviceContext", "ID3D11Buffer", "ID3D11Buffer", "ID3D10Blob", "ID3D11VertexShader", "ID3D11InputLayout", "ID3D11Buffer",
+		"ID3D10Blob", "ID3D11PixelShader", "ID3D11SamplerState", "ID3D11ShaderResourceView", "ID3D11RasterizerState", "ID3D11BlendState", "ID3D11DepthStencilState",
+		"IDXGISwapChain", "ID3D11RenderTargetView", "ID3D11Texture2D", "TextEditor" };
+	static const char* idecls[] = 
+	{
+		"typedef HWND_* HWND", "typedef long HRESULT", "typedef long* LPRESULT", "struct D3D11_RENDER_TARGET_VIEW_DESC", "struct DXGI_SWAP_CHAIN_DESC",
+		"typedef tagMSG MSG\n * Message structure","typedef LONG_PTR LRESULT","WPARAM", "LPARAM","UINT","LPVOID",
+		"ID3D11Device", "ID3D11DeviceContext", "ID3D11Buffer", "ID3D11Buffer", "ID3D10Blob", "ID3D11VertexShader", "ID3D11InputLayout", "ID3D11Buffer",
+		"ID3D10Blob", "ID3D11PixelShader", "ID3D11SamplerState", "ID3D11ShaderResourceView", "ID3D11RasterizerState", "ID3D11BlendState", "ID3D11DepthStencilState",
+		"IDXGISwapChain", "ID3D11RenderTargetView", "ID3D11Texture2D", "class TextEditor" };
+	for (long unsigned int i = 0; i < sizeof(identifiers) / sizeof(identifiers[0]); ++i)
+	{
+		TextEditor::Identifier id;
+		id.mDeclaration = std::string(idecls[i]);
+		lang.mIdentifiers.insert(std::make_pair(std::string(identifiers[i]), id));
+	}
+	editor.SetLanguageDefinition(lang);
+	//editor.SetPalette(TextEditor::GetLightPalette());
+
+	// error markers
+	TextEditor::ErrorMarkers markers;
+	markers.insert(std::make_pair<int, std::string>(6, "Example error here:\nInclude file not found: \"TextEditor.h\""));
+	markers.insert(std::make_pair<int, std::string>(41, "Another example error"));
+	editor.SetErrorMarkers(markers);
+
+    vector<string> cppStart;
+    cppStart.push_back("#include <iostream>");
+    cppStart.push_back("int main() {");
+    cppStart.push_back("\tstd::cout << \"Hello World!\";");
+    cppStart.push_back("\treturn 0;");
+    cppStart.push_back("}");
+    editor.SetTextLines(cppStart);
+
+    static const char* fileToEdit = "frog.cpp";
+
+    //texteditor setup ends here
+
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) != 0)
     {
         printf("Error: %s\n", SDL_GetError());
@@ -143,7 +213,7 @@ void graphic::setup(){
         }
         
         if(show_process){
-            makeProcess(); 
+            makeProcess(editor, fileToEdit); 
         }
 
         if(show_config){
@@ -161,14 +231,6 @@ void graphic::setup(){
             show_charSelector = true;
             characterCreated = false;
         }
-
-
-        // if(emulate){
-        //     while(chip.pc < sizeof(chip.memory)){
-        //         chip.emulate_cycle();
-        //         std::this_thread::sleep_for(std::chrono::seconds(1));
-        //     }
-        // }
         
         // Rendering
         ImGui::Render();
@@ -222,15 +284,58 @@ void graphic::makeDisplay(imageHandler& image, characterManager &character, char
     ImGui::End();
 }
 
-void graphic::makeProcess(){
+string result = "";
+
+void graphic::makeProcess(TextEditor &editor, const char* fileToEdit){
     // Processor information window calculation
-    ImGui::SetNextWindowSize({(float)width_px / 2, (float)height_px});
+    ImGui::SetNextWindowSize({(float)width_px / 2,(float)height_px / 4 * 3});
     ImGui::SetNextWindowPos({(float)width_px / 2, 0});
 
-    // Window - Processor Information
-    ImGui::Begin("Processor Information", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+    auto cpos = editor.GetCursorPosition();
+    editor.GetText();
+
+    ImGui::Begin("Sandbox", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar);
     {
- 
+        // if (ImGui::BeginMenu("File")) {
+        //     if (ImGui::MenuItem("New", "Ctrl+N")) {
+        //         // Handle New action
+        //     }
+        //     if (ImGui::MenuItem("Open", "Ctrl+O")) {
+        //         // Handle Open action
+        //     }
+        //     if (ImGui::MenuItem("Save", "Ctrl+S")) {
+        //         // Handle Save action
+        //     }
+        //     ImGui::Separator();
+        //     if (ImGui::MenuItem("Exit", "Alt+F4")) {
+        //         // Handle Exit action
+        //     }
+        //     ImGui::EndMenu();
+        // }
+
+        ImGui::Text("%6d/%-6d %6d lines  | %s | %s | %s | %s", cpos.mLine + 1, cpos.mColumn + 1, editor.GetTotalLines(),
+			editor.IsOverwrite() ? "Ovr" : "Ins",
+			editor.CanUndo() ? "*" : " ",
+			editor.GetLanguageDefinition().mName.c_str(), fileToEdit);
+
+		editor.Render("TextEditor");
+    }
+    ImGui::End();
+
+    ImGui::SetNextWindowSize({(float)width_px / 2, (float)height_px / 4});
+    ImGui::SetNextWindowPos({(float)width_px / 2, (float)height_px / 4 * 3});
+
+    // Window - Processor Information
+    ImGui::Begin("Submission details", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+    {
+        if(ImGui::Button("Run Code")){
+            string textToSave = editor.GetText();
+
+            result = executeCPP(textToSave);
+            cout << result << endl;
+        }
+
+        ImGui::InputTextMultiline("Result", const_cast<char*>(result.c_str()), result.size() + 1, ImVec2(500, 200), ImGuiInputTextFlags_ReadOnly);
     }
     ImGui::End();
 }
@@ -275,7 +380,6 @@ void graphic::makeCharacterSelector(imageHandler& image, characterManager &chara
     }
     ImGui::End();
 }
-
 
 void graphic::makeBackground(imageHandler background, movementHandler move, float &gridX, float &gridY){
     ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
@@ -338,5 +442,54 @@ void graphic::makeConfig(){
     }
     ImGui::End();
 
-        
+}
+
+string graphic::executeCPP(string code){
+    // Step 1: Write code to a temporary file
+    std::ofstream file("temp.cpp");
+    file << code;
+    file.close();
+
+        // Step 2: Invoke the compiler and capture output
+    std::string compileCommand = "clang++ -o temp temp.cpp 2>&1"; // Redirect stderr to stdout
+    FILE* pipe = popen(compileCommand.c_str(), "r");
+    if (!pipe) {
+        std::cerr << "Error invoking compiler command." << std::endl;
+        return "Error invoking compiler command.";
+    }
+
+    char buffer[128];
+    std::string compileOutput = "";
+    while (!feof(pipe)) {
+        if (fgets(buffer, 128, pipe) != NULL)
+            compileOutput += buffer;
+    }
+    pclose(pipe);
+
+    if (!compileOutput.empty()) {  //has error
+        remove("temp.cpp");
+        return compileOutput;
+    }
+
+    FILE* executePipe = popen("./temp 2>&1", "r");
+    if (!executePipe) {
+        std::cerr << "Error invoking execute command." << std::endl;
+        remove("temp.cpp");
+        remove("temp");
+        return "Error invoking execute command.";
+    }
+
+    char executeBuffer[128];
+    std::string executeOutput = "";
+    while (!feof(executePipe)) {
+        if (fgets(executeBuffer, 128, executePipe) != NULL)
+            executeOutput += executeBuffer;
+    }
+    pclose(executePipe);
+
+    // Clean up temporary files
+    remove("temp.cpp");
+    remove("temp");
+
+    return executeOutput;
 }
