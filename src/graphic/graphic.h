@@ -12,10 +12,11 @@ public:
     int width_px = 1280;
     int height_px = 720;
 
-    bool show_display = true;
-    bool show_process = true;
-    bool show_config = true;
-    bool show_charSelector = true;
+    bool show_login = true;
+    bool show_display = false;
+    bool show_process = false;
+    bool show_config = false;
+    bool show_charSelector = false;
 
     bool characterCreated = false;
 
@@ -29,6 +30,7 @@ public:
     void makeProcess(TextEditor &editor, const char* fileToEdit);
     void makeCharacterSelector(imageHandler& image, characterManager &character, characterBuilder& charBuild);
     void makeBackground(imageHandler background, movementHandler move, float &gridX, float &gridY);
+    void makeLogIn();
     string executeCPP(string code);
 
 private:
