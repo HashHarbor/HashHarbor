@@ -32,6 +32,8 @@ using std::ofstream;
 #include "../character/characterBuilder.h"
 #include "../movement/movementHandler.h"
 #include "../assets/font/IconsFontAwesome6.h"
+#include "../login/login.h"
+#include "database/database.h"
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui_internal.h"
@@ -183,7 +185,8 @@ void graphic::setup(){
     ImGui_ImplOpenGL3_Init(glsl_version);
 
     imageHandler image = imageHandler();
-
+    database& db = database::getInstance();
+    db.connect();
     characterManager character = characterManager();
     characterBuilder builder = characterBuilder(&image);
 
@@ -536,6 +539,8 @@ void graphic::makeLogIn()
     ImGui::SetNextWindowSize({(float)width_px, (float)height_px});
     ImGui::SetNextWindowPos({0, 0});
 
+    static login Login = login();
+
     static char username[64] = "";
     static char passwd[64] = "";
 
@@ -619,22 +624,22 @@ void graphic::makeLogIn()
             ImGui::SetCursorPos(ImVec2(250,(float)height_px / 6 * 4));
             ImGui::PushID(1);
             ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(200.f / 360.f,1.0f,1.0f));
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(200.f / 360.f,0.44f,1.0f));
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(200.f / 360.f,1.0f,0.61f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(200.f / 360.f,0.8f,1.0f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(200.f / 360.f,1.0f,0.81f));
             if(ImGui::Button("Login", ImVec2(100.f,50.f)))
             {
-                // TODO - Input validation
-                // TODO - authenticate user
+                if(Login.inputValidation( username, passwd)) // this will validate the input and then authenticate the user
+                {
+                    show_display = true;
+                    show_process = true;
+                    show_config = true;
+                    show_charSelector = true;
 
-                show_display = true;
-                show_process = true;
-                show_config = true;
-                show_charSelector = true;
+                    style.FrameRounding = 0.f;
+                    style.Colors[ImGuiCol_Text] = ImVec4(1.0f, 1.0f, 1.0f, 1.00f);
 
-                style.FrameRounding = 0.f;
-                style.Colors[ImGuiCol_Text] = ImVec4(1.0f, 1.0f, 1.0f, 1.00f);
-
-                show_login = false;
+                    show_login = false;
+                }
             }
             ImGui::PopStyleColor(3);
             ImGui::PopID();
@@ -658,7 +663,7 @@ void graphic::makeLogIn()
             ImGui::SetCursorPos(ImVec2(270, ((float)height_px / 6 * 2) ));
             ImGui::Text("Username");
             ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255,255,255,255));
-            ImGui::SameLine(); HelpMarker("A Username may contain:\n  Lowercase letters: a-z\n  Uppercase letters: A-Z\n  Digits: 0-9\n  Special character: - _ \' .");
+            ImGui::SameLine(); HelpMarker("A username should be between 3 and 40 character\nA Username may contain:\n  Lowercase letters: a-z\n  Uppercase letters: A-Z\n  Digits: 0-9\n  Special character: - _ .");
             ImGui::PopStyleColor();
 
             ImGui::SetCursorPos(ImVec2(150, ((float)height_px / 6 * 2) + 20));
@@ -669,7 +674,7 @@ void graphic::makeLogIn()
             ImGui::SetCursorPos(ImVec2(270, ((float)height_px / 6 * 2.5) + 0));
             ImGui::Text("Password");
             ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255,255,255,255));
-            ImGui::SameLine(); HelpMarker("Password must be at least 8 characters\nPassword MUST contain at least one from each group below:\n  lowercase letter: a-z\n  Uppercase letter: A-Z\n  Digit: 0-9\n  Special character: ~ ` ! @ # $ % ^ & * ( ) _ - + = \n                   { [ ] } : ; < > ?");
+            ImGui::SameLine(); HelpMarker("Password must be at least 8 characters\nPassword must be no more than 40 character\nPassword MUST contain at least one from each group below:\n  lowercase letter: a-z\n  Uppercase letter: A-Z\n  Digit: 0-9\n  Special character: ~ ` ! @ # $ % ^ & * ( ) _ - + = \n                   { } : ; < > ?");
             ImGui::PopStyleColor();
 
             ImGui::SetCursorPos(ImVec2(150, ((float)height_px / 6 * 2.5) + 20));

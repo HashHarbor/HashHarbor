@@ -6,6 +6,8 @@
 #include "../character/characterBuilder.h"
 #include "../movement/movementHandler.h"
 #include "textEditor/TextEditor.h"
+#include "../login/login.h"
+#include "database/database.h"
 
 class graphic {
 public:
