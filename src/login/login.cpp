@@ -33,25 +33,39 @@ bool login::inputValidation(string usr, string passwd)
     {
         if(std::regex_search(passwd, regex("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[~`!@#$%^&*()_+={}:;<>?-])[A-Za-z0-9~`!@#$%^&*()_+={}:;<>?-]{8,40}$"))) // if password is within allowed
         {
-            authentication();
+            authentication("temp");
+            createUser(usr,passwd);
+            authentication(usr);
             return true;
         }
     }
     return false;
 }
 
-bool login::authentication()
+bool login::authentication(string usr)
 {
     database& db = database::getInstance();
 
     database::usrProfile profile;
 
-    if(db.getUserAuth("temp", profile))
+    if(db.getUserAuth(usr, profile))
     {
-        cout << "Can start Auth\n" << "USER_ID:" << profile._id << "USER_PROFILE:" << profile.username << "USER_Pass:" << profile.hash << "USER_SALT:" << profile.salt <<endl;
+        cout << "Can start Auth\n" << "USER_ID:" << profile._id << "\nUSER_PROFILE:" << profile.username << "\nUSER_Pass:" << profile.hash << "\nUSER_SALT:" << profile.salt <<endl;
 
     }
     // hash input with salt
     // compare
     return false;
+}
+
+bool login::createUser(string usr, string passwd)
+{
+    database& db = database::getInstance();
+
+    database::usrProfile profile;
+    profile.username = usr;
+    profile.hash = passwd; // hash password
+    profile.salt = "123456789-SALT-"; // replace with real salt
+
+    return db.makeUser(profile);
 }

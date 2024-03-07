@@ -54,6 +54,7 @@ public:
     void connect();
 
      bool getUserAuth(string usr, usrProfile& profile);
+     bool makeUser(usrProfile& profile);
 
     //mongocxx::client& getClient(); // Get MongoDB client
     //mongocxx::database& getDatabase(); // Get MongoDB database

@@ -27,7 +27,7 @@ using std::regex;
 
 class login
 {
-    bool authentication();
+    bool authentication(string usr);
         // Keep as private function, only call if input has been validated
 public:
     string username;
@@ -35,4 +35,5 @@ public:
     login();
 
     bool inputValidation(string usr, string passwd);
+    bool createUser(string usr, string passwd);
 };
