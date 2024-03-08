@@ -565,22 +565,22 @@ void graphic::makeLogIn()
             ImGui::SetCursorPos(ImVec2(270, ((float)height_px / 6 * 2) + 0));
             ImGui::Text("Username");
 
-            ImGui::SetCursorPos(ImVec2(150, ((float)height_px / 6 * 2) + 20));
+            ImGui::SetCursorPos(ImVec2(150, (float)(height_px / 6 * 2) + 20));
             ImGui::PushItemWidth(300);
             ImGui::InputText(" ",username, IM_ARRAYSIZE(username), ImGuiInputTextFlags_None);
             ImGui::PopItemWidth();
 
-            ImGui::SetCursorPos(ImVec2(270, ((float)height_px / 6 * 2.5) + 0));
+            ImGui::SetCursorPos(ImVec2(270, (float)(height_px / 6 * 2.5) + 0));
             ImGui::Text("Password");
 
-            ImGui::SetCursorPos(ImVec2(150, ((float)height_px / 6 * 2.5) + 20));
+            ImGui::SetCursorPos(ImVec2(150, (float)(height_px / 6 * 2.5) + 20));
             ImGui::PushItemWidth(300);
             if(!viewPasswd)
             {
                 ImGui::InputText("  ",passwd, IM_ARRAYSIZE(passwd), ImGuiInputTextFlags_Password);
                 ImGui::PopItemWidth();
 
-                ImGui::SetCursorPos(ImVec2(450, ((float)height_px / 6 * 2.5) + 21));
+                ImGui::SetCursorPos(ImVec2(450, (float)(height_px / 6 * 2.5) + 21));
                 ImGui::PushID(8);
                 ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,1.0f));
                 if(ImGui::Button(ICON_FA_EYE_SLASH, ImVec2(30.f,16.f)))
@@ -595,7 +595,7 @@ void graphic::makeLogIn()
                 ImGui::InputText("  ",passwd, IM_ARRAYSIZE(passwd), ImGuiInputTextFlags_None);
                 ImGui::PopItemWidth();
 
-                ImGui::SetCursorPos(ImVec2(450, ((float)height_px / 6 * 2.5) + 21));
+                ImGui::SetCursorPos(ImVec2(450, (float)(height_px / 6 * 2.5) + 21));
                 ImGui::PushID(9);
                 ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,1.0f));
                 if(ImGui::Button(ICON_FA_EYE, ImVec2(30.f,16.f)))
@@ -628,7 +628,7 @@ void graphic::makeLogIn()
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(200.f / 360.f,1.0f,0.81f));
             if(ImGui::Button("Login", ImVec2(100.f,50.f)))
             {
-                if(Login.inputValidation( username, passwd)) // this will validate the input and then authenticate the user
+                if(Login.inputValidation( username, passwd, true)) // this will validate the input and then authenticate the user
                 {
                     show_display = true;
                     show_process = true;
@@ -677,7 +677,7 @@ void graphic::makeLogIn()
             ImGui::SameLine(); HelpMarker("Password must be at least 8 characters\nPassword must be no more than 40 character\nPassword MUST contain at least one from each group below:\n  lowercase letter: a-z\n  Uppercase letter: A-Z\n  Digit: 0-9\n  Special character: ~ ` ! @ # $ % ^ & * ( ) _ - + = \n                   { } : ; < > ?");
             ImGui::PopStyleColor();
 
-            ImGui::SetCursorPos(ImVec2(150, ((float)height_px / 6 * 2.5) + 20));
+            ImGui::SetCursorPos(ImVec2(150, (float)(height_px / 6 * 2.5) + 20));
 
             ImGui::PushItemWidth(300);
             if(!viewPasswd)
@@ -685,7 +685,7 @@ void graphic::makeLogIn()
                 ImGui::InputText("  ",createPasswd, IM_ARRAYSIZE(createPasswd), ImGuiInputTextFlags_Password);
                 ImGui::PopItemWidth();
 
-                ImGui::SetCursorPos(ImVec2(450, ((float)height_px / 6 * 2.5) + 21));
+                ImGui::SetCursorPos(ImVec2(450, (float)(height_px / 6 * 2.5) + 21));
                 ImGui::PushID(5);
                 ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,1.0f));
                 if(ImGui::Button(ICON_FA_EYE_SLASH, ImVec2(30.f,16.f)))
@@ -695,10 +695,10 @@ void graphic::makeLogIn()
                 ImGui::PopStyleColor(1);
                 ImGui::PopID();
 
-                ImGui::SetCursorPos(ImVec2(250, ((float)height_px / 6 * 3) + 0));
+                ImGui::SetCursorPos(ImVec2(250, (float)(height_px / 6 * 3) + 0));
                 ImGui::Text("Confirm Password");
 
-                ImGui::SetCursorPos(ImVec2(150, ((float)height_px / 6 * 3) + 20));
+                ImGui::SetCursorPos(ImVec2(150, (float)(height_px / 6 * 3) + 20));
                 ImGui::PushItemWidth(300);
                 ImGui::InputText("   ",confirmPasswd, IM_ARRAYSIZE(confirmPasswd), ImGuiInputTextFlags_Password);
                 ImGui::PopItemWidth();
@@ -734,18 +734,30 @@ void graphic::makeLogIn()
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(200.f / 360.f,1.0f,0.61f));
             if(ImGui::Button("Sign Up", ImVec2(100.f,50.f)))
             {
-                // TODO - Input validation
-                // TODO - authenticate  new user
+                if(strcmp(createPasswd,confirmPasswd) != 0) // confirm passwords match
+                {
+                    cout << "Passwords Dont Match" << endl;
+                    // todo - print error message
+                    createPasswd[0] = '\0';
+                    confirmPasswd[0] = '\0';
+                }
+                else if(!Login.inputValidation( createUsername, createPasswd, false)) // if account passes input validation, hashing and adding to database
+                {
+                    cout << "Failed input Validation" << endl;
+                    // todo - print error message
+                }
+                else
+                {
+                    show_display = true;
+                    show_process = true;
+                    show_config = true;
+                    show_charSelector = true;
 
-                show_display = true;
-                show_process = true;
-                show_config = true;
-                show_charSelector = true;
+                    style.FrameRounding = 0.f;
+                    style.Colors[ImGuiCol_Text] = ImVec4(1.0f, 1.0f, 1.0f, 1.00f);
 
-                style.FrameRounding = 0.f;
-                style.Colors[ImGuiCol_Text] = ImVec4(1.0f, 1.0f, 1.0f, 1.00f);
-
-                show_login = false;
+                    show_login = false;
+                }
             }
             ImGui::PopStyleColor(3);
             ImGui::PopID();

@@ -27,13 +27,18 @@ using std::regex;
 
 class login
 {
-    bool authentication(string usr);
-        // Keep as private function, only call if input has been validated
+    // Keep as private functions, only call if input has been validated
+    bool authentication(string usr, string passwd);
+    bool createUser(string usr, string passwd);
+
+    string saltGenerator();
+    string hash(string passwd, string salt);
 public:
     string username;
     string _id;
     login();
 
-    bool inputValidation(string usr, string passwd);
-    bool createUser(string usr, string passwd);
+    bool inputValidation(string usr, string passwd, bool mode);
+    // TRUE -> Authentication
+    // FALSE -> Create Account
 };

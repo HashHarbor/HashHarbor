@@ -102,6 +102,7 @@ bool database::makeUser(database::usrProfile &profile)
                 kvp("salt", profile.salt)
         ));
         assert(insertUsr);
+        return true;
 
     }catch(const std::exception& e)
     {
