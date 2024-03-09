@@ -17,136 +17,282 @@ using std::pair;
 #include <utility>
 #endif
 
-#include <iomanip>
 #include <regex>
-#include <random>
-#include <openssl/sha.h>
-#include <openssl/evp.h>
-#include <sstream>
+#include "../assets/font/IconsFontAwesome6.h"
+#include "../backends/authentication/authentication.h"
 
 using std::string;
 using std::vector;
 using std::regex;
-using std::stringstream;
 
-login::login()
+static void HelpMarker(const char* desc)
 {
+    ImGui::TextDisabled(ICON_FA_CIRCLE_QUESTION);
+    if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort))
+    {
+        ImGui::BeginTooltip();
+        ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+        ImGui::TextUnformatted(desc);
+        ImGui::PopTextWrapPos();
+        ImGui::EndTooltip();
+    }
 }
 
-bool login::inputValidation(string usr, string passwd, bool mode)
+login::login(int width, int height)
 {
-    if(regex_search(usr, regex("^[A-Za-z0-9_.-]{3,40}$"))) // check if username matches requirments
+    width_px = width;
+    height_px = height;
+
+    minWidth = (width / 2.f) - 200.f;
+    minHeight = (height / 2.f) - 240.f;
+}
+
+void login::drawLoginScreen()
+{
+    ImGui::SetNextWindowSize({(float)width_px, (float)height_px});
+    ImGui::SetNextWindowPos({0, 0});
+
+    ImGui::Begin("Log In", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
     {
-        if(std::regex_search(passwd, regex("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[~`!@#$%^&*()_+={}:;<>?-])[A-Za-z0-9~`!@#$%^&*()_+={}:;<>?-]{8,40}$"))) // if password is within allowed
+        draw_list = ImGui::GetWindowDrawList();
+        draw_list->AddRectFilled(ImVec2(minWidth, minHeight), ImVec2(minWidth + 400.f, minHeight + 500.f), ImColor(ImVec4(1.0f, 1.0f, 1.0f, 1.0f)), 20.0f);
+
+        if(!createAccount)
         {
-            if(mode)
+            drawLogin();
+        }
+        else
+        {
+            drawCreateUser();
+        }
+
+    }
+    ImGui::End();
+}
+
+void login::drawLogin()
+{
+    static char username[64] = "";
+    static char passwd[64] = "";
+
+    static bool viewPasswd = false; // keep password hidden by default
+
+    txtPos_x = (width_px / 2.f) - ((ImGui::CalcTextSize("LOGIN").x) / 2.f);
+    ImGui::SetCursorPos(ImVec2(txtPos_x, minHeight + 30.f));
+    ImGui::Text("LOGIN");
+
+    txtPos_x = (width_px / 2.f) - ((ImGui::CalcTextSize("Username").x) / 2.f);
+    ImGui::SetCursorPos(ImVec2(txtPos_x, minHeight + 120.f));
+    ImGui::Text("Username");
+
+    ImGui::SetCursorPos(ImVec2(minWidth + 50.f, minHeight + 140.f));
+    ImGui::PushItemWidth(300);
+    ImGui::InputText(" ",username, IM_ARRAYSIZE(username), ImGuiInputTextFlags_None);
+    ImGui::PopItemWidth();
+
+    txtPos_x = (width_px / 2.f) - ((ImGui::CalcTextSize("Password").x) / 2.f);
+    ImGui::SetCursorPos(ImVec2(txtPos_x, minHeight + 180.f));
+    ImGui::Text("Password");
+
+    ImGui::SetCursorPos(ImVec2(minWidth + 50.f, minHeight + 200.f));
+    ImGui::PushItemWidth(300);
+    if(!viewPasswd)
+    {
+        ImGui::InputText("  ",passwd, IM_ARRAYSIZE(passwd), ImGuiInputTextFlags_Password);
+        ImGui::PopItemWidth();
+
+        ImGui::SetCursorPos(ImVec2(minWidth + 350.f, minHeight + 201.f));
+        ImGui::PushID(8);
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,1.0f));
+        if(ImGui::Button(ICON_FA_EYE_SLASH, ImVec2(30.f,16.f)))
+        {
+            viewPasswd = true;
+        }
+        ImGui::PopStyleColor(1);
+        ImGui::PopID();
+    }
+    else
+    {
+        ImGui::InputText("  ",passwd, IM_ARRAYSIZE(passwd), ImGuiInputTextFlags_None);
+        ImGui::PopItemWidth();
+
+        ImGui::SetCursorPos(ImVec2(minWidth + 350.f, minHeight + 201.f));
+        ImGui::PushID(9);
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,1.0f));
+        if(ImGui::Button(ICON_FA_EYE, ImVec2(30.f,16.f)))
+        {
+            viewPasswd = false;
+        }
+        ImGui::PopStyleColor(1);
+        ImGui::PopID();
+    }
+
+    txtPos_x = (width_px / 2.f) - ((ImGui::CalcTextSize("Don't have an account?").x) / 2.f);
+    ImGui::SetCursorPos(ImVec2(txtPos_x - 50.f, minHeight + 320.f));
+    ImGui::Text("Don't have an account?");
+    ImGui::SameLine();
+    ImGui::PushID(2);
+    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,0.71f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,0.33f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(200.f / 360.f,1.0f,0.61f));
+    if(ImGui::Button("Sign Up", ImVec2(100.f,20.f)))
+    {
+        createAccount = true;
+        viewPasswd = false;
+        errorAuth = false;
+    }
+    ImGui::PopStyleColor(3);
+    ImGui::PopID();
+
+    ImGui::SetCursorPos(ImVec2((width_px / 2.f - 50.f),minHeight + 380.f));
+    ImGui::PushID(1);
+    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(200.f / 360.f,1.0f,1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(200.f / 360.f,0.8f,1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(200.f / 360.f,1.0f,0.81f));
+    if(ImGui::Button("Login", ImVec2(100.f,50.f)))
+    {
+        authentication auth = authentication();
+        if(auth.inputValidation( username, passwd, true)) // this will validate the input and then authenticate the user
+        {
+            auth.getUser(_username, _id);
+            STATUS = true;
+        }
+        else
+        {
+            errorAuth = true;
+        }
+    }
+    ImGui::PopStyleColor(3);
+    ImGui::PopID();
+}
+
+void login::drawCreateUser()
+{
+    static char createUsername[64] = "";
+    static char createPasswd[64] = "";
+    static char confirmPasswd[64] = "";
+
+    static bool viewPasswd = false; // keep password hidden by default
+
+    ImGui::SetCursorPos(ImVec2(minWidth + 20.f, minHeight + 20.f));
+    ImGui::PushID(7);
+    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,1.0f));
+    if(ImGui::Button(ICON_FA_CHEVRON_LEFT, ImVec2(23.f,18.f)))
+    {
+        createAccount = false;
+        viewPasswd = false; // turn off both the new account and viewing passwd
+    }
+    ImGui::PopStyleColor(1);
+    ImGui::PopID();
+
+    txtPos_x = (width_px / 2.f) - ((ImGui::CalcTextSize("Create Your Hash Harbor Account").x) / 2.f);
+    ImGui::SetCursorPos(ImVec2(txtPos_x, minHeight + 30.f));
+    ImGui::Text("Create Your Hash Harbor Account");
+
+    txtPos_x = (width_px / 2.f) - ((ImGui::CalcTextSize("Username").x) / 2.f);
+    ImGui::SetCursorPos(ImVec2(txtPos_x, minHeight + 120.f));
+    ImGui::Text("Username");
+    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255,255,255,255));
+    ImGui::SameLine(); HelpMarker("A username should be between 3 and 40 character\nA Username may contain:\n  Lowercase letters: a-z\n  Uppercase letters: A-Z\n  Digits: 0-9\n  Special character: - _ .");
+    ImGui::PopStyleColor();
+
+    ImGui::SetCursorPos(ImVec2(minWidth + 50.f, minHeight + 140.f));
+    ImGui::PushItemWidth(300);
+    ImGui::InputText(" ",createUsername, IM_ARRAYSIZE(createUsername), ImGuiInputTextFlags_None);
+    ImGui::PopItemWidth();
+
+    txtPos_x = (width_px / 2.f) - ((ImGui::CalcTextSize("Password").x) / 2.f);
+    ImGui::SetCursorPos(ImVec2(txtPos_x, minHeight + 180.f));
+    ImGui::Text("Password");
+    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255,255,255,255));
+    ImGui::SameLine(); HelpMarker("Password must be at least 8 characters\nPassword must be no more than 40 character\nPassword MUST contain at least one from each group below:\n  lowercase letter: a-z\n  Uppercase letter: A-Z\n  Digit: 0-9\n  Special character: ~ ` ! @ # $ % & * ^ ( ) _ - + = \n                   { } : ; < > ?");
+    ImGui::PopStyleColor();
+
+    ImGui::SetCursorPos(ImVec2(minWidth + 50.f, minHeight + 200.f));
+    ImGui::PushItemWidth(300);
+    if(!viewPasswd)
+    {
+        ImGui::InputText("  ",createPasswd, IM_ARRAYSIZE(createPasswd), ImGuiInputTextFlags_Password);
+        ImGui::PopItemWidth();
+
+        ImGui::SetCursorPos(ImVec2(minWidth + 350.f, minHeight + 201.f));
+        ImGui::PushID(5);
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,1.0f));
+        if(ImGui::Button(ICON_FA_EYE_SLASH, ImVec2(30.f,16.f)))
+        {
+            viewPasswd = true;
+        }
+        ImGui::PopStyleColor(1);
+        ImGui::PopID();
+
+        txtPos_x = (width_px / 2.f) - ((ImGui::CalcTextSize("Confirm Password").x) / 2.f);
+        ImGui::SetCursorPos(ImVec2(txtPos_x, minHeight + 240.f));
+        ImGui::Text("Confirm Password");
+
+        ImGui::SetCursorPos(ImVec2(minWidth + 50.f, minHeight + 260.f));
+        ImGui::PushItemWidth(300);
+        ImGui::InputText("   ",confirmPasswd, IM_ARRAYSIZE(confirmPasswd), ImGuiInputTextFlags_Password);
+        ImGui::PopItemWidth();
+    }
+    else
+    {
+        ImGui::InputText("  ",createPasswd, IM_ARRAYSIZE(createPasswd), ImGuiInputTextFlags_None);
+        ImGui::PopItemWidth();
+
+        ImGui::SetCursorPos(ImVec2(minWidth + 350.f, minHeight + 201.f));
+        ImGui::PushID(6);
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,1.0f));
+        if(ImGui::Button(ICON_FA_EYE, ImVec2(30.f,16.f)))
+        {
+            viewPasswd = false;
+        }
+        ImGui::PopStyleColor(1);
+        ImGui::PopID();
+
+        txtPos_x = (width_px / 2.f) - ((ImGui::CalcTextSize("Confirm Password").x) / 2.f);
+        ImGui::SetCursorPos(ImVec2(txtPos_x, minHeight + 240.f));
+        ImGui::Text("Confirm Password");
+
+        ImGui::SetCursorPos(ImVec2(minWidth + 50.f, minHeight + 260.f));
+        ImGui::PushItemWidth(300);
+        ImGui::InputText("   ",confirmPasswd, IM_ARRAYSIZE(confirmPasswd), ImGuiInputTextFlags_None);
+        ImGui::PopItemWidth();
+    }
+
+    ImGui::SetCursorPos(ImVec2((width_px / 2.f - 50.f),minHeight + 400.f));
+    ImGui::PushID(3);
+    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(200.f / 360.f,1.0f,1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(200.f / 360.f,0.44f,1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(200.f / 360.f,1.0f,0.61f));
+    if(ImGui::Button("Sign Up", ImVec2(100.f,50.f)))
+    {
+        errorCmp = false;
+        errorCreate = false;
+        if(strcmp(createPasswd,confirmPasswd) != 0) // confirm passwords match
+        {
+            errorCmp = true;
+            createPasswd[0] = '\0';
+            confirmPasswd[0] = '\0';
+        }
+        else
+        {
+            authentication auth = authentication();
+            if(auth.inputValidation( createUsername, createPasswd, false))
             {
-                return authentication(usr, passwd);
+                auth.getUser(_username, _id);
+                STATUS = true;
             }
             else
             {
-                return createUser(usr, passwd);
+                errorCreate = true;
             }
         }
     }
-    return false;
+    ImGui::PopStyleColor(3);
+    ImGui::PopID();
 }
 
-bool login::authentication(string usr, string passwd)
+bool login::checkAuth()
 {
-    database& db = database::getInstance();
-
-    database::usrProfile profile;
-
-    if(db.getUserAuth(usr, profile)) // if profile is in database
-    {
-        string authHash = hash(passwd, profile.salt);
-        if(!authHash.empty())
-        {
-            if(profile.hash == authHash)
-            {
-                profile.completeAuth(); // clears password and salt to not store after auth
-                _id = profile._id;
-                username = profile.username;
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-bool login::createUser(string usr, string passwd)
-{
-    database& db = database::getInstance();
-
-    database::usrProfile profile; // create a profile to store new user data
-    profile.username = usr;
-
-    string salt = saltGenerator();
-    string hashPasswd = hash(passwd, salt);
-
-    if(hashPasswd.empty())
-    {
-        return false;
-    }
-
-    profile.hash = hashPasswd;
-    profile.salt = salt;
-    return db.makeUser(profile);
-}
-
-string login::saltGenerator()
-{
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(0, 63);
-
-    string salt = "";
-
-    static const char alphaNum[] ="./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for(int i = 0; i < 32; i++)
-    {
-        int j = dis(gen);
-        salt += alphaNum[j];
-    }
-    return salt;
-}
-
-string login::hash(string passwd, string salt)
-{
-
-    string hashPassword = salt + passwd;
-
-    EVP_MD_CTX* digestContext = EVP_MD_CTX_new();
-    if(digestContext == nullptr)
-    {
-        return "";
-    }
-    if(!EVP_DigestInit_ex(digestContext, EVP_sha256(), nullptr))
-    {
-        EVP_MD_CTX_free(digestContext);
-        return "";
-    }
-    if(!EVP_DigestUpdate(digestContext, hashPassword.c_str(), hashPassword.length()))
-    {
-        EVP_MD_CTX_free(digestContext);
-        return "";
-    }
-
-    unsigned char hash[SHA256_DIGEST_LENGTH];
-    unsigned int hashLen = 0;
-    if(!EVP_DigestFinal_ex(digestContext, hash, &hashLen))
-    {
-        EVP_MD_CTX_free(digestContext);
-        return "";
-    }
-
-    EVP_MD_CTX_free(digestContext);
-    stringstream hashConverted;
-    for(unsigned int i = 0; i < hashLen; i++)
-    {
-        hashConverted << std::hex << std::setw(2) << std::setfill('0') << (int)hash[i];
-    }
-
-    return hashConverted.str();
+    return STATUS;
 }

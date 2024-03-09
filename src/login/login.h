@@ -27,18 +27,28 @@ using std::regex;
 
 class login
 {
-    // Keep as private functions, only call if input has been validated
-    bool authentication(string usr, string passwd);
-    bool createUser(string usr, string passwd);
+    int width_px;
+    int height_px;
+    float minWidth = 0.f;
+    float minHeight = 0.f;
+    float txtPos_x = 0.f;
 
-    string saltGenerator();
-    string hash(string passwd, string salt);
+    bool createAccount = false;
+    bool errorAuth = false;
+    bool errorCmp = false;
+    bool errorCreate = false;
+
+    ImDrawList* draw_list = nullptr;
+
+    bool STATUS = false;
+
+    void drawLogin() ;// screen for existing users to login
+    void drawCreateUser(); // screen for new users
 public:
-    string username;
+    string _username;
     string _id;
-    login();
+    login(int width, int height);
 
-    bool inputValidation(string usr, string passwd, bool mode);
-    // TRUE -> Authentication
-    // FALSE -> Create Account
+    void drawLoginScreen();
+    bool checkAuth();
 };
