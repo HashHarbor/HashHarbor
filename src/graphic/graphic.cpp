@@ -177,7 +177,7 @@ void graphic::setup(){
     characterBuilder builder = characterBuilder(&image);
 
     database& db = database::getInstance();
-    //db.connect();
+    db.connect();
     login Login = login(width_px, height_px);
 
     string pathMap;

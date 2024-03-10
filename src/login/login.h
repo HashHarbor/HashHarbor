@@ -44,6 +44,11 @@ class login
 
     void drawLogin() ;// screen for existing users to login
     void drawCreateUser(); // screen for new users
+
+    void passwordGuide(string tempPasswd);
+    void error_Auth();
+    void error_Comp();
+    void error_Create();
 public:
     string _username;
     string _id;
