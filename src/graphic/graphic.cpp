@@ -1,6 +1,6 @@
-#include "imgui.h"
-#include "imgui_impl_sdl.h"
-#include "imgui_impl_opengl3.h"
+#include "../../imgui/imgui.h"
+#include "../../backends/imgui_impl_sdl.h"
+#include "../../backends/imgui_impl_opengl3.h"
 #include <stdio.h>
 
 #include <SDL2/SDL.h>
@@ -14,11 +14,13 @@
 #if defined(__APPLE__)
 #include <iostream>
 #include <vector>
+#include <fstream>
 using std::string;
 using std::vector;
 using std::cout;
 using std::endl;
 using std::pair;
+using std::ofstream;
 #else
 #include <bits/stdc++.h>
 #endif
@@ -26,12 +28,17 @@ using std::pair;
 #include "graphic.h"
 #include "textEditor/TextEditor.h"
 #include "../imageHandler/imageHandler.h"
+#include "../imageHandler/imagePath.h"
 #include "../character/characterManager.h"
 #include "../character/characterBuilder.h"
 #include "../movement/movementHandler.h"
+#include "../assets/font/IconsFontAwesome6.h"
+#include "../login/login.h"
+#include "database/database.h"
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui_internal.h"
+
 
 void graphic::setup(){
     TextEditor editor;
@@ -149,18 +156,42 @@ void graphic::setup(){
     ImGui::StyleColorsDark();
     //ImGui::StyleColorsLight();
 
+    imagePath imgPth = imagePath();
+    // Font Icon set up
+    io.Fonts->AddFontDefault();
+    float baseFontSize = 25.0f; // 13.0f is the size of the default font. Change to the font size you use.
+    float iconFontSize = baseFontSize * 2.0f / 3.0f; // FontAwesome fonts need to have their sizes reduced by 2.0f/3.0f in order to align correctly
+    static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_16_FA, 0 };
+    ImFontConfig icons_config;
+    icons_config.MergeMode = true;
+    icons_config.PixelSnapH = true;
+    icons_config.GlyphMinAdvanceX = iconFontSize;
+#if defined(__APPLE__)
+    string font_1 = imgPth.currentPath.string() + FONT_ICON_FILE_NAME_FAR;
+    string font_2 = imgPth.currentPath.string() + FONT_ICON_FILE_NAME_FAS;
+#else
+    string font_1 = string("..") + FONT_ICON_FILE_NAME_FAR;
+    string font_2 = string("..") + FONT_ICON_FILE_NAME_FAS;
+#endif
+    io.Fonts->AddFontFromFileTTF(font_1.c_str(), iconFontSize, &icons_config, icons_ranges );
+    io.Fonts->AddFontFromFileTTF( font_2.c_str(), iconFontSize, &icons_config, icons_ranges );
+
+
     // Setup Platform/Renderer backends
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
     imageHandler image = imageHandler();
-
     characterManager character = characterManager();
     characterBuilder builder = characterBuilder(&image);
 
+    database& db = database::getInstance();
+    db.connect();
+    login Login = login(width_px, height_px, &image);
+
     string pathMap;
 #if defined(__APPLE__)
-    pathMap = "/Users/david/CLionProjects/HashHarbor/src/abc.png";
+    pathMap = imgPth.currentPath.string() + "/assets/map/abc.png";
 #else
     pathMap = "../src/abc.png";
 #endif
@@ -206,6 +237,11 @@ void graphic::setup(){
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
+
+        if(show_login)
+        {
+            makeLogIn(Login, image);
+        }
 
         if(show_display){
             makeBackground(background, move, mapGridX, mapGridY);
@@ -427,7 +463,6 @@ void graphic::makeBackground(imageHandler background, movementHandler move, floa
     ImGui::End();
 }
 
-
 void graphic::makeConfig(){
     // Config window calculation
     ImGui::SetNextWindowSize({(float)width_px / 2, (float)height_px / 2});
@@ -492,4 +527,25 @@ string graphic::executeCPP(string code){
     remove("temp");
 
     return executeOutput;
+}
+
+void graphic::makeLogIn(login& Login, imageHandler& image)
+{
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.FrameRounding = 7.5f;
+    style.Colors[ImGuiCol_Text] = ImVec4(0.0f, 0.0f, 0.0f, 1.00f);
+
+    Login.drawLoginScreen(&image);
+    if(Login.checkAuth())
+    {
+        show_display = true;
+        show_process = true;
+        show_config = true;
+        show_charSelector = true;
+
+        style.FrameRounding = 0.f;
+        style.Colors[ImGuiCol_Text] = ImVec4(1.0f, 1.0f, 1.0f, 1.00f);
+
+        show_login = false;
+    }
 }
