@@ -131,7 +131,7 @@ void login::drawLogin()
         ImGui::InputText("  ",passwd, IM_ARRAYSIZE(passwd), ImGuiInputTextFlags_Password);
         ImGui::PopItemWidth();
 
-        ImGui::SetCursorPos(ImVec2(minWidth + 350.f, minHeight + 201.f));
+        ImGui::SetCursorPos(ImVec2(minWidth + 350.f, minHeight + 211.f));
         ImGui::PushID(8);
         ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,1.0f));
         if(ImGui::Button(ICON_FA_EYE_SLASH, ImVec2(30.f,16.f)))
@@ -146,7 +146,7 @@ void login::drawLogin()
         ImGui::InputText("  ",passwd, IM_ARRAYSIZE(passwd), ImGuiInputTextFlags_None);
         ImGui::PopItemWidth();
 
-        ImGui::SetCursorPos(ImVec2(minWidth + 350.f, minHeight + 201.f));
+        ImGui::SetCursorPos(ImVec2(minWidth + 350.f, minHeight + 211.f));
         ImGui::PushID(9);
         ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,1.0f));
         if(ImGui::Button(ICON_FA_EYE, ImVec2(30.f,16.f)))
