@@ -34,7 +34,7 @@ using std::pair;
 #include "imgui_internal.h"
 
 void graphic::setup(){
-        TextEditor editor;
+    TextEditor editor;
 	auto lang = TextEditor::LanguageDefinition::CPlusPlus();
 
 	// set your own known preprocessor symbols...
@@ -99,7 +99,7 @@ void graphic::setup(){
     cppStart.push_back("}");
     editor.SetTextLines(cppStart);
 
-    static const char* fileToEdit = "frog.cpp";
+    static const char* fileToEdit = "solution.cpp";
 
     //texteditor setup ends here
 
@@ -450,8 +450,8 @@ string graphic::executeCPP(string code){
     file << code;
     file.close();
 
-        // Step 2: Invoke the compiler and capture output
-    std::string compileCommand = "clang++ -o temp temp.cpp 2>&1"; // Redirect stderr to stdout
+    // Step 2: Invoke the compiler and capture output
+    std::string compileCommand = "g++ -o temp temp.cpp 2>&1"; // Redirect stderr to stdout
     FILE* pipe = popen(compileCommand.c_str(), "r");
     if (!pipe) {
         std::cerr << "Error invoking compiler command." << std::endl;
