@@ -28,6 +28,7 @@ using std::ofstream;
 #include "graphic.h"
 #include "textEditor/TextEditor.h"
 #include "../imageHandler/imageHandler.h"
+#include "../imageHandler/imagePath.h"
 #include "../character/characterManager.h"
 #include "../character/characterBuilder.h"
 #include "../movement/movementHandler.h"
@@ -155,6 +156,7 @@ void graphic::setup(){
     ImGui::StyleColorsDark();
     //ImGui::StyleColorsLight();
 
+    imagePath imgPth = imagePath();
     // Font Icon set up
     io.Fonts->AddFontDefault();
     float baseFontSize = 25.0f; // 13.0f is the size of the default font. Change to the font size you use.
@@ -164,8 +166,15 @@ void graphic::setup(){
     icons_config.MergeMode = true;
     icons_config.PixelSnapH = true;
     icons_config.GlyphMinAdvanceX = iconFontSize;
-    io.Fonts->AddFontFromFileTTF( FONT_ICON_FILE_NAME_FAR, iconFontSize, &icons_config, icons_ranges );
-    io.Fonts->AddFontFromFileTTF( FONT_ICON_FILE_NAME_FAS, iconFontSize, &icons_config, icons_ranges );
+#if defined(__APPLE__)
+    string font_1 = imgPth.currentPath.string() + FONT_ICON_FILE_NAME_FAR;
+    string font_2 = imgPth.currentPath.string() + FONT_ICON_FILE_NAME_FAS;
+#else
+    string font_1 = ".." + FONT_ICON_FILE_NAME_FAR;
+    string font_2 = ".." + FONT_ICON_FILE_NAME_FAS;
+#endif
+    io.Fonts->AddFontFromFileTTF(font_1.c_str(), iconFontSize, &icons_config, icons_ranges );
+    io.Fonts->AddFontFromFileTTF( font_2.c_str(), iconFontSize, &icons_config, icons_ranges );
 
 
     // Setup Platform/Renderer backends
@@ -178,11 +187,11 @@ void graphic::setup(){
 
     database& db = database::getInstance();
     db.connect();
-    login Login = login(width_px, height_px);
+    login Login = login(width_px, height_px, &image);
 
     string pathMap;
 #if defined(__APPLE__)
-    pathMap = "/Users/david/CLionProjects/HashHarbor/src/abc.png";
+    pathMap = imgPth.currentPath.string() + "/assets/map/abc.png";
 #else
     pathMap = "../src/abc.png";
 #endif
@@ -231,7 +240,7 @@ void graphic::setup(){
 
         if(show_login)
         {
-            makeLogIn(Login);
+            makeLogIn(Login, image);
         }
 
         if(show_display){
@@ -520,13 +529,13 @@ string graphic::executeCPP(string code){
     return executeOutput;
 }
 
-void graphic::makeLogIn(login& Login)
+void graphic::makeLogIn(login& Login, imageHandler& image)
 {
     ImGuiStyle& style = ImGui::GetStyle();
     style.FrameRounding = 7.5f;
     style.Colors[ImGuiCol_Text] = ImVec4(0.0f, 0.0f, 0.0f, 1.00f);
 
-    Login.drawLoginScreen();
+    Login.drawLoginScreen(&image);
     if(Login.checkAuth())
     {
         show_display = true;

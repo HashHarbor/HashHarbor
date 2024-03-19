@@ -35,7 +35,11 @@ characterBuilder::characterBuilder(imageHandler* imgHandler)
     {
         imageHandler* img = new imageHandler();
 
-        string path = imgPath.absolutePath + iter;
+#if defined(__APPLE__)
+        string path = imgPath.currentPath.string() +"/"+ iter;
+#else
+        string path = imgPath.absolutePath + jter;
+#endif
         bool ret = imgHandler->loadTexture(path.c_str(), img);
         IM_ASSERT(ret);
         body.push_back(img);
@@ -45,7 +49,11 @@ characterBuilder::characterBuilder(imageHandler* imgHandler)
     for(auto & iter : imgPath.eyes)
     {
         imageHandler* img = new imageHandler();
-        string path = imgPath.absolutePath + iter;
+#if defined(__APPLE__)
+        string path = imgPath.currentPath.string() +"/"+ iter;
+#else
+        string path = imgPath.absolutePath + jter;
+#endif
         bool ret = imgHandler->loadTexture(path.c_str(), img);
         IM_ASSERT(ret);
         eyes.push_back(img);
@@ -58,7 +66,11 @@ characterBuilder::characterBuilder(imageHandler* imgHandler)
         for(auto & jter : iter.second)
         {
             imageHandler* img = new imageHandler();
+#if defined(__APPLE__)
+            string path = imgPath.currentPath.string() +"/"+ jter;
+#else
             string path = imgPath.absolutePath + jter;
+#endif
             bool ret = imgHandler->loadTexture(path.c_str(), img);
             IM_ASSERT(ret);
             temp.push_back(img);
@@ -78,7 +90,11 @@ characterBuilder::characterBuilder(imageHandler* imgHandler)
         for(auto & jter : iter.second)
         {
             imageHandler* img = new imageHandler();
+#if defined(__APPLE__)
+            string path = imgPath.currentPath.string() +"/"+ jter;
+#else
             string path = imgPath.absolutePath + jter;
+#endif
             bool ret = imgHandler->loadTexture(path.c_str(), img);
             IM_ASSERT(ret);
             temp.push_back(img);
@@ -99,7 +115,11 @@ characterBuilder::characterBuilder(imageHandler* imgHandler)
         for(auto & jter : iter.second)
         {
             imageHandler* img = new imageHandler();
+#if defined(__APPLE__)
+            string path = imgPath.currentPath.string() +"/"+ jter;
+#else
             string path = imgPath.absolutePath + jter;
+#endif
             bool ret = imgHandler->loadTexture(path.c_str(), img);
             IM_ASSERT(ret);
             temp.push_back(img);

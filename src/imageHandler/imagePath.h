@@ -1,9 +1,11 @@
 #pragma once
 
+#include <iostream>
 #include <map>
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <filesystem>
 
 using namespace std;
 
@@ -19,6 +21,7 @@ public:
 #if defined(__APPLE__)
 // USER DEPENDENT
     string absolutePath = "/Users/david/CLionProjects/HashHarbor/";
+    std::filesystem::path currentPath = std::filesystem::current_path();
 #else
     string absolutePath = "../";
 #endif

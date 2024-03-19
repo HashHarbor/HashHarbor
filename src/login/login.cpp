@@ -8,6 +8,7 @@
 #if defined(__APPLE__)
 #include <iostream>
 #include <vector>
+#include <filesystem>
 using std::cout;
 using std::endl;
 using std::pair;
@@ -21,6 +22,7 @@ using std::pair;
 #include "../assets/font/IconsFontAwesome6.h"
 #include "../backends/authentication/authentication.h"
 #include "../backends/database/database.h"
+#include "../imageHandler/imageHandler.h"
 
 using std::string;
 using std::vector;
@@ -39,22 +41,28 @@ static void HelpMarker(const char* desc)
     }
 }
 
-login::login(int width, int height)
+login::login(int width, int height, imageHandler* imgHandler)
 {
     width_px = width;
     height_px = height;
 
     minWidth = (width / 2.f) - 200.f;
     minHeight = (height / 2.f) - 240.f;
+
+    //string path = std::filesystem::current_path().string() + "/assets/other/login.png";
+    //img = new imageHandler();
+    //bool ret = imgHandler->loadTexture(path.c_str(), img);
 }
 
-void login::drawLoginScreen()
+void login::drawLoginScreen(imageHandler* imgHandler)
 {
     ImGui::SetNextWindowSize({(float)width_px, (float)height_px});
     ImGui::SetNextWindowPos({0, 0});
 
     ImGui::Begin("Log In", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
     {
+        //drawBackground(imgHandler);
+
         draw_list = ImGui::GetWindowDrawList();
         draw_list->AddRectFilled(ImVec2(minWidth, minHeight), ImVec2(minWidth + 400.f, minHeight + 500.f), ImColor(ImVec4(1.0f, 1.0f, 1.0f, 1.0f)), 20.0f);
 
@@ -448,6 +456,12 @@ void login::error_Create()
     ImGui::SetCursorPos(ImVec2(txtPos_x, minHeight + 370.f));
     ImGui::Text("Please double-check your information and try again.");
     ImGui::PopStyleColor();
+}
+
+void login::drawBackground(imageHandler* imgHandler)
+{
+    ImGui::SetCursorPos(ImVec2(0,0));
+    imgHandler->DrawImage(*img, 1.0);
 }
 bool login::checkAuth()
 {

@@ -27,6 +27,7 @@ using std::string;
 using std::vector;
 
 #include "cpptoml.h"
+#include "../src/imageHandler/imagePath.h"
 
 database::database() : client(), db(){}
 database::~database() {}
@@ -39,7 +40,8 @@ database& database::getInstance()
 
 void database::connect()
 {
-    auto config = cpptoml::parse_file("/Users/david/CLionProjects/HashHarbor/backends/database/db.toml");
+    imagePath imgPth = imagePath();
+    auto config = cpptoml::parse_file(imgPth.currentPath.string() + "/assets/api.toml");
     auto apikey = config->get_table("mongodb");
 
     const auto uri = mongocxx::uri{*apikey->get_as<string>("uri")};
@@ -76,7 +78,6 @@ bool database::getUserAuth(string usr, database::usrProfile& profile)
             assert(findUsr);
             return true;
         }
-        assert(findUsr);
     }catch(const std::exception& e)
     {
         cout << "Failed to get collection. :: " << e.what() << endl;

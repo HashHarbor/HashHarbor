@@ -175,7 +175,7 @@ class characterBuilder
     int indexHairColor = 2;
 
     int indexAccessories = 0;
-    int indexAccessoriesColor = 4;
+    int indexAccessoriesColor = 3;
 
     int frameCount_4 = 0;
 

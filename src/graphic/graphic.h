@@ -32,7 +32,7 @@ public:
     void makeProcess(TextEditor &editor, const char* fileToEdit);
     void makeCharacterSelector(imageHandler& image, characterManager &character, characterBuilder& charBuild);
     void makeBackground(imageHandler background, movementHandler move, float &gridX, float &gridY);
-    void makeLogIn(login& Login);
+    void makeLogIn(login& Login, imageHandler& image);
     string executeCPP(string code);
 
 private:

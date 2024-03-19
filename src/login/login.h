@@ -19,6 +19,7 @@ using std::pair;
 
 #include <regex>
 #include "database/database.h"
+#include "../imageHandler/imageHandler.h"
 
 using std::string;
 using std::vector;
@@ -39,11 +40,13 @@ class login
     bool errorCreate = false;
 
     ImDrawList* draw_list = nullptr;
+    imageHandler* img;
 
     bool STATUS = false;
 
     void drawLogin() ;// screen for existing users to login
     void drawCreateUser(); // screen for new users
+    void drawBackground(imageHandler* imgHandler);
 
     void passwordGuide(string tempPasswd);
     void error_Auth();
@@ -52,8 +55,8 @@ class login
 public:
     string _username;
     string _id;
-    login(int width, int height);
+    login(int width, int height, imageHandler* imgHandler);
 
-    void drawLoginScreen();
+    void drawLoginScreen(imageHandler* imgHandler);
     bool checkAuth();
 };
