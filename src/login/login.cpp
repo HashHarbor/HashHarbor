@@ -49,9 +49,9 @@ login::login(int width, int height, imageHandler* imgHandler)
     minWidth = (width / 2.f) - 200.f;
     minHeight = (height / 2.f) - 240.f;
 
-    //string path = std::filesystem::current_path().string() + "/assets/other/login.png";
-    //img = new imageHandler();
-    //bool ret = imgHandler->loadTexture(path.c_str(), img);
+    string path = std::filesystem::current_path().string() + "/assets/other/login.png";
+    img = new imageHandler();
+    bool ret = imgHandler->loadTexture(path.c_str(), img);
 }
 
 void login::drawLoginScreen(imageHandler* imgHandler)
@@ -59,9 +59,19 @@ void login::drawLoginScreen(imageHandler* imgHandler)
     ImGui::SetNextWindowSize({(float)width_px, (float)height_px});
     ImGui::SetNextWindowPos({0, 0});
 
-    ImGui::Begin("Log In", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
+    ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoTitleBar;
+    window_flags |= ImGuiWindowFlags_NoBackground;
+    window_flags |= ImGuiWindowFlags_NoCollapse;
+    window_flags |= ImGuiWindowFlags_NoDecoration;
+    window_flags |= ImGuiWindowFlags_NoMove;
+    window_flags |= ImGuiWindowFlags_NoNav;
+    window_flags |= ImGuiWindowFlags_NoResize;
+    window_flags |= ImGuiWindowFlags_NoScrollWithMouse;
+    window_flags |= ImGuiWindowFlags_NoScrollbar;
+
+    ImGui::Begin("Log In", NULL, window_flags);
     {
-        //drawBackground(imgHandler);
+        drawBackground(imgHandler);
 
         draw_list = ImGui::GetWindowDrawList();
         draw_list->AddRectFilled(ImVec2(minWidth, minHeight), ImVec2(minWidth + 400.f, minHeight + 500.f), ImColor(ImVec4(1.0f, 1.0f, 1.0f, 1.0f)), 20.0f);
