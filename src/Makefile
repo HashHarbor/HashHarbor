@@ -56,6 +56,14 @@ ifeq ($(UNAME_S), Linux) #LINUX
     # Add OpenCV flags to CXXFLAGS and LIBS
     CXXFLAGS += $(OPENCV_FLAGS)
     LIBS += $(OPENCV_FLAGS)
+	
+	MONGODB_FLAGS := $(shell pkg-config --cflags libmongocxx libbsoncxx)
+	MONGODB_LIBS := $(shell pkg-config --libs libmongocxx libbsoncxx)
+
+    # Add MongoDB C++ driver flags to CXXFLAGS and LIBS
+    CXXFLAGS += $(MONGODB_FLAGS)
+    LIBS += $(MONGODB_LIBS)
+
 
 endif
 

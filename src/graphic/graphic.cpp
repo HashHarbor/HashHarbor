@@ -170,8 +170,8 @@ void graphic::setup(){
     string font_1 = imgPth.currentPath.string() + FONT_ICON_FILE_NAME_FAR;
     string font_2 = imgPth.currentPath.string() + FONT_ICON_FILE_NAME_FAS;
 #else
-    string font_1 = ".." + FONT_ICON_FILE_NAME_FAR;
-    string font_2 = ".." + FONT_ICON_FILE_NAME_FAS;
+    string font_1 = string("..") + FONT_ICON_FILE_NAME_FAR;
+    string font_2 = string("..") + FONT_ICON_FILE_NAME_FAS;
 #endif
     io.Fonts->AddFontFromFileTTF(font_1.c_str(), iconFontSize, &icons_config, icons_ranges );
     io.Fonts->AddFontFromFileTTF( font_2.c_str(), iconFontSize, &icons_config, icons_ranges );

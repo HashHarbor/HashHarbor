@@ -38,7 +38,7 @@ characterBuilder::characterBuilder(imageHandler* imgHandler)
 #if defined(__APPLE__)
         string path = imgPath.currentPath.string() +"/"+ iter;
 #else
-        string path = imgPath.absolutePath + jter;
+        string path = imgPath.absolutePath + iter;
 #endif
         bool ret = imgHandler->loadTexture(path.c_str(), img);
         IM_ASSERT(ret);
@@ -52,7 +52,7 @@ characterBuilder::characterBuilder(imageHandler* imgHandler)
 #if defined(__APPLE__)
         string path = imgPath.currentPath.string() +"/"+ iter;
 #else
-        string path = imgPath.absolutePath + jter;
+        string path = imgPath.absolutePath + iter;
 #endif
         bool ret = imgHandler->loadTexture(path.c_str(), img);
         IM_ASSERT(ret);

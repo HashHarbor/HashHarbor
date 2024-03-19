@@ -41,7 +41,7 @@ database& database::getInstance()
 void database::connect()
 {
     imagePath imgPth = imagePath();
-    auto config = cpptoml::parse_file(imgPth.currentPath.string() + "/assets/api.toml");
+    auto config = cpptoml::parse_file(imgPth.absolutePath + "assets/api.toml");
     auto apikey = config->get_table("mongodb");
 
     const auto uri = mongocxx::uri{*apikey->get_as<string>("uri")};
