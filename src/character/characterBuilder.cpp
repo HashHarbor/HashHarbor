@@ -35,22 +35,30 @@ characterBuilder::characterBuilder(imageHandler* imgHandler)
     {
         imageHandler* img = new imageHandler();
 
+#if defined(__APPLE__)
+        string path = imgPath.currentPath.string() +"/"+ iter;
+#else
         string path = imgPath.absolutePath + iter;
+#endif
         bool ret = imgHandler->loadTexture(path.c_str(), img);
         IM_ASSERT(ret);
         body.push_back(img);
     }
-    cout << "---Body: " << body.size() << endl;
+    //cout << "---Body: " << body.size() << endl;
 
     for(auto & iter : imgPath.eyes)
     {
         imageHandler* img = new imageHandler();
+#if defined(__APPLE__)
+        string path = imgPath.currentPath.string() +"/"+ iter;
+#else
         string path = imgPath.absolutePath + iter;
+#endif
         bool ret = imgHandler->loadTexture(path.c_str(), img);
         IM_ASSERT(ret);
         eyes.push_back(img);
     }
-    cout << "---Eyes: " << eyes.size() << endl;
+    //cout << "---Eyes: " << eyes.size() << endl;
 
     for(auto & iter : imgPath.outfits)
     {
@@ -58,40 +66,48 @@ characterBuilder::characterBuilder(imageHandler* imgHandler)
         for(auto & jter : iter.second)
         {
             imageHandler* img = new imageHandler();
+#if defined(__APPLE__)
+            string path = imgPath.currentPath.string() +"/"+ jter;
+#else
             string path = imgPath.absolutePath + jter;
+#endif
             bool ret = imgHandler->loadTexture(path.c_str(), img);
             IM_ASSERT(ret);
             temp.push_back(img);
         }
         outfit.push_back(temp);
     }
-
+/*
     cout << "---Outfit: " << outfit.size() << endl;
     for(int i = 0; i < outfit.size(); i++)
     {
         cout << "------" << i << ": " << outfit.at(i).size() << endl;
     }
-
+*/
     for(auto & iter : imgPath.hairstyle)
     {
         vector<imageHandler*> temp;
         for(auto & jter : iter.second)
         {
             imageHandler* img = new imageHandler();
+#if defined(__APPLE__)
+            string path = imgPath.currentPath.string() +"/"+ jter;
+#else
             string path = imgPath.absolutePath + jter;
+#endif
             bool ret = imgHandler->loadTexture(path.c_str(), img);
             IM_ASSERT(ret);
             temp.push_back(img);
         }
         hair.push_back(temp);
     }
-
+/*
     cout << "---Hair: " << hair.size() << endl;
     for(int i = 0; i < hair.size(); i++)
     {
         cout << "------" << i << ": " << hair.at(i).size() << endl;
     }
-
+*/
 
     for(auto & iter : imgPath.accessories)
     {
@@ -99,7 +115,11 @@ characterBuilder::characterBuilder(imageHandler* imgHandler)
         for(auto & jter : iter.second)
         {
             imageHandler* img = new imageHandler();
+#if defined(__APPLE__)
+            string path = imgPath.currentPath.string() +"/"+ jter;
+#else
             string path = imgPath.absolutePath + jter;
+#endif
             bool ret = imgHandler->loadTexture(path.c_str(), img);
             IM_ASSERT(ret);
             temp.push_back(img);
@@ -107,50 +127,28 @@ characterBuilder::characterBuilder(imageHandler* imgHandler)
         accessories.push_back(temp);
     }
 
-    indexAccessories = accessories.size();
+    //indexAccessories = accessories.size();
+/*
     cout << "---Accessories: " << accessories.size() << endl;
     for(int i = 0; i < accessories.size(); i++)
     {
         cout << "------" << i << ": " << accessories.at(i).size() << endl;
     }
+*/
 }
 
 void characterBuilder::changeBody(int i)
 {
-    if(i == 0)
+    if(i < body.size())
     {
-        indexBody --;
-        if(indexBody < 0)
-        {
-            indexBody = body.size() - 1;
-        }
-    }
-    else if(i == 1)
-    {
-        indexBody++;
-        if(indexBody == body.size())
-        {
-            indexBody = 0;
-        }
+        indexBody = i;
     }
 }
 void characterBuilder::changeEyes(int i)
 {
-    if( i == 0)
+    if(i < eyes.size())
     {
-        indexEyes --;
-        if(indexEyes < 0)
-        {
-            indexEyes = eyes.size() - 1;
-        }
-    }
-    else if (i == 1)
-    {
-        indexEyes ++;
-        if(indexEyes == eyes.size())
-        {
-            indexEyes = 0;
-        }
+        indexEyes = i;
     }
 }
 void characterBuilder::changeOutfit(int i)
@@ -370,21 +368,45 @@ void characterBuilder::drawBodyEyeControl()
 {
     ImGui::SetCursorPos(ImVec2(50.f,138.f));
     ImGui::Text("Body       ");
-    ImGui::SameLine();
-    ImGui::PushButtonRepeat(true);
-    if (ImGui::ArrowButton("##bodyLEFT", ImGuiDir_Left)) { changeBody(0); }
-    ImGui::SameLine(0.0f, 15.f);
-    if (ImGui::ArrowButton("##bodyRIGHT", ImGuiDir_Right)) { changeBody(1); }
-    ImGui::PopButtonRepeat();
+
+    for(int i = 0; i < body.size(); i++)
+    {
+        float x = 30.f + (30.f * (float)i);
+        ImGui::SetCursorPos(ImVec2(x,168.f));
+        ImGui::PushID((i + 1) * 100);
+        int colorIndex = i * 3;
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)bodyColors.at(colorIndex));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)bodyColors.at(colorIndex + 1));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)bodyColors.at(colorIndex + 2));
+        if(ImGui::Button("  "))
+        {
+            changeBody(i);
+        }
+        ImGui::PopStyleColor(3);
+        ImGui::PopID();
+    }
+
+
 
     ImGui::SetCursorPos(ImVec2(50.f,206.f));
     ImGui::Text("Eyes       ");
-    ImGui::SameLine();
-    ImGui::PushButtonRepeat(true);
-    if (ImGui::ArrowButton("##Eleft", ImGuiDir_Left)) { changeEyes(0); }
-    ImGui::SameLine(0.0f, 15.f);
-    if (ImGui::ArrowButton("##Eright", ImGuiDir_Right)) { changeEyes(1); }
-    ImGui::PopButtonRepeat();
+
+    for(int i = 0; i < eyes.size(); i++)
+    {
+        float x = 30.f + (30.f * (float)i);
+        ImGui::SetCursorPos(ImVec2(x,236.f));
+        ImGui::PushID((i + 1) * 110);
+        int colorIndex = i * 3;
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)eyeColors.at(colorIndex));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)eyeColors.at(colorIndex + 1));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)eyeColors.at(colorIndex + 2));
+        if(ImGui::Button("  "))
+        {
+            changeEyes(i);
+        }
+        ImGui::PopStyleColor(3);
+        ImGui::PopID();
+    }
 }
 void characterBuilder::drawOutfitControls()
 {

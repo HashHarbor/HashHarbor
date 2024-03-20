@@ -1,0 +1,23 @@
+# API KEYS
+/backends/database/db.toml
+
+# Build Files
+/src/characterBuilder.o
+/src/characterManager.o
+/src/database.o
+/src/graphic.o
+/src/imageHandler.o
+/src/imgui.ini
+/src/imgui.o
+/src/imgui_demo.o
+/src/imgui_draw.o
+/src/imgui_impl_opengl3.o
+/src/imgui_tables.o
+/src/imgui_impl_sdl.o
+/src/imgui_widgets.o
+/src/login.o
+/src/main.o
+/src/movementHandler.o
+/src/TextEditor.o
+/src/abc
+/src/authentication.o

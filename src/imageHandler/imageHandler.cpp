@@ -105,7 +105,10 @@ pair<ImVec2, ImVec2> imageHandler::generateCords(int animation, int frame, float
 
     minX += 0.1f;
     minY += 0.1f;
-    maxX += 0.1f;
+    if(maxX != 0.0f)
+    {
+        maxX -= 0.1f;
+    }
     return make_pair(ImVec2(minX,minY), ImVec2(maxX,maxY));
     // Example if character: imgHandler->generateCords(1,frameCount_6,32.f,64.f,192.f,320.f)
 }
@@ -125,5 +128,5 @@ void imageHandler::DrawMap(imageHandler _image, int tileX, int tileY, float widt
 
     ImGui::Image((void*)(intptr_t)_image.texture, ImVec2(width, height), ImVec2(topLeft, topRight), ImVec2(botLeft, botRight));
 
-    cout << botLeft << " " << botRight << endl;
+    //cout << botLeft << " " << botRight << endl;
 }

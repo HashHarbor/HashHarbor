@@ -1,0 +1,62 @@
+#pragma once
+
+#include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/json.hpp>
+#include <mongocxx/client.hpp>
+#include <mongocxx/instance.hpp>
+#include <mongocxx/stdx.hpp>
+#include <mongocxx/uri.hpp>
+
+#if defined(__APPLE__)
+#include <iostream>
+#include <vector>
+using std::cout;
+using std::endl;
+using std::pair;
+#else
+#include <bits/stdc++.h>
+#include <utility>
+using std::pair;
+#endif
+using std::string;
+using std::vector;
+
+// database implemented as a singleton class
+class database
+{
+    mongocxx::instance instance; // MongoDB instance
+    mongocxx::client client; // MongoDB client
+    mongocxx::database db; // MongoDB database
+
+    database();
+    ~database();
+    database(const database&) = delete;
+    database& operator=(const database&) = delete;
+
+public:
+    struct usrProfile
+    {
+    public:
+        string _id = "";
+        string username = "";
+        string hash = "";
+        string salt = "";
+
+        void completeAuth()
+        {
+            hash.clear();
+            salt.clear();
+        }
+
+    };
+
+    static database& getInstance();
+    void connect();
+
+     bool getUserAuth(string usr, usrProfile& profile);
+     bool makeUser(usrProfile& profile);
+
+    //mongocxx::client& getClient(); // Get MongoDB client
+    //mongocxx::database& getDatabase(); // Get MongoDB database
+
+};

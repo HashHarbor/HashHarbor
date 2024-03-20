@@ -17,16 +17,16 @@
 EXE = abc
 IMGUI_DIR = ../
 
-SOURCES = main.cpp graphic/graphic.cpp imageHandler/imageHandler.cpp character/characterManager.cpp character/characterBuilder.cpp movement/movementHandler.cpp
+SOURCES = main.cpp graphic/graphic.cpp imageHandler/imageHandler.cpp character/characterManager.cpp character/characterBuilder.cpp movement/movementHandler.cpp login/login.cpp
 SOURCES += $(IMGUI_DIR)/imgui/imgui.cpp $(IMGUI_DIR)/imgui/imgui_demo.cpp $(IMGUI_DIR)/imgui/imgui_draw.cpp $(IMGUI_DIR)/imgui/imgui_tables.cpp $(IMGUI_DIR)/imgui/imgui_widgets.cpp
-SOURCES += $(IMGUI_DIR)/backends/imgui_impl_sdl.cpp $(IMGUI_DIR)/backends/imgui_impl_opengl3.cpp
+SOURCES += $(IMGUI_DIR)/backends/imgui_impl_sdl.cpp $(IMGUI_DIR)/backends/imgui_impl_opengl3.cpp $(IMGUI_DIR)/backends/textEditor/TextEditor.cpp $(IMGUI_DIR)/backends/database/database.cpp $(IMGUI_DIR)/backends/authentication/authentication.cpp
 OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))
 UNAME_S := $(shell uname -s)
 LINUX_GL_LIBS = -lGL
 
 CXXFLAGS = -std=c++17 -I$(IMGUI_DIR)/imgui -I$(IMGUI_DIR)/backends
 CXXFLAGS += -g -Wall -Wformat -lpthread
-LIBS =
+LIBS = -lssl -lcrypto
 
 ##---------------------------------------------------------------------
 ## OPENGL ES
@@ -56,6 +56,14 @@ ifeq ($(UNAME_S), Linux) #LINUX
     # Add OpenCV flags to CXXFLAGS and LIBS
     CXXFLAGS += $(OPENCV_FLAGS)
     LIBS += $(OPENCV_FLAGS)
+	
+	MONGODB_FLAGS := $(shell pkg-config --cflags libmongocxx libbsoncxx)
+	MONGODB_LIBS := $(shell pkg-config --libs libmongocxx libbsoncxx)
+
+    # Add MongoDB C++ driver flags to CXXFLAGS and LIBS
+    CXXFLAGS += $(MONGODB_FLAGS)
+    LIBS += $(MONGODB_LIBS)
+
 
 endif
 
@@ -67,24 +75,20 @@ ifeq ($(UNAME_S), Darwin) #APPLE
 	CXXFLAGS += `sdl2-config --cflags`
 	CXXFLAGS += -I/usr/local/include -I/opt/local/include
 	CFLAGS = $(CXXFLAGS)
-endif
 
-ifeq ($(OS), Windows_NT)
-    ECHO_MESSAGE = "MinGW"
-    LIBS += -lgdi32 -lopengl32 -limm32 `pkg-config --static --libs sdl2`
+	# Path to OpenCV includes and libraries
+   	OPENCV_INCLUDES := -I/usr/local/include/opencv4
+    OPENCV_LIBS := -L/usr/local/lib -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs
 
-    CXXFLAGS += `pkg-config --cflags sdl2`
-    CFLAGS = $(CXXFLAGS)
-endif
+    # Add OpenCV flags to CXXFLAGS and LIBS
+    CXXFLAGS += $(OPENCV_INCLUDES)
+    LIBS += $(OPENCV_LIBS)
 
-ifeq ($(UNAME_S), Darwin) #APPLE
-	ECHO_MESSAGE = "Mac OS X"
-	LIBS += -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo `sdl2-config --libs`
-	LIBS += -L/usr/local/lib -L/opt/local/lib
+    MONGO_FLAGS := $(shell pkg-config --cflags libmongocxx) $(shell pkg-config --cflags libbsoncxx)
+    MONGO_LIBS := $(shell pkg-config --libs libmongocxx) $(shell pkg-config --libs libbsoncxx)
 
-	CXXFLAGS += `sdl2-config --cflags`
-	CXXFLAGS += -I/usr/local/include -I/opt/local/include
-	CFLAGS = $(CXXFLAGS)
+    CXXFLAGS += $(MONGO_FLAGS)
+    LIBS +=$(MONGO_LIBS)
 endif
 
 ifeq ($(OS), Windows_NT)
@@ -113,12 +117,24 @@ endif
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 %.o:movement/%.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<	
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+%.o:login/%.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 %.o:$(IMGUI_DIR)/imgui/%.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 %.o:$(IMGUI_DIR)/backends/%.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+%.o:$(IMGUI_DIR)/backends/textEditor/%.cpp
+	$(CXX) $(CXXFLAGS) -w -c -o $@ $<
+
+%.o:$(IMGUI_DIR)/backends/database/%.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+%.o:$(IMGUI_DIR)/backends/authentication/%.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 all: $(EXE)
