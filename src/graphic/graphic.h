@@ -38,5 +38,5 @@ public:
     void makeSettings(login& Login, imageHandler& image, characterManager& character, characterBuilder& charBuild);
 
 private:
-
+    bool resetPauseScreen = false;
 };

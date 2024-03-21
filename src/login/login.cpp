@@ -48,7 +48,7 @@ login::login(int width, int height, imageHandler* imgHandler)
 
     minWidth = (width / 2.f) - 200.f;
     minHeight = (height / 2.f) - 240.f;
-
+    // todo - add linux Support
     string path = std::filesystem::current_path().string() + "/assets/other/login.png";
     img = new imageHandler();
     bool ret = imgHandler->loadTexture(path.c_str(), img);
