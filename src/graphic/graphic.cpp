@@ -186,7 +186,7 @@ void graphic::setup(){
     characterBuilder builder = characterBuilder(&image);
 
     database& db = database::getInstance();
-    db.connect();
+    //db.connect();
     login Login = login(width_px, height_px, &image);
 
     string pathMap;
@@ -238,9 +238,25 @@ void graphic::setup(){
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
 
+        if(ImGui::IsKeyPressedEx(ImGuiKey_Escape, false))
+        {
+            if(characterCreated && !show_login)
+            {
+                show_settings = !show_settings;
+                show_display = !show_display;
+                show_process = !show_process;
+                show_config = !show_config;
+            }
+        }
+
         if(show_login)
         {
             makeLogIn(Login, image);
+        }
+
+        if(show_settings)
+        {
+            makeSettings(Login, image, character, builder);
         }
 
         if(show_display){
@@ -259,13 +275,6 @@ void graphic::setup(){
         if(show_charSelector)
         {
             makeCharacterSelector(image, character, builder);
-        }
-
-        if(ImGui::IsKeyDown(ImGuiKey_Escape))
-        {
-            //todo move settings menu when created
-            show_charSelector = true;
-            characterCreated = false;
         }
         
         // Rendering
@@ -301,7 +310,7 @@ void graphic::makeDisplay(imageHandler& image, characterManager &character, char
     // Window - Graphics
     ImGui::Begin("Graphics", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
     {
-        if(characterCreated)
+        if(characterCreated && !show_settings)
         {
             frameTimer -= ImGui::GetIO().DeltaTime;
 
@@ -548,4 +557,115 @@ void graphic::makeLogIn(login& Login, imageHandler& image)
 
         show_login = false;
     }
+}
+
+void graphic::makeSettings(login &Login, imageHandler& image, characterManager &character, characterBuilder& charBuild)
+{
+    // todo - change background color
+    float windowWidth = 320.f;
+    float windowHeight = 620.f; // allow for 50px padding on a 1280x720 window
+    float padding = ((float)height_px - windowHeight) / 2.f;
+
+    static bool settingsWindow = false;
+    static bool userProfileWindow = false;
+    static bool characterWindow = false;
+    static bool logOutWindow = false;
+    static bool quitWindow = false;
+
+    ImGui::SetNextWindowSize({windowWidth, windowHeight});
+    ImGui::SetNextWindowPos({padding, padding});
+
+    ImGui::Begin("Pause", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+    {
+        // todo - settings button color
+        ImGui::SetCursorPos(ImVec2(85.f, (620.f / 6.f) * 1.f - 20.f));
+        ImGui::PushID(1111);
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
+        if(ImGui::Button("Settings", ImVec2(150.f, 40.f)))
+        {
+            settingsWindow = true;
+            userProfileWindow = false;
+            characterWindow = false;
+            logOutWindow = false;
+            quitWindow = false;
+        }
+        ImGui::PopStyleColor(3);
+        ImGui::PopID();
+        // todo - user profile button color
+        ImGui::SetCursorPos(ImVec2(85.f, (620.f / 6.f) * 2.f - 20.f));
+        ImGui::PushID(2222);
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
+        if(ImGui::Button("User Profile", ImVec2(150.f, 40.f)))
+        {
+            settingsWindow = false;
+            userProfileWindow = true;
+            characterWindow = false;
+            logOutWindow = false;
+            quitWindow = false;
+        }
+        ImGui::PopStyleColor(3);
+        ImGui::PopID();
+        // todo - change character button color
+        ImGui::SetCursorPos(ImVec2(85.f, (620.f / 6.f) * 3.f - 20.f));
+        ImGui::PushID(3333);
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
+        if(ImGui::Button("Change Character", ImVec2(150.f, 40.f)))
+        {
+            settingsWindow = false;
+            userProfileWindow = false;
+            characterWindow = true;
+            logOutWindow = false;
+            quitWindow = false;
+        }
+        ImGui::PopStyleColor(3);
+        ImGui::PopID();
+        // todo - log out color
+        ImGui::SetCursorPos(ImVec2(85.f, (620.f / 6.f) * 4.f - 20.f));
+        ImGui::PushID(4444);
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
+        if(ImGui::Button("Log Out", ImVec2(150.f, 40.f)))
+        {
+            settingsWindow = false;
+            userProfileWindow = false;
+            characterWindow = false;
+            logOutWindow = true;
+            quitWindow = false;
+        }
+        ImGui::PopStyleColor(3);
+        ImGui::PopID();
+        // todo - quit color
+        ImGui::SetCursorPos(ImVec2(85.f, (620.f / 6.f) * 5.f - 20.f));
+        ImGui::PushID(5555);
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
+        if(ImGui::Button("Quit", ImVec2(150.f, 40.f)))
+        {
+            settingsWindow = false;
+            userProfileWindow = false;
+            characterWindow = false;
+            logOutWindow = false;
+            quitWindow = true;
+        }
+        ImGui::PopStyleColor(3);
+        ImGui::PopID();
+    }
+    ImGui::End();
+
+
+    if(settingsWindow){}
+    else if(userProfileWindow){}
+    else if(characterWindow){}
+    else if (logOutWindow) {}
+    else if(quitWindow){}
+
+    // todo - remove backgroind color
 }

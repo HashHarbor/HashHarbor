@@ -21,3 +21,5 @@
 /src/TextEditor.o
 /src/abc
 /src/authentication.o
+/assets/api.toml
+/src/assets/

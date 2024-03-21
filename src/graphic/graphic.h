@@ -14,11 +14,12 @@ public:
     int width_px = 1280;
     int height_px = 720;
 
-    bool show_login = true;
-    bool show_display = false;
-    bool show_process = false;
-    bool show_config = false;
-    bool show_charSelector = false;
+    bool show_login = false;
+    bool show_display = true;
+    bool show_process = true;
+    bool show_config = true;
+    bool show_charSelector = true;
+    bool show_settings = false;
 
     bool characterCreated = false;
 
@@ -34,6 +35,7 @@ public:
     void makeBackground(imageHandler background, movementHandler move, float &gridX, float &gridY);
     void makeLogIn(login& Login, imageHandler& image);
     string executeCPP(string code);
+    void makeSettings(login& Login, imageHandler& image, characterManager& character, characterBuilder& charBuild);
 
 private:
 
