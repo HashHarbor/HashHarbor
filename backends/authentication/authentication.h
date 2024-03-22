@@ -42,5 +42,8 @@ public:
     // TRUE -> Authentication
     // FALSE -> Create Account
 
+    bool changePassword(string usr, string oldPasswd, string newPasswd);
+    bool changeUsername(string newUsr, string id);
+
     void getUser(string& usr, string& id);
 };

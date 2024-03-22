@@ -116,3 +116,47 @@ bool database::makeUser(database::usrProfile &profile)
     return false;
 }
 
+bool database::updatePassword(usrProfile& profile)
+{
+    try{
+        auto collection = db["UserAuth"];
+
+        auto update_one_result = collection.update_one(
+                make_document(kvp("_id", bsoncxx::oid(profile._id))),
+                make_document(kvp("$set", make_document(kvp("password", profile.hash), kvp("salt", profile.salt)))));
+
+        assert(update_one_result);  // Acknowledged writes return results.
+        assert(update_one_result->modified_count() == 1);
+        return true;
+    }catch(const std::exception& e)
+    {
+        cout << "Database Failure:: " << e.what() << endl;
+    }
+    return false;
+}
+
+bool database::updateUsername(string id, string newUsr)
+{
+    try{
+        auto collection = db["UserAuth"];
+
+        auto findUsr = collection.find_one(make_document(kvp("username", newUsr)));
+        if(findUsr) // make sure this username has not been used
+        {
+            assert(findUsr);
+            return false;
+        }
+
+        auto update_one_result = collection.update_one(
+                make_document(kvp("_id", bsoncxx::oid(id))),
+                make_document(kvp("$set", make_document(kvp("username", newUsr)))));
+
+        assert(update_one_result);  // Acknowledged writes return results.
+        assert(update_one_result->modified_count() == 1);
+        return true;
+    }catch(const std::exception& e)
+    {
+        cout << "Database Failure:: " << e.what() << endl;
+    }
+    return false;
+}

@@ -14,11 +14,11 @@ public:
     int width_px = 1280;
     int height_px = 720;
 
-    bool show_login = false;
-    bool show_display = true;
-    bool show_process = true;
-    bool show_config = true;
-    bool show_charSelector = true;
+    bool show_login = true;
+    bool show_display = false;
+    bool show_process = false;
+    bool show_config = false;
+    bool show_charSelector = false;
     bool show_settings = false;
 
     bool characterCreated = false;

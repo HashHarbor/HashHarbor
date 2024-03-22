@@ -151,8 +151,45 @@ string authentication::hash(string passwd, string salt)
     return hashConverted.str();
 }
 
-void authentication::getUser(std::string &usr, std::string &id)
+void authentication::getUser(string &usr, string &id)
 {
     usr = username;
     id = _id;
+}
+
+bool authentication::changePassword(string usr, string oldPasswd, string newPasswd)
+{
+    if(std::regex_search(oldPasswd, regex("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[~`!@#$%^&*()_+={}:;<>?-])[A-Za-z0-9~`!@#$%^&*()_+={}:;<>?-]{8,48}$"))) // if old password is within allowed parameters
+    {
+        if(std::regex_search(newPasswd, regex("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[~`!@#$%^&*()_+={}:;<>?-])[A-Za-z0-9~`!@#$%^&*()_+={}:;<>?-]{8,48}$"))) // if new password is within allowed params
+        {
+            if(auth(usr, oldPasswd))
+            {
+                database &db = database::getInstance();
+
+                database::usrProfile profile;
+
+                string newSalt = saltGenerator();
+                string authHash = hash(newPasswd, newSalt);
+
+                profile._id = _id;
+                profile.username = username;
+                profile.hash = authHash;
+                profile.salt = newSalt;
+
+                return db.updatePassword(profile);
+            }
+        }
+    }
+    return false;
+}
+
+bool authentication::changeUsername(string newUsr, string id)
+{
+    if(regex_search(newUsr, regex("^[A-Za-z0-9_.-]{3,48}$")))
+    {
+        database &db = database::getInstance();
+        return db.updateUsername(id, newUsr);
+    }
+    return false;
 }

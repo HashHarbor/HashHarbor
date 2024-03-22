@@ -35,6 +35,7 @@ using std::ofstream;
 #include "../assets/font/IconsFontAwesome6.h"
 #include "../login/login.h"
 #include "database/database.h"
+#include "authentication/authentication.h"
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui_internal.h"
@@ -186,7 +187,7 @@ void graphic::setup(){
     characterBuilder builder = characterBuilder(&image);
 
     database& db = database::getInstance();
-    //db.connect();
+    db.connect();
     login Login = login(width_px, height_px, &image);
 
     string pathMap;
@@ -804,7 +805,7 @@ void graphic::makeSettings(login &Login, imageHandler& image, characterManager &
                 usr_Username = true;
                 usr_Password = false;
 
-                createUsername[64] = '\0';
+                createUsername[0] = '\0';
             }
             ImGui::PopStyleColor(3);
             ImGui::PopID();
@@ -819,9 +820,9 @@ void graphic::makeSettings(login &Login, imageHandler& image, characterManager &
                 usr_Username = false;
                 usr_Password = true;
 
-                currentPasswd[64] = '\0';
-                createPasswd[64] = '\0';
-                confirmPasswd[64] = '\0';
+                currentPasswd[0] = '\0';
+                createPasswd[0] = '\0';
+                confirmPasswd[0] = '\0';
             }
             ImGui::PopStyleColor(3);
             ImGui::PopID();
@@ -841,6 +842,7 @@ void graphic::makeSettings(login &Login, imageHandler& image, characterManager &
             ImGui::PopStyleColor(3);
             ImGui::PopID();
 
+            // todo - change to have its own window for each instead of current layout
             if(usr_Username)
             {
                 draw_list->AddRectFilled(ImVec2(profileWidth + 350.f, profileHeight + 70.f), ImVec2(profileWidth + 800.f, profileHeight + 200.f), ImColor(ImVec4(0.6f, 0.6f, 0.6f, 1.0f)), 20.0f);
@@ -862,10 +864,21 @@ void graphic::makeSettings(login &Login, imageHandler& image, characterManager &
                 ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
                 if(ImGui::Button("Update Username", ImVec2(130.f, 30.f)))
                 {
-                    // todo - Connect to login and database to update username
-                        // this needs to check to not have overlapping usernames
-                        // use stored db id to access user
-                        // if successful change on other display, clear input filed, and close this setting window
+                    authentication auth = authentication();
+                    if(auth.changeUsername(createUsername, Login._id))
+                    {
+                        // todo - display success
+                        cout << "Username Change Success" << endl;
+                        usr_Username = false;
+
+                        Login._username = createUsername;
+                    }
+                    else
+                    {
+                        cout << "Username Error\n";
+                        // todo - display error message
+                    }
+                    createUsername[0] = '\0';
                 }
                 ImGui::PopStyleColor(3);
                 ImGui::PopID();
@@ -912,10 +925,24 @@ void graphic::makeSettings(login &Login, imageHandler& image, characterManager &
                 ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
                 if(ImGui::Button("Update Password", ImVec2(130.f, 30.f)))
                 {
-                    // todo - Connect to login and database to change password
-                    // add function in auth and database to handle this
-                    // use stored db id to access user
-                    // if successful change display a success message, clear input filed
+                    if(strcmp(createPasswd,confirmPasswd) != 0) // if new password and confirmation dont match
+                    {
+                        // todo - display error message
+                        cout << "New Passwords Dont Match" << endl;
+                    }
+                    else
+                    {
+                        authentication auth = authentication();
+                        if(auth.changePassword(Login._username, currentPasswd, createPasswd))
+                        {
+                            // todo - display success
+                            cout << "Success" << endl;
+                            usr_Password = false;
+                        }
+                    }
+                    currentPasswd[0] = '\0';
+                    createPasswd[0] = '\0';
+                    confirmPasswd[0] = '\0';
                 }
                 ImGui::PopStyleColor(3);
                 ImGui::PopID();
