@@ -35,8 +35,9 @@ public:
     void makeBackground(imageHandler background, movementHandler move, float &gridX, float &gridY);
     void makeLogIn(login& Login, imageHandler& image);
     string executeCPP(string code);
-    void makeSettings(login& Login, imageHandler& image, characterManager& character, characterBuilder& charBuild);
+    void makeSettings(login& Login, imageHandler& image, characterManager& character, characterBuilder& charBuild, bool& done);
 
 private:
     bool resetPauseScreen = false;
+    bool changeResolution = false;
 };

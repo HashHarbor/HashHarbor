@@ -232,6 +232,11 @@ void graphic::setup(){
                 done = true;
         }
 
+        if(changeResolution)
+        {
+            SDL_SetWindowSize(window, width_px, height_px);
+            changeResolution = false;
+        }
 
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
@@ -258,7 +263,7 @@ void graphic::setup(){
 
         if(show_settings)
         {
-            makeSettings(Login, image, character, builder);
+            makeSettings(Login, image, character, builder, done);
         }
 
         if(show_display){
@@ -561,7 +566,7 @@ void graphic::makeLogIn(login& Login, imageHandler& image)
     }
 }
 
-void graphic::makeSettings(login &Login, imageHandler& image, characterManager &character, characterBuilder& charBuild)
+void graphic::makeSettings(login &Login, imageHandler& image, characterManager &character, characterBuilder& charBuild, bool& done)
 {
     // todo - change background color
     float windowWidth = 320.f;
@@ -681,14 +686,68 @@ void graphic::makeSettings(login &Login, imageHandler& image, characterManager &
 
     if(settingsWindow)
     {
+        // todo - change to real audio controls from audio class
+        static int tempMain = 20;
+        static int tempMusic = 20;
+        static int tempSoundEffect = 20;
+
         ImGui::SetNextWindowSize({(float)width_px - windowWidth - (padding * 2.f) - 10.f, 620.f});
         ImGui::SetNextWindowPos({windowWidth + padding + 10.f, padding});
 
         ImGui::Begin("Settings", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
         {
-            // Chnage volume
-            // chnage resolution
-            //
+            ImGui::SetCursorPos(ImVec2(20.f, 40.f));
+            ImGui::Text("Change Screen Resolution");
+
+            ImGui::SetCursorPos(ImVec2(30.f, 60.f));
+            static int e = 0;
+            static int k = 0;
+#if defined(__APPLE__)
+            ImGui::RadioButton("2480 x 1440", &e, 0);
+            ImGui::SameLine();
+            ImGui::RadioButton("2560 x 1800", &e, 1);
+#else
+            ImGui::RadioButton("1280 x 720", &e, 0);
+            ImGui::SameLine();
+            ImGui::RadioButton("1440 x 900", &e, 1);
+            ImGui::SameLine();
+            ImGui::RadioButton("1920 x 1080", &e, 2);
+#endif
+            // Disabled due to issues with SDL and MAC Retina Displays
+            /*
+            if(k != e)
+            {
+                switch(e)
+                {
+                    case 0:
+                        width_px = 1280;
+                        height_px = 720;
+                        break;
+                    case 1:
+                        width_px = 1440;
+                        height_px = 900;
+                        break;
+                    case 2:
+                        width_px = 1920;
+                        height_px = 1080;
+                        break;
+                }
+                changeResolution = true;
+                k = e;
+            }
+             */
+
+            ImGui::SetCursorPos(ImVec2(20.f, 100.f));
+            ImGui::Text("Volume Controls: ");
+
+            ImGui::SetCursorPos(ImVec2(30.f, 120.f));
+            ImGui::SliderInt("Main", &tempMain, 0, 20);
+            ImGui::SetCursorPos(ImVec2(30.f, 145.f));
+            ImGui::SliderInt("Music", &tempMusic, 0, 20);
+            ImGui::SetCursorPos(ImVec2(30.f, 170.f));
+            ImGui::SliderInt("Sound Effects", &tempSoundEffect, 0, 20);
+            // Change resolution
+                // give warning on mac that resolution exceeds display size on anything over 1440x900 or just double the number displayed
         }
         ImGui::End();
     }
@@ -708,27 +767,27 @@ void graphic::makeSettings(login &Login, imageHandler& image, characterManager &
         ImGui::Begin("User Profile", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
         {
             ImDrawList* draw_list = ImGui::GetWindowDrawList();
-            draw_list->AddRectFilled(ImVec2(profileWidth + 20.f, profileHeight + 40.f), ImVec2(profileWidth + 300.f, profileHeight + 200.f), ImColor(ImVec4(0.6f, 0.6f, 0.6f, 1.0f)), 20.0f);
-            draw_list->AddRectFilled(ImVec2(profileWidth + 35.f, profileHeight + 55.f), ImVec2(profileWidth + 109.f, profileHeight + 188.f), ImColor(ImVec4(0.9f, 0.9f, 0.9f, 1.0f)), 20.0f);
+            draw_list->AddRectFilled(ImVec2(profileWidth + 20.f, profileHeight + 70.f), ImVec2(profileWidth + 300.f, profileHeight + 230.f), ImColor(ImVec4(0.6f, 0.6f, 0.6f, 1.0f)), 20.0f);
+            draw_list->AddRectFilled(ImVec2(profileWidth + 35.f, profileHeight + 85.f), ImVec2(profileWidth + 109.f, profileHeight + 218.f), ImColor(ImVec4(0.9f, 0.9f, 0.9f, 1.0f)), 20.0f);
 
-            charBuild.drawCharacterAnimation(&image, ImVec2(40.f, 55.f), {ImVec2(0.1f / 192.f, 0.1f/320.f),ImVec2(31.99f/192.f, 64.f/320.f)}, 2.f, character.getMainPlayer()->dynamicIndex);
+            charBuild.drawCharacterAnimation(&image, ImVec2(40.f, 85.f), {ImVec2(0.1f / 192.f, 0.1f/320.f),ImVec2(31.99f/192.f, 64.f/320.f)}, 2.f, character.getMainPlayer()->dynamicIndex);
             // show username
-            ImGui::SetCursorPos(ImVec2(124.f, 80.f));
+            ImGui::SetCursorPos(ImVec2(124.f, 110.f));
             ImGui::Text("Username: ");
             ImGui::SameLine();
             ImGui::Text(Login._username.c_str());
 
-            ImGui::SetCursorPos(ImVec2(124.f, 100.f));
+            ImGui::SetCursorPos(ImVec2(124.f, 130.f));
             ImGui::Text("Date Joined: ");
             ImGui::SameLine();
             ImGui::Text("mm/dd/yyyy"); // todo - get from database
 
-            ImGui::SetCursorPos(ImVec2(124.f, 120.f));
+            ImGui::SetCursorPos(ImVec2(124.f, 150.f));
             ImGui::Text("Level: "); // todo - change to whatever gets implemented
             ImGui::SameLine();
             ImGui::Text("0");
 
-            ImGui::SetCursorPos(ImVec2(124.f, 140.f));
+            ImGui::SetCursorPos(ImVec2(124.f, 170.f));
             ImGui::Text("Problems Solved: "); // todo - get from database
             ImGui::SameLine();
             ImGui::Text("0");
@@ -863,7 +922,18 @@ void graphic::makeSettings(login &Login, imageHandler& image, characterManager &
             }
 
             // see progress
-                // have a child window to list and selectg the problems to see how the user did
+            // have a child window to list and selectg the problems to see how the user did
+            draw_list->AddRectFilled(ImVec2(profileWidth + 20.f, profileHeight + 260.f), ImVec2(profileWidth + 405.f, profileHeight + 600.f), ImColor(ImVec4(0.6f, 0.6f, 0.6f, 1.0f)), 20.0f);
+            ImGui::SetCursorPos(ImVec2(30.f, 270.f));
+            ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,0.0f));
+            ImGui::Text("Solved Problems");
+            ImGui::PopStyleColor();
+
+            draw_list->AddRectFilled(ImVec2(profileWidth + 425.f, profileHeight + 260.f), ImVec2(profileWidth + 830.f, profileHeight + 600.f), ImColor(ImVec4(0.6f, 0.6f, 0.6f, 1.0f)), 20.0f);
+            ImGui::SetCursorPos(ImVec2(435.f, 270.f));
+            ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,0.0f));
+            ImGui::Text("Inventory");
+            ImGui::PopStyleColor();
             // possibly see inventory
                 // use a child window to view the items
         }
@@ -909,8 +979,93 @@ void graphic::makeSettings(login &Login, imageHandler& image, characterManager &
         }
         ImGui::End();
     }
-    else if (logOutWindow) {}
-    else if(quitWindow){}
+    else if (logOutWindow)
+    {
+        ImGui::SetNextWindowSize({320.f, 110.f});
+        ImGui::SetNextWindowPos({windowWidth + padding + 10.f, padding});
+        ImGui::Begin("Log Out", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+        {
+            ImGui::SetCursorPos(ImVec2(20.f, 20.f));
+            ImGui::Text("Are You Sure You Want to Log Out?");
+
+            ImGui::SetCursorPos(ImVec2( 20.f,50.f));
+            ImGui::PushID(77);
+            ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
+            if(ImGui::Button("Keep Playing", ImVec2(120.f, 40.f)))
+            {
+                settingsWindow = false;
+                userProfileWindow = false;
+                characterWindow = false;
+                logOutWindow = false;
+                quitWindow = false;
+            }
+            ImGui::PopStyleColor(3);
+            ImGui::PopID();
+
+            ImGui::SetCursorPos(ImVec2( 160.f,50.f));
+            ImGui::PushID(66);
+            ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.f / 360.f, 1.0f, 0.76f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.f / 360.f, 1.f, 1.f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.f / 360.f, 1.f, 0.384f));
+            if(ImGui::Button("Log Out", ImVec2(120.f, 40.f)))
+            {
+                // todo - login function to clear saved data
+                show_display = false;
+                show_process = false;
+                show_config = false;
+                show_charSelector = false;
+                show_settings = false;
+
+                characterCreated = false;
+
+                show_login = true;
+            }
+            ImGui::PopStyleColor(3);
+            ImGui::PopID();
+        }
+        ImGui::End();
+    }
+    else if(quitWindow)
+    {
+        ImGui::SetNextWindowSize({320.f, 110.f});
+        ImGui::SetNextWindowPos({windowWidth + padding + 10.f, padding});
+        ImGui::Begin("Quit", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+        {
+            ImGui::SetCursorPos(ImVec2(20.f, 20.f));
+            ImGui::Text("Are You Sure You Want to Quit?");
+
+            ImGui::SetCursorPos(ImVec2( 20.f,50.f));
+            ImGui::PushID(77);
+            ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
+            if(ImGui::Button("Keep Playing", ImVec2(120.f, 40.f)))
+            {
+                settingsWindow = false;
+                userProfileWindow = false;
+                characterWindow = false;
+                logOutWindow = false;
+                quitWindow = false;
+            }
+            ImGui::PopStyleColor(3);
+            ImGui::PopID();
+
+            ImGui::SetCursorPos(ImVec2( 160.f,50.f));
+            ImGui::PushID(66);
+            ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.f / 360.f, 1.0f, 0.76f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.f / 360.f, 1.f, 1.f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.f / 360.f, 1.f, 0.384f));
+            if(ImGui::Button("Quit", ImVec2(120.f, 40.f)))
+            {
+                done = true;
+            }
+            ImGui::PopStyleColor(3);
+            ImGui::PopID();
+        }
+        ImGui::End();
+    }
 
     // todo - remove backgroind color
 }
