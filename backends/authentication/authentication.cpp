@@ -1,9 +1,9 @@
 #include "authentication.h"
-
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
 #include "database/database.h"
+#include "userProfile/userProfile.h"
 
 #if defined(__APPLE__)
 #include <iostream>
@@ -55,8 +55,9 @@ bool authentication::inputValidation(string usr, string passwd, bool mode)
 bool authentication::auth(string usr, string passwd)
 {
     database& db = database::getInstance();
-
     database::usrProfile profile;
+
+    userProfile& usrProfile = userProfile::getInstance();
 
     if(db.getUserAuth(usr, profile)) // if profile is in database
     {
@@ -66,8 +67,8 @@ bool authentication::auth(string usr, string passwd)
             if(profile.hash == authHash)
             {
                 profile.completeAuth(); // clears password and salt to not store after auth
-                _id = profile._id;
-                username = profile.username;
+                usrProfile.setUsername(profile.username);
+                usrProfile.setId(profile._id);
                 return true;
             }
         }
@@ -151,29 +152,23 @@ string authentication::hash(string passwd, string salt)
     return hashConverted.str();
 }
 
-void authentication::getUser(string &usr, string &id)
-{
-    usr = username;
-    id = _id;
-}
-
-bool authentication::changePassword(string usr, string oldPasswd, string newPasswd)
+bool authentication::changePassword(string oldPasswd, string newPasswd)
 {
     if(std::regex_search(oldPasswd, regex("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[~`!@#$%^&*()_+={}:;<>?-])[A-Za-z0-9~`!@#$%^&*()_+={}:;<>?-]{8,48}$"))) // if old password is within allowed parameters
     {
         if(std::regex_search(newPasswd, regex("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[~`!@#$%^&*()_+={}:;<>?-])[A-Za-z0-9~`!@#$%^&*()_+={}:;<>?-]{8,48}$"))) // if new password is within allowed params
         {
-            if(auth(usr, oldPasswd))
+            userProfile& usrProfile = userProfile::getInstance();
+
+            if(auth(usrProfile.getUsername(), oldPasswd))
             {
                 database &db = database::getInstance();
-
                 database::usrProfile profile;
 
                 string newSalt = saltGenerator();
                 string authHash = hash(newPasswd, newSalt);
 
-                profile._id = _id;
-                profile.username = username;
+                profile._id = usrProfile.getId();
                 profile.hash = authHash;
                 profile.salt = newSalt;
 
@@ -189,7 +184,7 @@ bool authentication::changeUsername(string newUsr, string id)
     if(regex_search(newUsr, regex("^[A-Za-z0-9_.-]{3,48}$")))
     {
         database &db = database::getInstance();
-        return db.updateUsername(id, newUsr);
+        return db.updateUsername(newUsr);
     }
     return false;
 }

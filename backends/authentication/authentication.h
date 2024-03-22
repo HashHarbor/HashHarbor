@@ -34,16 +34,14 @@ class authentication
     string saltGenerator();
     string hash(string passwd, string salt);
 public:
-    string username;
-    string _id;
+    //string username;
+    //string _id;
     authentication();
 
     bool inputValidation(string usr, string passwd, bool mode);
     // TRUE -> Authentication
     // FALSE -> Create Account
 
-    bool changePassword(string usr, string oldPasswd, string newPasswd);
+    bool changePassword(string oldPasswd, string newPasswd);
     bool changeUsername(string newUsr, string id);
-
-    void getUser(string& usr, string& id);
 };

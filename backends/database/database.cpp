@@ -28,6 +28,7 @@ using std::vector;
 
 #include "cpptoml.h"
 #include "../src/imageHandler/imagePath.h"
+#include "userProfile/userProfile.h"
 
 database::database() : client(), db(){}
 database::~database() {}
@@ -135,9 +136,11 @@ bool database::updatePassword(usrProfile& profile)
     return false;
 }
 
-bool database::updateUsername(string id, string newUsr)
+bool database::updateUsername(string newUsr)
 {
     try{
+        userProfile& usrProfile = userProfile::getInstance();
+
         auto collection = db["UserAuth"];
 
         auto findUsr = collection.find_one(make_document(kvp("username", newUsr)));
@@ -148,11 +151,13 @@ bool database::updateUsername(string id, string newUsr)
         }
 
         auto update_one_result = collection.update_one(
-                make_document(kvp("_id", bsoncxx::oid(id))),
+                make_document(kvp("_id", bsoncxx::oid(usrProfile.getId()))),
                 make_document(kvp("$set", make_document(kvp("username", newUsr)))));
 
         assert(update_one_result);  // Acknowledged writes return results.
         assert(update_one_result->modified_count() == 1);
+
+        usrProfile.setUsername(newUsr);
         return true;
     }catch(const std::exception& e)
     {

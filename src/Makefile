@@ -17,9 +17,9 @@
 EXE = abc
 IMGUI_DIR = ../
 
-SOURCES = main.cpp graphic/graphic.cpp imageHandler/imageHandler.cpp character/characterManager.cpp character/characterBuilder.cpp movement/movementHandler.cpp login/login.cpp
+SOURCES = main.cpp graphic/graphic.cpp imageHandler/imageHandler.cpp character/characterManager.cpp character/characterBuilder.cpp movement/movementHandler.cpp login/login.cpp pause/pause.cpp
 SOURCES += $(IMGUI_DIR)/imgui/imgui.cpp $(IMGUI_DIR)/imgui/imgui_demo.cpp $(IMGUI_DIR)/imgui/imgui_draw.cpp $(IMGUI_DIR)/imgui/imgui_tables.cpp $(IMGUI_DIR)/imgui/imgui_widgets.cpp
-SOURCES += $(IMGUI_DIR)/backends/imgui_impl_sdl.cpp $(IMGUI_DIR)/backends/imgui_impl_opengl3.cpp $(IMGUI_DIR)/backends/textEditor/TextEditor.cpp $(IMGUI_DIR)/backends/database/database.cpp $(IMGUI_DIR)/backends/authentication/authentication.cpp
+SOURCES += $(IMGUI_DIR)/backends/imgui_impl_sdl.cpp $(IMGUI_DIR)/backends/imgui_impl_opengl3.cpp $(IMGUI_DIR)/backends/textEditor/TextEditor.cpp $(IMGUI_DIR)/backends/database/database.cpp $(IMGUI_DIR)/backends/authentication/authentication.cpp $(IMGUI_DIR)/backends/userProfile/userProfile.cpp
 OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))
 UNAME_S := $(shell uname -s)
 LINUX_GL_LIBS = -lGL
@@ -106,7 +106,6 @@ endif
 %.o:%.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-
 %.o:character/%.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
@@ -122,6 +121,9 @@ endif
 %.o:login/%.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
+%.o:pause/%.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
 %.o:$(IMGUI_DIR)/imgui/%.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
@@ -135,6 +137,9 @@ endif
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 %.o:$(IMGUI_DIR)/backends/authentication/%.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+%.o:$(IMGUI_DIR)/backends/userProfile/%.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 all: $(EXE)

@@ -185,7 +185,6 @@ void login::drawLogin()
 
         if(auth.inputValidation( username, passwd, true)) // this will validate the input and then authenticate the user
         {
-            auth.getUser(_username, _id);
             STATUS = true;
         }
         else
@@ -314,7 +313,6 @@ void login::drawCreateUser()
             authentication auth = authentication();
             if(auth.inputValidation( createUsername, createPasswd, false))
             {
-                auth.getUser(_username, _id);
                 STATUS = true;
             }
             else

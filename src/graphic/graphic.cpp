@@ -34,6 +34,7 @@ using std::ofstream;
 #include "../movement/movementHandler.h"
 #include "../assets/font/IconsFontAwesome6.h"
 #include "../login/login.h"
+#include "userProfile/userProfile.h"
 #include "database/database.h"
 #include "authentication/authentication.h"
 
@@ -185,7 +186,7 @@ void graphic::setup(){
     imageHandler image = imageHandler();
     characterManager character = characterManager();
     characterBuilder builder = characterBuilder(&image);
-
+    userProfile& usrProfile = userProfile::getInstance();
     database& db = database::getInstance();
     db.connect();
     login Login = login(width_px, height_px, &image);
@@ -597,6 +598,8 @@ void graphic::makeSettings(login &Login, imageHandler& image, characterManager &
         resetPauseScreen = false;
     }
 
+    userProfile& usrProfile = userProfile::getInstance();
+
     ImGui::SetNextWindowSize({windowWidth, windowHeight});
     ImGui::SetNextWindowPos({padding, padding});
 
@@ -776,7 +779,7 @@ void graphic::makeSettings(login &Login, imageHandler& image, characterManager &
             ImGui::SetCursorPos(ImVec2(124.f, 110.f));
             ImGui::Text("Username: ");
             ImGui::SameLine();
-            ImGui::Text(Login._username.c_str());
+            ImGui::Text("%s", usrProfile.getUsername().c_str());
 
             ImGui::SetCursorPos(ImVec2(124.f, 130.f));
             ImGui::Text("Date Joined: ");
@@ -865,13 +868,11 @@ void graphic::makeSettings(login &Login, imageHandler& image, characterManager &
                 if(ImGui::Button("Update Username", ImVec2(130.f, 30.f)))
                 {
                     authentication auth = authentication();
-                    if(auth.changeUsername(createUsername, Login._id))
+                    if(auth.changeUsername(createUsername, usrProfile.getId()))
                     {
                         // todo - display success
                         cout << "Username Change Success" << endl;
                         usr_Username = false;
-
-                        Login._username = createUsername;
                     }
                     else
                     {
@@ -933,7 +934,7 @@ void graphic::makeSettings(login &Login, imageHandler& image, characterManager &
                     else
                     {
                         authentication auth = authentication();
-                        if(auth.changePassword(Login._username, currentPasswd, createPasswd))
+                        if(auth.changePassword(currentPasswd, createPasswd))
                         {
                             // todo - display success
                             cout << "Success" << endl;

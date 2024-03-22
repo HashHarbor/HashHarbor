@@ -53,8 +53,6 @@ class login
     void error_Comp();
     void error_Create();
 public:
-    string _username;
-    string _id;
     login(int width, int height, imageHandler* imgHandler);
 
     void drawLoginScreen(imageHandler* imgHandler);
