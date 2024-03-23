@@ -52,7 +52,7 @@ login::login(int width, int height, imageHandler* imgHandler)
 #if defined(__APPLE__)
     string path = std::filesystem::current_path().string() + "/assets/other/login.png";
 #else
-    string path = "../../assets/other/login.png";
+    string path = "../assets/other/login.png";
 #endif
     img = new imageHandler();
     imgHandler->loadTexture(path.c_str(), img);
