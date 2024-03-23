@@ -1208,6 +1208,7 @@ void graphic::makeSettings(imageHandler& image, characterManager &character, cha
                 character.selectMainCharacter(&charBuild);
                 db.updateCharacter();
                 show_settings = !show_settings;
+                show_blur = !show_blur;
                 //show_display = !show_display;
                 //show_process = !show_process;
                 //show_config = !show_config;
