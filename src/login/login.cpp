@@ -51,7 +51,7 @@ login::login(int width, int height, imageHandler* imgHandler)
 
     string path = std::filesystem::current_path().string() + "/assets/other/login.png";
     img = new imageHandler();
-    bool ret = imgHandler->loadTexture(path.c_str(), img);
+    imgHandler->loadTexture(path.c_str(), img);
 }
 
 void login::drawLoginScreen(imageHandler* imgHandler)

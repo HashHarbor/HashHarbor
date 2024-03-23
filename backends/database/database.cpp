@@ -41,11 +41,9 @@ database& database::getInstance()
 void database::connect()
 {
     imagePath imgPth = imagePath();
-#if defined(__APPLE__)
-    auto config = cpptoml::parse_file(imgPth.currentPath.string() + "/assets/api.toml");
-#else
+
     auto config = cpptoml::parse_file(imgPth.absolutePath + "assets/api.toml");
-#endif
+
     auto apikey = config->get_table("mongodb");
 
     const auto uri = mongocxx::uri{*apikey->get_as<string>("uri")};

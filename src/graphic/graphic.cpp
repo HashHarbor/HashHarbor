@@ -190,19 +190,27 @@ void graphic::setup(){
     login Login = login(width_px, height_px, &image);
 
     string pathMap;
+    string obsMap;
+    string overlapMap;
 #if defined(__APPLE__)
     pathMap = imgPth.currentPath.string() + "/assets/map/abc.png";
 #else
     pathMap = "../src/abc.png";
+    obsMap = "../src/obs.png";
+    overlapMap = "../src/overlap.png";
 #endif
     imageHandler background = imageHandler(pathMap.c_str());
+    imageHandler overlap = imageHandler(overlapMap.c_str());
     background.loadTexture(background.filepath, &background);
+    overlap.loadTexture(overlap.filepath, &overlap);
 
-    character.createCharacter("Bob", false, true, &image);
-    character.setMainPlayer("Bob");
+    character.createCharacter("USER", false, true, &image);
+    character.setMainPlayer("USER");
 
-    movementHandler move = movementHandler(pathMap);
-    // auto gr = obs.getGrid();
+    movementHandler move = movementHandler(obsMap, width_px, height_px);
+    int lastAction = 0;
+    // auto gr = move.getGrid();
+    // cout << gr.size() << ", " << gr[0].size() << endl;
     // for(uint i = 0; i < gr.size(); i++){
     //     for(uint j = 0; j < gr[0].size(); j++){
     //         cout << gr[i][j] << " ";
@@ -210,8 +218,8 @@ void graphic::setup(){
     //     cout << endl;
     // }
 
-    float mapGridX = 15.0f;
-    float mapGridY = 8.0f;
+    double mapGridX = 44.0f;
+    double mapGridY = 46.0f;
     
     // Main loop
     bool done = false;
@@ -244,16 +252,26 @@ void graphic::setup(){
         }
 
         if(show_display){
-            makeBackground(background, move, mapGridX, mapGridY);
-            makeDisplay(image, character, builder);
+            makeCharacter(image, overlap, mapGridX, mapGridY, move, lastAction, character, builder,  allowMovement);
+            makeBackground(background, move.getGrid(), mapGridX, mapGridY, allowMovement);
         }
-        
-        if(show_process){
-            makeProcess(editor, fileToEdit); 
+
+        if(show_codeEditor){
+            makeQuestion();
+            makeCodeEditor(editor, fileToEdit); 
+            
+        }
+
+        if(show_userProfile){
+            makeUserProfile();
         }
 
         if(show_config){
-            makeConfig();
+            makeConfig(cppStart, editor);
+        }
+
+        if(show_blur){
+            makeBlur();
         }
 
         if(show_charSelector)
@@ -288,8 +306,18 @@ void graphic::setup(){
     SDL_Quit();
 }
 
+void graphic::makeBlur(){
+    ImGui::SetNextWindowSize({(float)width_px, (float)height_px});
+    ImGui::SetNextWindowPos({0, 0});
 
-void graphic::makeDisplay(imageHandler& image, characterManager &character, characterBuilder& charBuild)
+    ImGui::Begin("Blur", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoInputs);
+    {   
+    }
+
+    ImGui::End();
+}
+
+void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, double &gridX, double &gridY, movementHandler move, int &lastAction, characterManager &character, characterBuilder& charBuild, bool canMove)
 {
     // Graphics window calculation
     ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
@@ -299,38 +327,153 @@ void graphic::makeDisplay(imageHandler& image, characterManager &character, char
     static float frameTimer = frameLength;
 
     // Window - Graphics
-    ImGui::Begin("Graphics", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
+    ImGui::Begin("Graphics", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus);
     {
         if(characterCreated)
         {
             frameTimer -= ImGui::GetIO().DeltaTime;
 
-            ImVec2 characterPos = ImVec2((ImGui::GetContentRegionAvail() - ImVec2(32, 64)) * 0.5f);
+            ImVec2 characterPos = ImVec2((ImGui::GetContentRegionAvail() - ImVec2(32, 64)) * 0.5f) + ImVec2(8, 0) - ImVec2(0, 8);
             character.drawPos = characterPos;
 
             ImGui::SetCursorPos(characterPos);
-            character.moveMainCharacter(&image, &charBuild, frameTimer);
+            character.moveMainCharacter(&image, &charBuild, frameTimer, canMove);
 
             if (frameTimer <= 0.f)
             {
                 frameTimer = 2.5f / 10.f;
             }
         }
+
+        ImGui::SetCursorPos(ImVec2(0, 0));
+
+        int keyDown = 0; // used to identify which direction the character is moving
+
+        if(canMove){
+            if(ImGui::IsKeyDown(ImGuiKey_W)) { keyDown = 1; }
+            else if(ImGui::IsKeyDown(ImGuiKey_S)) { keyDown = 2; }
+            else if(ImGui::IsKeyDown(ImGuiKey_D)) { keyDown = 3; }
+            else if(ImGui::IsKeyDown(ImGuiKey_A)) { keyDown = 4; }
+        }
+
+        move.mapMovement(keyDown, overlap, gridX, gridY, move.getGrid().size(), move.getGrid()[0].size(), lastAction);
+
     }
     ImGui::End();
 }
 
-string result = "";
+void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, double gridX, double gridY, bool canMove){
+    ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
+    ImGui::SetNextWindowPos({0, 0});
 
-void graphic::makeProcess(TextEditor &editor, const char* fileToEdit){
-    // Processor information window calculation
+    ImGui::Begin("Background", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus);
+    {   
+        ImGui::SetCursorPos(ImVec2(0,0));
+        background.DrawMap(background, gridX, gridY, (width_px / 2), (height_px / 2), grid.size(), grid[0].size());
+
+    }
+
+    ImGui::End();
+}
+
+void graphic::makeQuestion() {
+    int horizontalIndent = 20;
+    int verticalIndent = 20;
+    ImGui::SetNextWindowSize({(float)width_px / 2 - (2 * horizontalIndent), (float)height_px - (2 * verticalIndent)});
+    ImGui::SetNextWindowPos({(float)horizontalIndent, (float)verticalIndent});
+
+    ImGui::Begin("Question", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);
+    {
+        ImGui::TextWrapped("Given an integer n, return a string array answer (1-indexed) where:\n"
+                           "\n"
+                           "    answer[i] == \"HashHarbor\" if i is divisible by 3 and 5.\n"
+                           "    answer[i] == \"Hash\" if i is divisible by 3.\n"
+                           "    answer[i] == \"Harbor\" if i is divisible by 5.\n"
+                           "    answer[i] == i (as a string) if none of the above conditions are true.\n"
+                           "\n"
+                           "Example 1:\n"
+                           "\n"
+                           "Input: n = 3\n"
+                           "Output: [\"1\",\"2\",\"Hash\"]\n"
+                           "\n"
+                           "Example 2:\n"
+                           "\n"
+                           "Input: n = 5\n"
+                           "Output: [\"1\",\"2\",\"Hash\",\"4\",\"Harbor\"]\n"
+                           "\n"
+                           "Example 3:\n"
+                           "\n"
+                           "Input: n = 15\n"
+                           "Output: [\"1\",\"2\",\"Hash\",\"4\",\"Harbor\",\"Hash\",\"7\",\"8\",\"Hash\",\"Harbor\",\"11\",\"Hash\",\"13\",\"14\",\"HashHarbor\"]\n"
+                           "\n"
+                           "Constraints:\n"
+                           "\n"
+                           "    1 <= n <= 104");
+        ImGui::SetWindowFontScale(1.1f); // Increase the font scale
+    }
+
+    ImGui::End();
+}
+
+void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit){
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus;
+    if(show_blur){
+        flags |= ImGuiWindowFlags_NoInputs;
+    }
+
+    ImGui::SetNextWindowSize({(float)width_px / 2, (float)height_px / 4});
+    ImGui::SetNextWindowPos({(float)width_px / 2, (float)height_px / 4 * 3});
+
+    // Submission window
+    ImGui::Begin("Submission details", NULL, flags);
+    {
+
+        if (ImGui::BeginTabBar("SubWindowTabs"))
+        {
+
+            if (ImGui::BeginTabItem("Code Execution"))
+            {
+                if (ImGui::Button("Run Code"))
+                {
+                    string textToSave = editor.GetText();
+                    result = executeCPP(textToSave);
+                    cout << result << endl;
+                }
+
+                ImGui::Text("Results");
+                ImGui::InputTextMultiline(" ", const_cast<char*>(result.c_str()), result.size() + 1, ImVec2((float)width_px / 2 - 20, 100), ImGuiInputTextFlags_ReadOnly);
+
+                ImGui::EndTabItem(); // End of Tab 1
+            }
+
+            if (ImGui::BeginTabItem("Custom Test Case"))
+            {
+                ImGui::Text("To be implemented");
+
+                ImGui::EndTabItem(); 
+            }
+
+            if (ImGui::BeginTabItem("Run All Tests"))
+            {
+
+                ImGui::Text("To be implemented");
+
+                ImGui::EndTabItem(); 
+            }
+
+            ImGui::EndTabBar();
+        }
+    }
+    ImGui::End();
+
+    // Code Editor
     ImGui::SetNextWindowSize({(float)width_px / 2,(float)height_px / 4 * 3});
     ImGui::SetNextWindowPos({(float)width_px / 2, 0});
 
     auto cpos = editor.GetCursorPosition();
     editor.GetText();
 
-    ImGui::Begin("Sandbox", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar);
+    ImGui::Begin("Sandbox", NULL, flags);
     {
         // if (ImGui::BeginMenu("File")) {
         //     if (ImGui::MenuItem("New", "Ctrl+N")) {
@@ -351,29 +494,78 @@ void graphic::makeProcess(TextEditor &editor, const char* fileToEdit){
 
         ImGui::Text("%6d/%-6d %6d lines  | %s | %s | %s | %s", cpos.mLine + 1, cpos.mColumn + 1, editor.GetTotalLines(),
 			editor.IsOverwrite() ? "Ovr" : "Ins",
-			editor.CanUndo() ? "*" : " ",
+			editor.CanUndo() ? " " : " ",
 			editor.GetLanguageDefinition().mName.c_str(), fileToEdit);
 
 		editor.Render("TextEditor");
     }
     ImGui::End();
 
-    ImGui::SetNextWindowSize({(float)width_px / 2, (float)height_px / 4});
-    ImGui::SetNextWindowPos({(float)width_px / 2, (float)height_px / 4 * 3});
+}
 
-    // Window - Processor Information
-    ImGui::Begin("Submission details", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+void graphic::makeUserProfile(){
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus;
+    if(show_blur){
+        flags |= ImGuiWindowFlags_NoInputs;
+    }
+
+    ImGui::SetNextWindowSize({(float)width_px / 2, (float)height_px / 3});
+    ImGui::SetNextWindowPos({(float)width_px / 2, (float)height_px / 3 * 2});
+
+    // Submission window
+    ImGui::Begin("Inventory", NULL, flags);
     {
-        if(ImGui::Button("Run Code")){
-            string textToSave = editor.GetText();
 
-            result = executeCPP(textToSave);
-            cout << result << endl;
-        }
-
-        ImGui::InputTextMultiline("Result", const_cast<char*>(result.c_str()), result.size() + 1, ImVec2(500, 200), ImGuiInputTextFlags_ReadOnly);
     }
     ImGui::End();
+
+    // Code Editor
+    ImGui::SetNextWindowSize({(float)width_px / 2,(float)height_px / 3 * 2});
+    ImGui::SetNextWindowPos({(float)width_px / 2, 0});
+
+    ImGui::Begin("Profile", NULL, flags);
+    {
+
+    }
+    ImGui::End();
+
+}
+
+void graphic::makeConfig(vector<string> &codeStarter, TextEditor &editor){
+    // Config window calculation
+    ImGui::SetNextWindowSize({(float)width_px / 2, (float)height_px / 2});
+
+    ImGui::SetNextWindowPos({0, (float)height_px/2});
+
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus;
+    if(show_blur){
+        flags |= ImGuiWindowFlags_NoInputs;
+    }
+
+    // Window - Config
+    ImGui::Begin("Interactions", NULL, flags);
+    {   
+        
+        if(ImGui::Button("leetcode")){
+            show_codeEditor = !show_codeEditor;
+            show_userProfile = !show_userProfile;
+            allowMovement = !allowMovement;
+
+            codeStarter.clear();
+
+            codeStarter.push_back("#include <iostream>");
+            codeStarter.push_back("int main() {");
+            codeStarter.push_back("\tstd::cout << \"Hello World!\";");
+            codeStarter.push_back("\treturn 0;");
+            codeStarter.push_back("}");
+            editor.SetTextLines(codeStarter);
+
+            result = "";
+        }
+
+    }
+    ImGui::End();
+
 }
 
 void graphic::makeCharacterSelector(imageHandler& image, characterManager &character, characterBuilder& charBuild)
@@ -409,6 +601,8 @@ void graphic::makeCharacterSelector(imageHandler& image, characterManager &chara
             character.selectMainCharacter(&charBuild);
             characterCreated = true;
             show_charSelector = false;
+            show_blur = false;
+            allowMovement = true;
         }
         ImGui::PopStyleColor(3);
         
@@ -417,66 +611,27 @@ void graphic::makeCharacterSelector(imageHandler& image, characterManager &chara
     ImGui::End();
 }
 
-void graphic::makeBackground(imageHandler background, movementHandler move, float &gridX, float &gridY){
-    ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
-    ImGui::SetNextWindowPos({0, 0});
+void graphic::makeLogIn(login& Login, imageHandler& image)
+{
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.FrameRounding = 7.5f;
+    style.Colors[ImGuiCol_Text] = ImVec4(0.0f, 0.0f, 0.0f, 1.00f);
 
-    static auto lastKeyEventTime = std::chrono::steady_clock::now();
-
-    // Get the current time
-    auto currentTime = std::chrono::steady_clock::now();
-
-    // Calculate the time elapsed since the last key event
-    auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastKeyEventTime).count();
-
-    // Define the cooldown duration between key events in milliseconds
-    const int cooldownMilliseconds = 1000; // 1 second cooldown
-
-
-    #ifdef IMGUI_DISABLE_OBSOLETE_KEYIO
-    struct funcs { static bool IsLegacyNativeDupe(ImGuiKey) { return false; } };
-            const ImGuiKey key_first = ImGuiKey_NamedKey_BEGIN;
-    #else
-        struct funcs { static bool IsLegacyNativeDupe(ImGuiKey key) { return key < 512 && ImGui::GetIO().KeyMap[key] != -1; } };
-        const ImGuiKey key_first = 0;
-    #endif
-
-    int keyDown = 0; // used to identify which direction the character is moving
-    for (ImGuiKey key = key_first; key < ImGuiKey_COUNT; key++)
+    Login.drawLoginScreen(&image);
+    if(Login.checkAuth())
     {
-        if (elapsedTime >= cooldownMilliseconds) {
-            if (funcs::IsLegacyNativeDupe(key)) continue;
+        show_display = true;
+        show_codeEditor = false;
+        show_config = true;
+        show_charSelector = true;
+        show_blur = true;
+        show_userProfile = true;
 
-            if(ImGui::IsKeyDown(ImGuiKey_UpArrow) || ImGui::IsKeyDown(ImGuiKey_W)) { keyDown = 1; }
-            else if(ImGui::IsKeyDown(ImGuiKey_DownArrow) || ImGui::IsKeyDown(ImGuiKey_S)) { keyDown = 2; }
-            else if(ImGui::IsKeyDown(ImGuiKey_RightArrow) || ImGui::IsKeyDown(ImGuiKey_D)) { keyDown = 3; }
-            else if(ImGui::IsKeyDown(ImGuiKey_LeftArrow) || ImGui::IsKeyDown(ImGuiKey_A)) { keyDown = 4; }
-            
-        }
+        style.FrameRounding = 0.f;
+        style.Colors[ImGuiCol_Text] = ImVec4(1.0f, 1.0f, 1.0f, 1.00f);
+
+        show_login = false;
     }
-
-    ImGui::Begin("Background", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);
-    {
-        move.mapMovement(keyDown, background, gridX, gridY);
-    }
-
-    ImGui::End();
-}
-
-void graphic::makeConfig(){
-    // Config window calculation
-    ImGui::SetNextWindowSize({(float)width_px / 2, (float)height_px / 2});
-
-    ImGui::SetNextWindowPos({0, (float)height_px/2});
-
-    // Window - Config
-    ImGui::Begin("Config", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
-    {
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-        
-    }
-    ImGui::End();
-
 }
 
 string graphic::executeCPP(string code){
@@ -527,25 +682,4 @@ string graphic::executeCPP(string code){
     remove("temp");
 
     return executeOutput;
-}
-
-void graphic::makeLogIn(login& Login, imageHandler& image)
-{
-    ImGuiStyle& style = ImGui::GetStyle();
-    style.FrameRounding = 7.5f;
-    style.Colors[ImGuiCol_Text] = ImVec4(0.0f, 0.0f, 0.0f, 1.00f);
-
-    Login.drawLoginScreen(&image);
-    if(Login.checkAuth())
-    {
-        show_display = true;
-        show_process = true;
-        show_config = true;
-        show_charSelector = true;
-
-        style.FrameRounding = 0.f;
-        style.Colors[ImGuiCol_Text] = ImVec4(1.0f, 1.0f, 1.0f, 1.00f);
-
-        show_login = false;
-    }
 }
