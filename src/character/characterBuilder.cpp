@@ -140,14 +140,14 @@ characterBuilder::characterBuilder(imageHandler* imgHandler)
 
 void characterBuilder::changeBody(int i)
 {
-    if(i < body.size())
+    if(i < (int)body.size())
     {
         indexBody = i;
     }
 }
 void characterBuilder::changeEyes(int i)
 {
-    if(i < eyes.size())
+    if(i < (int)eyes.size())
     {
         indexEyes = i;
     }
@@ -165,7 +165,7 @@ void characterBuilder::changeOutfit(int i)
     else if(i == 1)
     {
         indexOutfit ++;
-        if(indexOutfit == outfit.size())
+        if(indexOutfit == (int)outfit.size())
         {
             indexOutfit = 0;
         }
@@ -184,7 +184,7 @@ void characterBuilder::changeHair(int i)
     else if(i == 1)
     {
         indexHair ++;
-        if(indexHair > hair.size())
+        if(indexHair > (int)hair.size())
         {
             indexHair = 0;
         }
@@ -203,7 +203,7 @@ void characterBuilder::changeAccessories(int i)
     else if(i == 1)
     {
         indexAccessories ++;
-        if(indexAccessories > accessories.size())
+        if(indexAccessories > (int)accessories.size())
         {
             indexAccessories = 0;
         }
@@ -212,21 +212,21 @@ void characterBuilder::changeAccessories(int i)
 
 void characterBuilder::changeHairColor(int i)
 {
-    if(i < hair.at(indexHair).size())
+    if(i < (int)hair.at(indexHair).size())
     {
         indexHairColor = i;
     }
 }
 void characterBuilder::changeOutfitColor(int i)
 {
-    if(i < outfit.at(indexOutfit).size())
+    if(i < (int)outfit.at(indexOutfit).size())
     {
         indexOutfitColor = i;
     }
 }
 void characterBuilder::changeAccessoriesColor(int i)
 {
-    if(i < accessories.at(indexAccessories).size())
+    if(i < (int)accessories.at(indexAccessories).size())
     {
         indexAccessoriesColor = i;
     }
@@ -254,13 +254,13 @@ void characterBuilder::drawCharacter(imageHandler *imgHandler, float frameTimer)
     ImGui::SetCursorPos(drawPos);
     imgHandler->DrawAnimationFrame(*outfit.at(indexOutfit).at(indexOutfitColor), cordsAnim.at(frameCount_4), factor); // outfit
 
-    if(indexHair != hair.size())
+    if(indexHair != (int)hair.size())
     {
         ImGui::SetCursorPos(drawPos);
         imgHandler->DrawAnimationFrame(*hair.at(indexHair).at(indexHairColor), cordsAnim.at(frameCount_4), factor); // hair
     }
 
-    if(indexAccessories != accessories.size())
+    if(indexAccessories != (int)accessories.size())
     {
         ImGui::SetCursorPos(drawPos);
         imgHandler->DrawAnimationFrame(*accessories.at(indexAccessories).at(indexAccessoriesColor), cordsAnim.at(frameCount_4), factor); // accessories
@@ -283,7 +283,7 @@ void characterBuilder::drawHairControls()
     if (ImGui::ArrowButton("##Hright", ImGuiDir_Right)) { changeHair(1); }
     ImGui::PopButtonRepeat();
 
-    if(indexHair != hair.size())
+    if(indexHair != (int)hair.size())
     {
         // hairstyle_x_1
         ImGui::SetCursorPos(ImVec2(30.f,372.f));
@@ -382,7 +382,7 @@ void characterBuilder::drawBodyEyeControl()
     ImGui::SetCursorPos(ImVec2(50.f,138.f));
     ImGui::Text("Body       ");
 
-    for(int i = 0; i < body.size(); i++)
+    for(int i = 0; i < (int)body.size(); i++)
     {
         float x = 30.f + (30.f * (float)i);
         ImGui::SetCursorPos(ImVec2(x,168.f));
@@ -404,7 +404,7 @@ void characterBuilder::drawBodyEyeControl()
     ImGui::SetCursorPos(ImVec2(50.f,206.f));
     ImGui::Text("Eyes       ");
 
-    for(int i = 0; i < eyes.size(); i++)
+    for(int i = 0; i < (int)eyes.size(); i++)
     {
         float x = 30.f + (30.f * (float)i);
         ImGui::SetCursorPos(ImVec2(x,236.f));
@@ -440,7 +440,7 @@ void characterBuilder::drawOutfitControls()
     }
     ImGui::PopButtonRepeat();
 
-    for(int i = 0; i < outfit.at(indexOutfit).size(); i++)
+    for(int i = 0; i < (int)outfit.at(indexOutfit).size(); i++)
     {
         float x = 30.f + (30.f * (float)i);
         ImGui::SetCursorPos(ImVec2(x,304.f));
@@ -476,9 +476,9 @@ void characterBuilder::drawAccessoriesControl()
     }
     ImGui::PopButtonRepeat();
 
-    if(indexAccessories != accessories.size())
+    if(indexAccessories != (int)accessories.size())
     {
-        for(int i = 0; i < accessories.at(indexAccessories).size(); i++)
+        for(int i = 0; i < (int)accessories.at(indexAccessories).size(); i++)
         {
             float x = 30.f + (30.f * (float)i);
             ImGui::SetCursorPos(ImVec2(x,100.f));
@@ -583,12 +583,12 @@ void characterBuilder::drawCharacterAnimation(imageHandler *imgHandler, ImVec2 p
     ImGui::SetCursorPos(pos);
     imgHandler->DrawAnimationFrame(*outfit[characterIndex[2]][characterIndex[3]], cords, scale);
 
-    if(indexHair != hair.size())
+    if(indexHair != (int)hair.size())
     {
         ImGui::SetCursorPos(pos);
         imgHandler->DrawAnimationFrame(*hair[characterIndex[4]][characterIndex[5]], cords, scale);
     }
-    if(indexAccessories != accessories.size())
+    if(indexAccessories != (int)accessories.size())
     {
         ImGui::SetCursorPos(pos);
         imgHandler->DrawAnimationFrame(*accessories[characterIndex[6]][characterIndex[7]], cords, scale);

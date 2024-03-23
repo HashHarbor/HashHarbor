@@ -53,7 +53,6 @@ public:
     void makeCharacterSelector(imageHandler& image, characterManager &character, characterBuilder& charBuild);
     void makeBackground(imageHandler background, movementHandler move, float &gridX, float &gridY);
     void makeLogIn(login& Login, imageHandler& image, characterManager &character, characterBuilder& charBuild);
-    void makeLogIn(login& Login, imageHandler& image);
     void makeQuestion();
 
     void makeBlur();

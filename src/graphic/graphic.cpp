@@ -103,7 +103,7 @@ void graphic::setup(){
     vector<string> cppStart;
     cppStart.push_back("#include <iostream>");
     cppStart.push_back("int main() {");
-    cppStart.push_back("\tstd::cout << \"Hello World!\";");
+    cppStart.push_back("\tstd::cout << \"Hello HashHarbor!\";");
     cppStart.push_back("\treturn 0;");
     cppStart.push_back("}");
     editor.SetTextLines(cppStart);
@@ -223,7 +223,7 @@ void graphic::setup(){
     // }
 
     double mapGridX = 44.0f;
-    double mapGridY = 46.0f;
+    double mapGridY = 42.0f;
     
     // Main loop
     bool done = false;
@@ -602,7 +602,7 @@ void graphic::makeConfig(vector<string> &codeStarter, TextEditor &editor){
 
             codeStarter.push_back("#include <iostream>");
             codeStarter.push_back("int main() {");
-            codeStarter.push_back("\tstd::cout << \"Hello World!\";");
+            codeStarter.push_back("\tstd::cout << \"Hello HashHarbor!\";");
             codeStarter.push_back("\treturn 0;");
             codeStarter.push_back("}");
             editor.SetTextLines(codeStarter);
@@ -658,29 +658,6 @@ void graphic::makeCharacterSelector(imageHandler& image, characterManager &chara
         ImGui::PopID();
     }
     ImGui::End();
-}
-
-void graphic::makeLogIn(login& Login, imageHandler& image)
-{
-    ImGuiStyle& style = ImGui::GetStyle();
-    style.FrameRounding = 7.5f;
-    style.Colors[ImGuiCol_Text] = ImVec4(0.0f, 0.0f, 0.0f, 1.00f);
-
-    Login.drawLoginScreen(&image);
-    if(Login.checkAuth())
-    {
-        show_display = true;
-        show_codeEditor = false;
-        show_config = true;
-        show_charSelector = true;
-        show_blur = true;
-        show_userProfile = true;
-
-        style.FrameRounding = 0.f;
-        style.Colors[ImGuiCol_Text] = ImVec4(1.0f, 1.0f, 1.0f, 1.00f);
-
-        show_login = false;
-    }
 }
 
 string graphic::executeCPP(string code){
