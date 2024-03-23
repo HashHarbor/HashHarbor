@@ -236,6 +236,15 @@ void characterBuilder::drawCharacter(imageHandler *imgHandler, float frameTimer)
 {
     float factor = 4.f;
 
+    ImGui::SetCursorPos(ImVec2(drawPos.x + 20.f,drawPos.y - 20.f));
+    static bool animate = true;
+    ImGui::Checkbox("Animate", &animate);
+
+    if(!animate)
+    {
+        frameCount_4 = 0 ;
+    }
+
     ImGui::SetCursorPos(drawPos);
     imgHandler->DrawAnimationFrame(*body.at(indexBody), cordsAnim.at(frameCount_4), factor); // body
 

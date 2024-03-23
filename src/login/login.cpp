@@ -80,6 +80,18 @@ void login::drawLoginScreen(imageHandler* imgHandler)
         draw_list = ImGui::GetWindowDrawList();
         draw_list->AddRectFilled(ImVec2(minWidth, minHeight), ImVec2(minWidth + 400.f, minHeight + 500.f), ImColor(ImVec4(1.0f, 1.0f, 1.0f, 1.0f)), 20.0f);
 
+        ImGui::SetCursorPos(ImVec2(txtPos_x, minHeight + 50.f));
+        static bool DEV = false;
+        ImGui::Checkbox("DEVELOPER SIGN IN", &DEV);
+        if(DEV)
+        {
+            string s = "HARDCODED";
+            string p = "Admin_2024";
+
+            strcpy(username, s.c_str());
+            strcpy(passwd, p.c_str());
+        }
+
         if(!createAccount)
         {
             drawLogin();

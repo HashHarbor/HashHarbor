@@ -985,6 +985,10 @@ void graphic::makeSettings(imageHandler& image, characterManager &character, cha
 
             charBuild.drawCharacterAnimation(&image, ImVec2(40.f, 85.f), {ImVec2(0.1f / 192.f, 0.1f/320.f),ImVec2(31.99f/192.f, 64.f/320.f)}, 2.f, character.getMainPlayer()->dynamicIndex);
             // show username
+            //ICON_FA_ID_CARD
+            ImGui::SetCursorPos(ImVec2(270.f, 85.f));
+            ImGui::Text(ICON_FA_USER);
+
             ImGui::SetCursorPos(ImVec2(124.f, 110.f));
             ImGui::Text("Username: ");
             ImGui::SameLine();
@@ -1014,7 +1018,7 @@ void graphic::makeSettings(imageHandler& image, characterManager &character, cha
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
             if(ImGui::Button("Change Username", ImVec2(130.f, 20.f)))
             {
-                usr_Username = true;
+                usr_Username = !usr_Username;
                 usr_Password = false;
 
                 createUsername[0] = '\0';
@@ -1030,7 +1034,7 @@ void graphic::makeSettings(imageHandler& image, characterManager &character, cha
             if(ImGui::Button("Change Password", ImVec2(130.f, 20.f)))
             {
                 usr_Username = false;
-                usr_Password = true;
+                usr_Password = !usr_Password;
 
                 currentPasswd[0] = '\0';
                 createPasswd[0] = '\0';
@@ -1209,9 +1213,6 @@ void graphic::makeSettings(imageHandler& image, characterManager &character, cha
                 db.updateCharacter();
                 show_settings = !show_settings;
                 show_blur = !show_blur;
-                //show_display = !show_display;
-                //show_process = !show_process;
-                //show_config = !show_config;
 
                 resetPauseScreen = true;
                 // todo - change to show message that character changed instead of closing

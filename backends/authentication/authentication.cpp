@@ -50,7 +50,12 @@ bool authentication::inputValidation(string usr, string passwd, bool mode)
             }
             else
             {
-                return createUser(usr, passwd);
+                if(createUser(usr, passwd))
+                {
+                    database& db = database::getInstance();
+                    db.getUserData();
+                    return true;
+                }
             }
         }
     }
@@ -98,7 +103,14 @@ bool authentication::createUser(string usr, string passwd)
 
     profile.hash = hashPasswd;
     profile.salt = salt;
-    return db.makeUser(profile);
+    if(db.makeUser(profile))
+    {
+        userProfile& usrProfile = userProfile::getInstance();
+        usrProfile.setId(profile._id);
+        usrProfile.setUsername(profile.username);
+        return true;
+    }
+    return false;
 }
 
 string authentication::saltGenerator()
