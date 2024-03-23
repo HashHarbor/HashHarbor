@@ -53,5 +53,5 @@ public:
         // generate coordinates to make animations
         // DO NOT USE FOR CHARACTERS - there are hardcoded values as all NPC and Characters have the save size sprite sheet
     void cleanUp();
-    void DrawMap(imageHandler _image, int tileX, int tileY, float width, float height);
+    void DrawMap(imageHandler _image, double tileX, double tileY, float width, float height, int mapRows, int mapCols);
 };

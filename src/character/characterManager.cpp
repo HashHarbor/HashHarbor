@@ -74,7 +74,7 @@ void characterManager::setMainPlayer(std::string name)
 }
 
 
-void characterManager::moveMainCharacter(imageHandler* imgHandler, characterBuilder* charBuild,float frameTimer)
+void characterManager::moveMainCharacter(imageHandler* imgHandler, characterBuilder* charBuild,float frameTimer, bool canMove)
 
 {
 #ifdef IMGUI_DISABLE_OBSOLETE_KEYIO
@@ -88,16 +88,17 @@ void characterManager::moveMainCharacter(imageHandler* imgHandler, characterBuil
 #endif
 
     int keyDown = 0; // used to identify which direction the character is moving
-    for (ImGuiKey key = key_first; key < ImGuiKey_COUNT; key++)
-    {
-        if (funcs::IsLegacyNativeDupe(key)) continue;
-        if(ImGui::IsKeyDown(ImGuiKey_UpArrow) || ImGui::IsKeyDown(ImGuiKey_W)) { keyDown = 1; }
-        else if(ImGui::IsKeyDown(ImGuiKey_DownArrow) || ImGui::IsKeyDown(ImGuiKey_S)) { keyDown = 2; }
-        else if(ImGui::IsKeyDown(ImGuiKey_RightArrow) || ImGui::IsKeyDown(ImGuiKey_D)) { keyDown = 3; }
-        else if(ImGui::IsKeyDown(ImGuiKey_LeftArrow) || ImGui::IsKeyDown(ImGuiKey_A)) { keyDown = 4; }
-        else { keyDown = 0; }
+    if(canMove){
+        for (ImGuiKey key = key_first; key < ImGuiKey_COUNT; key++)
+        {
+            if (funcs::IsLegacyNativeDupe(key)) continue;
+            if(ImGui::IsKeyDown(ImGuiKey_W)) { keyDown = 1; }
+            else if(ImGui::IsKeyDown(ImGuiKey_S)) { keyDown = 2; }
+            else if(ImGui::IsKeyDown(ImGuiKey_D)) { keyDown = 3; }
+            else if(ImGui::IsKeyDown(ImGuiKey_A)) { keyDown = 4; }
+            else { keyDown = 0; }
+        }
     }
-
 
     float factor = 1.f;
     //Draw Order: Body -> Eyes -> Outfit -> Hair -> Accessories
