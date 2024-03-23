@@ -115,6 +115,7 @@ bool database::makeUser(database::usrProfile &profile)
         ));
         assert(insertProgress);
 
+        profile._id = insertUsr->inserted_id().get_oid().value.to_string();
         return true;
 
     }catch(const std::exception& e)
@@ -140,7 +141,7 @@ bool database::getUserData()
             auto time = std::chrono::system_clock::to_time_t(time_point);
             std::tm* tmPtr = std::localtime(&time);
             std::stringstream ss;
-            ss << std::setfill('0') << std::setw(2) << tmPtr->tm_mon + 1 << "/" << setw(2) << tmPtr->tm_mday << "/" << std::setw(4) << tmPtr->tm_year + 1900;
+            ss << std::setfill('0') << std::setw(2) << tmPtr->tm_mon + 1 << "/" << std::setw(2) << tmPtr->tm_mday << "/" << std::setw(4) << tmPtr->tm_year + 1900;
             usrProfile.setJoinDate(ss.str());
 
             bsoncxx::document::element db_character = findData.value()["character"]; // array for character

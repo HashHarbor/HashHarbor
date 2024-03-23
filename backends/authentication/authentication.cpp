@@ -50,12 +50,7 @@ bool authentication::inputValidation(string usr, string passwd, bool mode)
             }
             else
             {
-                if(createUser(usr, passwd))
-                {
-                    database& db = database::getInstance();
-                    db.getUserData();
-                    return true;
-                }
+                return createUser(usr, passwd);
             }
         }
     }
@@ -108,6 +103,14 @@ bool authentication::createUser(string usr, string passwd)
         userProfile& usrProfile = userProfile::getInstance();
         usrProfile.setId(profile._id);
         usrProfile.setUsername(profile.username);
+
+        auto time_point = std::chrono::system_clock::time_point(std::chrono::system_clock::now());
+        auto time = std::chrono::system_clock::to_time_t(time_point);
+        std::tm* tmPtr = std::localtime(&time);
+        std::stringstream ss;
+        ss << std::setfill('0') << std::setw(2) << tmPtr->tm_mon + 1 << "/" << std::setw(2) << tmPtr->tm_mday << "/" << std::setw(4) << tmPtr->tm_year + 1900;
+        usrProfile.setJoinDate(ss.str());
+
         return true;
     }
     return false;
