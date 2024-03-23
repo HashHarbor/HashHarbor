@@ -284,7 +284,7 @@ void graphic::setup(){
 
         if(show_settings)
         {
-            makeSettings(image, character, builder, done);
+            makeSettings(image, character, builder, Login, done);
         }
 
         if(show_display){
@@ -601,12 +601,13 @@ void graphic::makeLogIn(login& Login, imageHandler& image, characterManager &cha
     }
 }
 
-void graphic::makeSettings(imageHandler& image, characterManager &character, characterBuilder& charBuild, bool& done)
+void graphic::makeSettings(imageHandler& image, characterManager &character, characterBuilder& charBuild, login& Login, bool& done)
 {
     // todo - change background color
     float windowWidth = 320.f;
     float windowHeight = 620.f; // allow for 50px padding on a 1280x720 window
-    float padding = ((float)height_px - windowHeight) / 2.f;
+    float paddingHeight = ((float)height_px - windowHeight) / 2.f;
+    float paddingWidth = ((float)width_px - (320.f + 860.f)) / 2.f;
 
     static bool settingsWindow = false;
     static bool userProfileWindow = false;
@@ -634,7 +635,7 @@ void graphic::makeSettings(imageHandler& image, characterManager &character, cha
     userProfile& usrProfile = userProfile::getInstance();
 
     ImGui::SetNextWindowSize({windowWidth, windowHeight});
-    ImGui::SetNextWindowPos({padding, padding});
+    ImGui::SetNextWindowPos({paddingWidth, paddingHeight});
 
     ImGui::Begin("Pause", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
     {
@@ -717,6 +718,21 @@ void graphic::makeSettings(imageHandler& image, characterManager &character, cha
         }
         ImGui::PopStyleColor(3);
         ImGui::PopID();
+
+        ImGui::SetCursorPos(ImVec2(90.f, ((620.f / 6.f) * 1.f - 20.f) + 15.f));
+        ImGui::Text(ICON_FA_GEAR);
+
+        ImGui::SetCursorPos(ImVec2(90.f, ((620.f / 6.f) * 2.f - 20.f) + 15.f));
+        ImGui::Text(ICON_FA_USER);
+
+        ImGui::SetCursorPos(ImVec2(86.f, ((620.f / 6.f) * 3.f - 20.f) + 15.f));
+        ImGui::Text(ICON_FA_PERSON);
+
+        ImGui::SetCursorPos(ImVec2(90.f, ((620.f / 6.f) * 4.f - 20.f) + 15.f));
+        ImGui::Text(ICON_FA_CIRCLE_ARROW_LEFT);
+
+        ImGui::SetCursorPos(ImVec2(90.f, ((620.f / 6.f) * 5.f - 20.f) + 15.f));
+        ImGui::Text(ICON_FA_POWER_OFF);
     }
     ImGui::End();
 
@@ -728,8 +744,8 @@ void graphic::makeSettings(imageHandler& image, characterManager &character, cha
         static int tempMusic = 20;
         static int tempSoundEffect = 20;
 
-        ImGui::SetNextWindowSize({(float)width_px - windowWidth - (padding * 2.f) - 10.f, 620.f});
-        ImGui::SetNextWindowPos({windowWidth + padding + 10.f, padding});
+        ImGui::SetNextWindowSize({850.f, 620.f});
+        ImGui::SetNextWindowPos({windowWidth + paddingWidth + 10.f, paddingHeight});
 
         ImGui::Begin("Settings", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
         {
@@ -751,7 +767,7 @@ void graphic::makeSettings(imageHandler& image, characterManager &character, cha
             ImGui::RadioButton("1920 x 1080", &e, 2);
 #endif
             // Disabled due to issues with SDL and MAC Retina Displays
-            /*
+/*
             if(k != e)
             {
                 switch(e)
@@ -759,21 +775,23 @@ void graphic::makeSettings(imageHandler& image, characterManager &character, cha
                     case 0:
                         width_px = 1280;
                         height_px = 720;
+                        Login.updateResolution(1280, 720);
                         break;
                     case 1:
                         width_px = 1440;
-                        height_px = 900;
+                        height_px = 800;
+                        Login.updateResolution(1440, 800);
                         break;
                     case 2:
                         width_px = 1920;
                         height_px = 1080;
+                        Login.updateResolution(1920, 1080);
                         break;
                 }
                 changeResolution = true;
                 k = e;
             }
-             */
-
+*/
             ImGui::SetCursorPos(ImVec2(20.f, 100.f));
             ImGui::Text("Volume Controls: ");
 
@@ -790,9 +808,9 @@ void graphic::makeSettings(imageHandler& image, characterManager &character, cha
     }
     else if(userProfileWindow)
     {
-        const float profileWidth = windowWidth + padding + 10.f;
-        const float profileHeight = padding;
-        ImGui::SetNextWindowSize({(float)width_px - windowWidth - (padding * 2.f) - 10.f, 620.f});
+        const float profileWidth = windowWidth + paddingWidth + 10.f;
+        const float profileHeight = paddingHeight;
+        ImGui::SetNextWindowSize({850.f, 620.f});
         ImGui::SetNextWindowPos({profileWidth, profileHeight});
 
         static char createUsername[64] = "";
@@ -1006,6 +1024,9 @@ void graphic::makeSettings(imageHandler& image, characterManager &character, cha
         const float frameLength = 5.f / 10.f; // In seconds, so  FPS
         static float frameTimer = frameLength;
 
+        ImGui::SetNextWindowSize({850.f, 620.f});
+        ImGui::SetNextWindowPos({windowWidth + paddingWidth + 10.f, paddingHeight});
+
         ImGui::Begin("Change Character", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
         {
             frameTimer -= ImGui::GetIO().DeltaTime;
@@ -1018,7 +1039,7 @@ void graphic::makeSettings(imageHandler& image, characterManager &character, cha
                 frameTimer = 5.f / 10.f;
             }
 
-            ImGui::SetCursorPos(ImVec2(290.f, padding + 380.f));
+            ImGui::SetCursorPos(ImVec2(350.f, 550.f));
             ImGui::PushID(8);
             ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
             ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
@@ -1044,7 +1065,7 @@ void graphic::makeSettings(imageHandler& image, characterManager &character, cha
     else if (logOutWindow)
     {
         ImGui::SetNextWindowSize({320.f, 110.f});
-        ImGui::SetNextWindowPos({windowWidth + padding + 10.f, padding});
+        ImGui::SetNextWindowPos({windowWidth + paddingWidth + 10.f, paddingHeight});
         ImGui::Begin("Log Out", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
         {
             ImGui::SetCursorPos(ImVec2(20.f, 20.f));
@@ -1083,7 +1104,7 @@ void graphic::makeSettings(imageHandler& image, characterManager &character, cha
     else if(quitWindow)
     {
         ImGui::SetNextWindowSize({320.f, 110.f});
-        ImGui::SetNextWindowPos({windowWidth + padding + 10.f, padding});
+        ImGui::SetNextWindowPos({windowWidth + paddingWidth + 10.f, paddingHeight});
         ImGui::Begin("Quit", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
         {
             ImGui::SetCursorPos(ImVec2(20.f, 20.f));

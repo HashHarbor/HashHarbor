@@ -11,8 +11,8 @@
 
 class graphic {
 public:
-    int width_px = 1280;
-    int height_px = 720;
+    int width_px = 1320;
+    int height_px = 768;
 
     bool show_login = true;
     bool show_display = false;
@@ -35,7 +35,7 @@ public:
     void makeBackground(imageHandler background, movementHandler move, float &gridX, float &gridY);
     void makeLogIn(login& Login, imageHandler& image, characterManager &character, characterBuilder& charBuild);
     string executeCPP(string code);
-    void makeSettings(imageHandler& image, characterManager& character, characterBuilder& charBuild, bool& done);
+    void makeSettings(imageHandler& image, characterManager& character, characterBuilder& charBuild, login& Login, bool& done);
 
 private:
     bool resetPauseScreen = false;

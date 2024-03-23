@@ -64,6 +64,7 @@ class login
     void error_Create();
 public:
     login(int width, int height, imageHandler* imgHandler);
+    void updateResolution(int width, int height);
 
     void drawLoginScreen(imageHandler* imgHandler);
     bool checkAuth();

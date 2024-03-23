@@ -470,6 +470,11 @@ bool login::checkChar()
     return CHAR;
 }
 
+void login::updateResolution(int width, int height)
+{
+    width_px = width;
+    height_px = height;
+}
 void login::reset()
 {
     STATUS = false;
