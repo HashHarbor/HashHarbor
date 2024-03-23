@@ -1,15 +1,27 @@
 #include <stdio.h>
+
+#if defined(__APPLE__)
+#include <iostream>
+#include <vector>
+#include <filesystem>
+using std::cout;
+using std::endl;
+using std::pair;
+#else
 #include <bits/stdc++.h>
+using std::pair;
+#include <utility>
+#endif
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <SDL_opengles2.h>
 #else
-#include <SDL_opengl.h>
+#include <SDL2/SDL_opengl.h>
 #endif
 
 #include <opencv2/opencv.hpp>

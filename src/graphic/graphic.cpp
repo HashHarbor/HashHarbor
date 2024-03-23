@@ -196,6 +196,8 @@ void graphic::setup(){
     string overlapMap;
 #if defined(__APPLE__)
     pathMap = imgPth.currentPath.string() + "/assets/map/abc.png";
+    obsMap = imgPth.currentPath.string() + "/assets/map/obs.png";
+    overlapMap = imgPth.currentPath.string() + "/assets/map/overlap.png";
 #else
     pathMap = "../src/abc.png";
     obsMap = "../src/obs.png";
@@ -256,13 +258,15 @@ void graphic::setup(){
             character.selectMainCharacter(&builder);
             // todo - add anything else that needs to be reeset
 
+            allowMovement = false;
+            show_login = true;
             show_display = false;
-            show_process = false;
+            show_codeEditor = false;
             show_config = false;
             show_charSelector = false;
             show_settings = false;
-            characterCreated = false;
-            show_login = true;
+            show_blur = false;
+            show_userProfile = false;
 
             reset = false;
         }
@@ -276,10 +280,8 @@ void graphic::setup(){
         {
             if(!show_charSelector && !show_login)
             {
+                show_blur = ! show_blur;
                 show_settings = !show_settings;
-                show_display = !show_display;
-                show_process = !show_process;
-                show_config = !show_config;
 
                 resetPauseScreen = true;
             }
@@ -288,11 +290,6 @@ void graphic::setup(){
         if(show_login)
         {
             makeLogIn(Login, image, character, builder);
-        }
-
-        if(show_settings)
-        {
-            makeSettings(image, character, builder, Login, done);
         }
 
         if(show_display){
@@ -316,6 +313,11 @@ void graphic::setup(){
 
         if(show_blur){
             makeBlur();
+        }
+
+        if(show_settings)
+        {
+            makeSettings(image, character, builder, Login, done);
         }
 
         if(show_charSelector)
@@ -378,7 +380,7 @@ void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, double &
 
             if (frameTimer <= 0.f)
             {
-                frameTimer = 2.5f / 10.f;
+                frameTimer = frameLength;
             }
         }
 
@@ -607,8 +609,8 @@ void graphic::makeConfig(vector<string> &codeStarter, TextEditor &editor){
 
 void graphic::makeCharacterSelector(imageHandler& image, characterManager &character, characterBuilder& charBuild)
 {
-    ImGui::SetNextWindowSize({ImGui::GetIO().DisplaySize.x-550.f, ImGui::GetIO().DisplaySize.y-200.f});
-    ImGui::SetNextWindowPos({275.f,100.f});
+    ImGui::SetNextWindowSize({850.f, 520.f});
+    ImGui::SetNextWindowPos({((float)width_px - 850.f) / 2.f,((float)height_px - 520.f) / 2.f});
 
     float factor = 4.f;
     const float frameLength = 5.f / 10.f; // In seconds, so  FPS
@@ -628,7 +630,7 @@ void graphic::makeCharacterSelector(imageHandler& image, characterManager &chara
         }
 
         //---setchar
-        ImGui::SetCursorPos(ImVec2(290.f,390.f));
+        ImGui::SetCursorPos(ImVec2(characterPos.x * 3.f - 10.f, 420.f));
         ImGui::PushID(8);
         ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
@@ -733,7 +735,7 @@ void graphic::makeLogIn(login& Login, imageHandler& image, characterManager &cha
     if(Login.checkAuth())
     {
         show_display = true;
-        show_process = true;
+        show_userProfile = true;
         show_config = true;
 
         if(Login.checkChar())
@@ -742,6 +744,7 @@ void graphic::makeLogIn(login& Login, imageHandler& image, characterManager &cha
             character.selectMainCharacter(&charBuild);
             characterCreated = true;
             show_charSelector = false;
+            allowMovement = true;
         }
         else
         {
@@ -1205,9 +1208,9 @@ void graphic::makeSettings(imageHandler& image, characterManager &character, cha
                 character.selectMainCharacter(&charBuild);
                 db.updateCharacter();
                 show_settings = !show_settings;
-                show_display = !show_display;
-                show_process = !show_process;
-                show_config = !show_config;
+                //show_display = !show_display;
+                //show_process = !show_process;
+                //show_config = !show_config;
 
                 resetPauseScreen = true;
                 // todo - change to show message that character changed instead of closing
