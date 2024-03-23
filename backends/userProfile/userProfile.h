@@ -15,12 +15,15 @@ using std::pair;
 #endif
 
 using std::string;
+using std::vector;
 
 // User profile is implemented as a singleton class
 class userProfile {
     string username = "";
     string id = "";
+
     string joinDate = "";
+    int character[8];
 
     userProfile();
     ~userProfile();
@@ -39,6 +42,11 @@ public:
 
     //----- User Data -----//
     string getJoinDate();
-    void setJoinDate();
+    int* getCharacter();
+
+    void setJoinDate(string date);
+    void setCharacter(int i, int val);
+
+    void clear();
 };
 

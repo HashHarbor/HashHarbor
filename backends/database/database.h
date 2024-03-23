@@ -54,8 +54,10 @@ public:
     void connect();
 
      bool getUserAuth(string usr, usrProfile& profile);
+    bool makeUser(usrProfile& profile);
+
      bool getUserData();
-     bool makeUser(usrProfile& profile);
      bool updatePassword(usrProfile& profile);
      bool updateUsername(string newUsr);
+     bool updateCharacter();
 };

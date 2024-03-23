@@ -102,11 +102,6 @@ void login::drawLoginScreen(imageHandler* imgHandler)
 
 void login::drawLogin()
 {
-    static char username[64] = "";
-    static char passwd[64] = "";
-
-    static bool viewPasswd = false; // keep password hidden by default
-
     txtPos_x = (width_px / 2.f) - ((ImGui::CalcTextSize("LOGIN").x) / 2.f);
     ImGui::SetCursorPos(ImVec2(txtPos_x, minHeight + 30.f));
     ImGui::Text("LOGIN");
@@ -186,6 +181,7 @@ void login::drawLogin()
         if(auth.inputValidation( username, passwd, true)) // this will validate the input and then authenticate the user
         {
             STATUS = true;
+            CHAR = true;
         }
         else
         {
@@ -198,12 +194,6 @@ void login::drawLogin()
 
 void login::drawCreateUser()
 {
-    static char createUsername[64] = "";
-    static char createPasswd[64] = "";
-    static char confirmPasswd[64] = "";
-
-    static bool viewPasswd = false; // keep password hidden by default
-
     ImGui::SetCursorPos(ImVec2(minWidth + 20.f, minHeight + 20.f));
     ImGui::PushID(7);
     ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,1.0f));
@@ -474,4 +464,28 @@ void login::drawBackground(imageHandler* imgHandler)
 bool login::checkAuth()
 {
     return STATUS;
+}
+bool login::checkChar()
+{
+    return CHAR;
+}
+
+void login::reset()
+{
+    STATUS = false;
+    CHAR = false;
+
+    username[0] = '\0';
+    passwd[0] = '\0';
+
+    createUsername[0] = '\0';
+    createPasswd[0] = '\0';
+    confirmPasswd[0] = '\0';
+
+    viewPasswd = false;
+
+    createAccount = false;
+    errorAuth = false;
+    errorCmp = false;
+    errorCreate = false;
 }

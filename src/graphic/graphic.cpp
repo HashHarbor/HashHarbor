@@ -240,6 +240,25 @@ void graphic::setup(){
             changeResolution = false;
         }
 
+        if(reset)
+        {
+            usrProfile.clear();
+            Login.reset();
+            builder.reset();
+            character.selectMainCharacter(&builder);
+            // todo - add anything else that needs to be reeset
+
+            show_display = false;
+            show_process = false;
+            show_config = false;
+            show_charSelector = false;
+            show_settings = false;
+            characterCreated = false;
+            show_login = true;
+
+            reset = false;
+        }
+
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
@@ -247,7 +266,7 @@ void graphic::setup(){
 
         if(ImGui::IsKeyPressedEx(ImGuiKey_Escape, false))
         {
-            if(characterCreated && !show_login)
+            if(!show_charSelector && !show_login)
             {
                 show_settings = !show_settings;
                 show_display = !show_display;
@@ -260,12 +279,12 @@ void graphic::setup(){
 
         if(show_login)
         {
-            makeLogIn(Login, image);
+            makeLogIn(Login, image, character, builder);
         }
 
         if(show_settings)
         {
-            makeSettings(Login, image, character, builder, done);
+            makeSettings(image, character, builder, done);
         }
 
         if(show_display){
@@ -424,9 +443,11 @@ void graphic::makeCharacterSelector(imageHandler& image, characterManager &chara
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
         if(ImGui::Button("Select Character", ImVec2(150.f, 40.f)))
         {
+            database& db = database::getInstance();
             character.selectMainCharacter(&charBuild);
             characterCreated = true;
             show_charSelector = false;
+            db.updateCharacter();
         }
         ImGui::PopStyleColor(3);
         
@@ -547,7 +568,7 @@ string graphic::executeCPP(string code){
     return executeOutput;
 }
 
-void graphic::makeLogIn(login& Login, imageHandler& image)
+void graphic::makeLogIn(login& Login, imageHandler& image, characterManager &character, characterBuilder& charBuild)
 {
     ImGuiStyle& style = ImGui::GetStyle();
     style.FrameRounding = 7.5f;
@@ -559,7 +580,19 @@ void graphic::makeLogIn(login& Login, imageHandler& image)
         show_display = true;
         show_process = true;
         show_config = true;
-        show_charSelector = true;
+
+        if(Login.checkChar())
+        {
+            charBuild.setCharacterFromDb();
+            character.selectMainCharacter(&charBuild);
+            characterCreated = true;
+            show_charSelector = false;
+        }
+        else
+        {
+            characterCreated = false;
+            show_charSelector = true;
+        }
 
         style.FrameRounding = 0.f;
         style.Colors[ImGuiCol_Text] = ImVec4(1.0f, 1.0f, 1.0f, 1.00f);
@@ -568,7 +601,7 @@ void graphic::makeLogIn(login& Login, imageHandler& image)
     }
 }
 
-void graphic::makeSettings(login &Login, imageHandler& image, characterManager &character, characterBuilder& charBuild, bool& done)
+void graphic::makeSettings(imageHandler& image, characterManager &character, characterBuilder& charBuild, bool& done)
 {
     // todo - change background color
     float windowWidth = 320.f;
@@ -784,7 +817,7 @@ void graphic::makeSettings(login &Login, imageHandler& image, characterManager &
             ImGui::SetCursorPos(ImVec2(124.f, 130.f));
             ImGui::Text("Date Joined: ");
             ImGui::SameLine();
-            ImGui::Text("mm/dd/yyyy"); // todo - get from database
+            ImGui::Text("%s", usrProfile.getJoinDate().c_str()); // todo - get from database
 
             ImGui::SetCursorPos(ImVec2(124.f, 150.f));
             ImGui::Text("Level: "); // todo - change to whatever gets implemented
@@ -992,14 +1025,15 @@ void graphic::makeSettings(login &Login, imageHandler& image, characterManager &
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
             if(ImGui::Button("Select Character", ImVec2(150.f, 40.f)))
             {
+                database& db = database::getInstance();
                 character.selectMainCharacter(&charBuild);
+                db.updateCharacter();
                 show_settings = !show_settings;
                 show_display = !show_display;
                 show_process = !show_process;
                 show_config = !show_config;
 
                 resetPauseScreen = true;
-
                 // todo - change to show message that character changed instead of closing
             }
             ImGui::PopStyleColor(3);
@@ -1039,16 +1073,7 @@ void graphic::makeSettings(login &Login, imageHandler& image, characterManager &
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.f / 360.f, 1.f, 0.384f));
             if(ImGui::Button("Log Out", ImVec2(120.f, 40.f)))
             {
-                // todo - login function to clear saved data
-                show_display = false;
-                show_process = false;
-                show_config = false;
-                show_charSelector = false;
-                show_settings = false;
-
-                characterCreated = false;
-
-                show_login = true;
+                reset = true;
             }
             ImGui::PopStyleColor(3);
             ImGui::PopID();

@@ -94,6 +94,7 @@ bool database::makeUser(database::usrProfile &profile)
 {
     try {
         auto collection = db["UserAuth"];
+        auto collectionProgress = db["UserProgress"];
 
         auto findUsr = collection.find_one(make_document(kvp("username", profile.username)));
         if(findUsr) // make sure this username has not been used
@@ -108,8 +109,83 @@ bool database::makeUser(database::usrProfile &profile)
                 kvp("salt", profile.salt)
         ));
         assert(insertUsr);
+
+        auto insertProgress = collectionProgress.insert_one(make_document(
+                kvp("_id", insertUsr->inserted_id().get_oid()), // use user oid number to relate data to user
+                kvp("join", bsoncxx::types::b_date(std::chrono::system_clock::now())),
+                kvp("character", make_array(0,5,8,0,2,2,0,3))
+        ));
+        assert(insertProgress);
+
         return true;
 
+    }catch(const std::exception& e)
+    {
+        cout << "Database Failure:: " << e.what() << endl;
+    }
+    return false;
+}
+
+bool database::getUserData()
+{
+    try {
+        userProfile& usrProfile = userProfile::getInstance();
+        auto collectionProgress = db["UserProgress"];
+
+        auto findData = collectionProgress.find_one(make_document(kvp("_id", bsoncxx::oid(usrProfile.getId()))));
+        if(findData)
+        {
+            bsoncxx::document::element db_join = findData.value()["join"]; // date
+            assert(db_join.type() == bsoncxx::type::k_date);
+            bsoncxx::types::b_date date = db_join.get_date();
+            auto time_point = std::chrono::system_clock::time_point(std::chrono::milliseconds(date.to_int64()));
+            auto time = std::chrono::system_clock::to_time_t(time_point);
+            std::tm* tmPtr = std::localtime(&time);
+            std::stringstream ss;
+            ss << std::setfill('0') << std::setw(2) << tmPtr->tm_mon + 1 << "/" << setw(2) << tmPtr->tm_mday << "/" << std::setw(4) << tmPtr->tm_year + 1900;
+            usrProfile.setJoinDate(ss.str());
+
+            bsoncxx::document::element db_character = findData.value()["character"]; // array for character
+            assert(db_character.type() == bsoncxx::type::k_array);
+            bsoncxx::array::view arr = db_character.get_array();
+
+            int i = 0;
+            for(auto iter : arr)
+            {
+                assert(iter.type() == bsoncxx::type::k_int32);
+                usrProfile.setCharacter(i, iter.get_int32().value);
+                i++;
+            }
+
+            assert(findData);
+            return true;
+        }
+    }catch(const std::exception& e)
+    {
+        cout << "Database Failure:: " << e.what() << endl;
+    }
+    return false;
+}
+
+bool database::updateCharacter()
+{
+    try {
+        userProfile& usrProfile = userProfile::getInstance();
+        auto collectionProgress = db["UserProgress"];
+
+        auto update_one_result = collectionProgress.update_one(
+                make_document(kvp("_id", bsoncxx::oid(usrProfile.getId()))),
+                make_document(kvp("$set", make_document(kvp("character", make_array(usrProfile.getCharacter()[0],
+                                                                                    usrProfile.getCharacter()[1],
+                                                                                    usrProfile.getCharacter()[2],
+                                                                                    usrProfile.getCharacter()[3],
+                                                                                    usrProfile.getCharacter()[4],
+                                                                                    usrProfile.getCharacter()[5],
+                                                                                    usrProfile.getCharacter()[6],
+                                                                                    usrProfile.getCharacter()[7]))))));
+
+        assert(update_one_result);  // Acknowledged writes return results.
+        return true;
     }catch(const std::exception& e)
     {
         cout << "Database Failure:: " << e.what() << endl;

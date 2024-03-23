@@ -33,11 +33,12 @@ public:
     void makeProcess(TextEditor &editor, const char* fileToEdit);
     void makeCharacterSelector(imageHandler& image, characterManager &character, characterBuilder& charBuild);
     void makeBackground(imageHandler background, movementHandler move, float &gridX, float &gridY);
-    void makeLogIn(login& Login, imageHandler& image);
+    void makeLogIn(login& Login, imageHandler& image, characterManager &character, characterBuilder& charBuild);
     string executeCPP(string code);
-    void makeSettings(login& Login, imageHandler& image, characterManager& character, characterBuilder& charBuild, bool& done);
+    void makeSettings(imageHandler& image, characterManager& character, characterBuilder& charBuild, bool& done);
 
 private:
     bool resetPauseScreen = false;
     bool changeResolution = false;
+    bool reset = false;
 };

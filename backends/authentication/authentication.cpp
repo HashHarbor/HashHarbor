@@ -41,7 +41,12 @@ bool authentication::inputValidation(string usr, string passwd, bool mode)
         {
             if(mode)
             {
-                return auth(usr, passwd);
+                if(auth(usr, passwd))
+                {
+                    database& db = database::getInstance();
+                    db.getUserData();
+                    return true;
+                }
             }
             else
             {
