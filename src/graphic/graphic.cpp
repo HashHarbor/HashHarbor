@@ -421,7 +421,12 @@ void graphic::makeQuestion() {
     ImGui::SetNextWindowSize({(float)width_px / 2 - (2 * horizontalIndent), (float)height_px - (2 * verticalIndent)});
     ImGui::SetNextWindowPos({(float)horizontalIndent, (float)verticalIndent});
 
-    ImGui::Begin("Question", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar;
+    if(show_blur){
+        flags |= ImGuiWindowFlags_NoInputs;
+    }
+
+    ImGui::Begin("Question", NULL, flags);
     {
         ImGui::TextWrapped("Given an integer n, return a string array answer (1-indexed) where:\n"
                            "\n"
@@ -464,7 +469,7 @@ void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit){
     ImGui::SetNextWindowPos({(float)width_px / 2, (float)height_px / 4 * 3});
 
     // Submission window
-    ImGui::Begin("Submission details", NULL, flags);
+    ImGui::Begin("Submission details", NULL, flags |= ImGuiWindowFlags_NoTitleBar );
     {
 
         if (ImGui::BeginTabBar("SubWindowTabs"))
@@ -479,10 +484,10 @@ void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit){
                     cout << result << endl;
                 }
 
-                ImGui::Text("Results");
-                ImGui::InputTextMultiline(" ", const_cast<char*>(result.c_str()), result.size() + 1, ImVec2((float)width_px / 2 - 20, 100), ImGuiInputTextFlags_ReadOnly);
+                ImGui::Text("Results:");
+                ImGui::InputTextMultiline(" ", const_cast<char*>(result.c_str()), result.size() + 1, ImVec2((float)width_px / 2 - 20, (height_px / 4) - 100), ImGuiInputTextFlags_ReadOnly);
 
-                ImGui::EndTabItem(); // End of Tab 1
+                ImGui::EndTabItem();
             }
 
             if (ImGui::BeginTabItem("Custom Test Case"))
@@ -536,7 +541,10 @@ void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit){
 			editor.CanUndo() ? " " : " ",
 			editor.GetLanguageDefinition().mName.c_str(), fileToEdit);
 
-		editor.Render("TextEditor");
+        if(!show_blur){
+            editor.Render("TextEditor");
+        }
+		
     }
     ImGui::End();
 
