@@ -227,6 +227,7 @@ void graphic::setup(){
     
     // Main loop
     bool done = false;
+    auto lastFrameTime = std::chrono::steady_clock::now();
     while (!done)
     {
         // Poll and handle events (inputs, window resize, etc.)
@@ -275,6 +276,15 @@ void graphic::setup(){
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
+
+        auto currentTime = std::chrono::steady_clock::now();
+        float deltaTime = std::chrono::duration<float>(currentTime - lastFrameTime).count();
+        if (deltaTime < 1.0f / 60.0f) {
+            std::this_thread::sleep_for(std::chrono::duration<float>(1.0f / 70.0f - deltaTime));
+            currentTime = std::chrono::steady_clock::now();
+            deltaTime = std::chrono::duration<float>(currentTime - lastFrameTime).count();
+        }
+        lastFrameTime = currentTime;
 
         if(ImGui::IsKeyPressedEx(ImGuiKey_Escape, false))
         {
@@ -365,8 +375,13 @@ void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, double &
     const float frameLength = 1.f / 10.f; // In seconds, so  FPS
     static float frameTimer = frameLength;
 
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus;
+    if(show_blur){
+        flags |= ImGuiWindowFlags_NoInputs;
+    }
+
     // Window - Graphics
-    ImGui::Begin("Graphics", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus);
+    ImGui::Begin("Graphics", NULL, flags);
     {
         if(characterCreated && !show_settings)
         {
@@ -405,7 +420,12 @@ void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, 
     ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
     ImGui::SetNextWindowPos({0, 0});
 
-    ImGui::Begin("Background", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus);
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus;
+    if(show_blur){
+        flags |= ImGuiWindowFlags_NoInputs;
+    }
+
+    ImGui::Begin("Background", NULL, flags);
     {
         ImGui::SetCursorPos(ImVec2(0,0));
         background.DrawMap(background, gridX, gridY, (width_px / 2), (height_px / 2), grid.size(), grid[0].size());
@@ -592,7 +612,9 @@ void graphic::makeConfig(vector<string> &codeStarter, TextEditor &editor){
     // Window - Config
     ImGui::Begin("Interactions", NULL, flags);
     {
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
+        ImGui::Text(" ");
         if(ImGui::Button("leetcode")){
             show_codeEditor = !show_codeEditor;
             show_userProfile = !show_userProfile;

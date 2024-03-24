@@ -38,6 +38,8 @@ public:
     int tileSize = 32;
     string filepath = "";
 
+    bool adjust = false;
+
     int width_px = 0;
     int height_px = 0;
 
