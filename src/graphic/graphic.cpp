@@ -290,8 +290,9 @@ void graphic::setup(){
         {
             if(!show_charSelector && !show_login)
             {
-                show_blur = ! show_blur;
+                show_blur = !show_blur;
                 show_settings = !show_settings;
+                allowMovement= !allowMovement;
 
                 resetPauseScreen = true;
             }
@@ -501,7 +502,6 @@ void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit){
                 {
                     string textToSave = editor.GetText();
                     result = executeCPP(textToSave);
-                    cout << result << endl;
                 }
 
                 ImGui::Text("Results:");
@@ -1220,6 +1220,7 @@ void graphic::makeSettings(imageHandler& image, characterManager &character, cha
                 db.updateCharacter();
                 show_settings = !show_settings;
                 show_blur = !show_blur;
+                allowMovement = !allowMovement;
 
                 resetPauseScreen = true;
                 // todo - change to show message that character changed instead of closing
