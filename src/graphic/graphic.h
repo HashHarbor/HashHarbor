@@ -8,6 +8,7 @@
 #include "textEditor/TextEditor.h"
 #include "../login/login.h"
 #include "database/database.h"
+#include "../src/apiToolTip/tooltip.h"
 
 class graphic {
 public:

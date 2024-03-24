@@ -526,6 +526,16 @@ void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit){
                 ImGui::EndTabItem();
             }
 
+            if (ImGui::BeginTabItem("Tool Tip"))
+            {   
+                ImGui::InputTextMultiline(" ", const_cast<char*>(result.c_str()), result.size() + 1, ImVec2((float)width_px / 2 - 20, (height_px / 4) - 100), ImGuiInputTextFlags_ReadOnly);
+                string output;
+                output = toolTip();
+                ImGui::Text(output);
+
+                ImGui::EndTabItem();
+            }
+
             ImGui::EndTabBar();
         }
     }

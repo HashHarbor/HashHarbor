@@ -1,6 +1,7 @@
 # API KEYS
 /backends/database/db.toml
 /assets/api.toml
+/assets/config.json
 
 # Build Files
 /src/characterBuilder.o
