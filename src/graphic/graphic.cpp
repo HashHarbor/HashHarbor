@@ -1,6 +1,7 @@
 #include "../../imgui/imgui.h"
 #include "../../backends/imgui_impl_sdl.h"
 #include "../../backends/imgui_impl_opengl3.h"
+#include "../toolTip/toolTip.h"
 #include <stdio.h>
 
 #include <SDL2/SDL.h>
@@ -528,10 +529,12 @@ void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit){
 
             if (ImGui::BeginTabItem("Tool Tip"))
             {   
-                ImGui::InputTextMultiline(" ", const_cast<char*>(result.c_str()), result.size() + 1, ImVec2((float)width_px / 2 - 20, (height_px / 4) - 100), ImGuiInputTextFlags_ReadOnly);
+                string toolTipInput;
                 string output;
-                output = toolTip();
-                ImGui::Text(output);
+                ImGui::Text("How can I help you?");
+                ImGui::InputTextMultiline(" ", const_cast<char*>(toolTipInput.c_str()), toolTipInput.size() + 1, ImVec2((float)width_px / 2 - 20, (height_px / 4) - 100), ImGuiInputTextFlags_ReadOnly);
+                output = toolTip(toolTipInput);
+                ImGui::Text(output.c_str());
 
                 ImGui::EndTabItem();
             }

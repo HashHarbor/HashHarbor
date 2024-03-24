@@ -15,7 +15,7 @@ std::string toolTip(const std::string& input) {
     }
 
     PyObject *name, *load_module, *func, *callfunc, *args;
-    name = PyUnicode_FromString((char*)"llama");
+    name = PyUnicode_FromString((char*)"toolTip");
     if (!name) {
         Py_Finalize();
         return "Failed to create Python string object";
