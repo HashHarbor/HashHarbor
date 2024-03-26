@@ -193,7 +193,7 @@ void login::drawLogin()
     if(ImGui::Button("Login", ImVec2(100.f,50.f)))
     {
         authentication auth = authentication();
-
+        viewPasswd = false;
         if(auth.inputValidation( username, passwd, true)) // this will validate the input and then authenticate the user
         {
             STATUS = true;
@@ -308,6 +308,7 @@ void login::drawCreateUser()
     {
         errorCmp = false;
         errorCreate = false;
+        viewPasswd = false;
         if(strcmp(createPasswd,confirmPasswd) != 0) // confirm passwords match
         {
             errorCmp = true;
