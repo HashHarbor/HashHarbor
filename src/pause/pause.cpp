@@ -174,6 +174,10 @@ void pause::drawPauseMenu(imageHandler *image, characterManager *character, char
         }
         ImGui::End();
     }
+    else if(notebookWindow)
+    {
+        drawNotebookWindow();
+    }
     else if(characterWindow)
     {
         drawCharacterCreatorWindow(image, charBuild, updateCharacter);
@@ -192,6 +196,7 @@ void pause::reset()
 {
     settingsWindow = false;
     userProfileWindow = false;
+    notebookWindow = false;
     characterWindow = false;
     logOutWindow = false;
     quitWindow = false;
@@ -222,7 +227,7 @@ void pause::mainControls()
         if(ImGui::Button("Settings", ImVec2(150.f, 40.f)))
         {
             settingsWindow = true;
-            userProfileWindow = false;
+            notebookWindow = false;
             characterWindow = false;
             logOutWindow = false;
             quitWindow = false;
@@ -235,10 +240,10 @@ void pause::mainControls()
         ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
-        if(ImGui::Button("User Profile", ImVec2(150.f, 40.f)))
+        if(ImGui::Button("Notebook", ImVec2(150.f, 40.f)))
         {
             settingsWindow = false;
-            userProfileWindow = true;
+            notebookWindow = true;
             characterWindow = false;
             logOutWindow = false;
             quitWindow = false;
@@ -254,7 +259,7 @@ void pause::mainControls()
         if(ImGui::Button("Change Character", ImVec2(150.f, 40.f)))
         {
             settingsWindow = false;
-            userProfileWindow = false;
+            notebookWindow = false;
             characterWindow = true;
             logOutWindow = false;
             quitWindow = false;
@@ -270,7 +275,7 @@ void pause::mainControls()
         if(ImGui::Button("Log Out", ImVec2(150.f, 40.f)))
         {
             settingsWindow = false;
-            userProfileWindow = false;
+            notebookWindow = false;
             characterWindow = false;
             logOutWindow = true;
             quitWindow = false;
@@ -286,7 +291,7 @@ void pause::mainControls()
         if(ImGui::Button("Quit", ImVec2(150.f, 40.f)))
         {
             settingsWindow = false;
-            userProfileWindow = false;
+            notebookWindow = false;
             characterWindow = false;
             logOutWindow = false;
             quitWindow = true;
@@ -298,7 +303,7 @@ void pause::mainControls()
         ImGui::Text(ICON_FA_GEAR);
 
         ImGui::SetCursorPos(ImVec2(90.f, ((620.f / 6.f) * 2.f - 20.f) + 15.f));
-        ImGui::Text(ICON_FA_USER);
+        ImGui::Text(ICON_FA_BOOK);
 
         ImGui::SetCursorPos(ImVec2(86.f, ((620.f / 6.f) * 3.f - 20.f) + 15.f));
         ImGui::Text(ICON_FA_PERSON);
@@ -377,6 +382,177 @@ void pause::drawSettingsWindow()
         ImGui::SliderInt("Sound Effects", &tempSoundEffect, 0, 20);
         // Change resolution
         // give warning on mac that resolution exceeds display size on anything over 1440x900 or just double the number displayed
+    }
+    ImGui::End();
+}
+
+void pause::drawNotebookWindow()
+{
+    const float profileWidth = windowWidth + paddingWidth + 10.f;
+    const float profileHeight = paddingHeight;
+    ImGui::SetNextWindowSize({850.f, 620.f});
+    ImGui::SetNextWindowPos({profileWidth, profileHeight});
+
+    ImGui::Begin("Notebook", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar);
+    {
+        // NOTEBOOK ISSUES
+        // Notebook does not save to file
+        // The multiline input does nto support text wrapping, another solution would be required to handle this
+
+        // TODO - Load notebook from local storage
+
+        draw_list = ImGui::GetWindowDrawList();
+
+        static int page = 0;
+        static int maxPage = 1;
+        static char text[2048] = "";
+        static bool edit = true;
+
+        int textSize = strlen(text);
+
+        if(edit)
+        {
+            ImGui::SetCursorPos(ImVec2(425.f - (ImGui::CalcTextSize("EDITING MODE").x / 2.f) , 20.f));
+            ImGui::Text("EDITING MODE", textSize, (page + 1), ((int)notebook.size() + 1));
+
+            ImGui::SetCursorPos(ImVec2(225.f, 40.f));
+            static ImGuiInputTextFlags flags = ImGuiInputTextFlags_AllowTabInput;
+            ImGui::InputTextMultiline("##source", text, IM_ARRAYSIZE(text), ImVec2(400, ImGui::GetTextLineHeight() * 40), flags);
+
+            ImGui::SetCursorPos(ImVec2(55.f, 215.f));
+            ImGui::PushID(1);
+            if(ImGui::Button("READ", ImVec2(60.f, 40.f)))
+            {
+                edit = !edit;
+            }
+            ImGui::PopID();
+        }
+        else // used to wrap text on page due to limitation of ImGui
+        {
+            ImGui::SetCursorPos(ImVec2(425.f - (ImGui::CalcTextSize("READING MODE").x / 2.f) , 20.f));
+            ImGui::Text("READING MODE", textSize, (page + 1), ((int)notebook.size() + 1));
+
+            draw_list->AddRectFilled(ImVec2(profileWidth + 225.f, profileHeight + 40.f), ImVec2(profileWidth + 625.f, profileHeight +(ImGui::GetTextLineHeight() * 40) + 40.f), ImColor(ImVec4(0.1f, 0.1f, 0.1f, 1.0f)));
+
+            ImGui::SetCursorPos(ImVec2(229.f, 43.f));
+            static float wrap_width = 400.0f;
+            ImGui::PushTextWrapPos(ImGui::GetCursorPos().x + wrap_width);
+            ImGui::Text(text, wrap_width);
+            ImGui::PopTextWrapPos();
+
+            ImGui::SetCursorPos(ImVec2(55.f, 215.f)); // button to chnage modes
+            ImGui::PushID(1);
+            if(ImGui::Button("EDIT", ImVec2(60.f, 40.f)))
+            {
+                edit = !edit;
+            }
+            ImGui::PopID();
+        }
+
+        ImGui::SetCursorPos(ImVec2(425.f - (ImGui::CalcTextSize("Characters: %d / 2048           Page: %d / %d").x / 2.f) , (ImGui::GetTextLineHeight() * 40) + 40.f));
+        if((page + 1) >= maxPage) // update page limit on display
+        {
+            maxPage = page + 1;
+        }
+        ImGui::Text("Characters: %d / 2048           Page: %d / %d", textSize, (page + 1), maxPage);
+
+        ImGui::SetCursorPos(ImVec2(425.f - (ImGui::CalcTextSize("In Editing mode the text will write as one big line, to view it  with edge wrapping use Reading mode").x / 2.f) , 600.f));
+        ImGui::Text("In Editing mode the text will write as one big line, to view it  with edge wrapping use Reading mode");
+
+        ImGui::SetCursorPos(ImVec2(55.f, 275.f));
+        ImGui::PushID(2);
+        if(ImGui::Button("SAVE", ImVec2(60.f, 40.f)))
+        {
+            if(page == notebook.size())
+            {
+                if(textSize > 0 && notebook.size() < 10)
+                {
+                    notebook.push_back(text);
+                }
+                else if(textSize > 0 && notebook.size() == 10)
+                {
+                    notebook.at(page) = text;
+                }
+            }
+            else if (page < notebook.size())
+            {
+                notebook.at(page) = text;
+            }
+        }
+        ImGui::PopID();
+
+        ImGui::SetCursorPos(ImVec2(55.f, 335.f));
+        ImGui::PushID(3);
+        if(ImGui::Button("EXPORT", ImVec2(60.f, 40.f)))
+        {
+            // TODO - Implement saving to file to ../../assets/other
+        }
+        ImGui::PopID();
+
+        ImGui::SetCursorPos(ImVec2(170.f, 40.f));
+        ImGui::PushID(12345);
+        if(ImGui::Button(ICON_FA_ARROW_LEFT, ImVec2(50.f, ImGui::GetTextLineHeight() * 40)))
+        {
+            if(page != 0)
+            {
+                if(page == notebook.size())
+                {
+                    if(textSize > 0 && notebook.size() < 10)
+                    {
+                        notebook.push_back(text);
+                    }
+                    else if(textSize > 0 && notebook.size() == 10)
+                    {
+                        notebook.at(page) = text;
+                    }
+                }
+                else
+                {
+                    notebook.at(page) = text;
+                }
+                page --;
+                text[0] = '\0';
+                std::strcpy(text, notebook.at(page).c_str());
+            }
+            else
+            {
+                page = 0;
+            }
+        }
+        ImGui::PopID();
+
+        ImGui::SetCursorPos(ImVec2(630.f, 40.f));
+        ImGui::PushID(123456);
+        if(ImGui::Button(ICON_FA_ARROW_RIGHT, ImVec2(50.f, ImGui::GetTextLineHeight() * 40)))
+        {
+            if(page == notebook.size())
+            {
+                if(textSize > 0)
+                {
+                    if(notebook.size() <= 8)
+                    {
+                        notebook.push_back(text);
+                        page ++;
+                        text[0] = '\0';
+                    }
+                }
+            }
+            else if (page < notebook.size())
+            {
+                notebook.at(page) = text;
+                if(page < 9)
+                {
+                    text[0] = '\0';
+                    page ++;
+                    cout << page << endl;
+                    if(page < notebook.size())
+                    {
+                        std::strcpy(text, notebook.at(page).c_str());
+                    }
+                }
+            }
+        }
+        ImGui::PopID();
     }
     ImGui::End();
 }

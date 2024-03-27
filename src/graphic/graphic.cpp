@@ -139,6 +139,10 @@ void graphic::setup(){
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 #endif
 
+#if defined(__APPLE__)
+    this->width_px = 1320;
+    this->height_px = 768;
+#endif
 
     // Create window with graphics context
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);

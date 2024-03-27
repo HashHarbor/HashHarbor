@@ -41,6 +41,7 @@ class pause
 
     bool settingsWindow = false;
     bool userProfileWindow = false;
+    bool notebookWindow = false;
     bool characterWindow = false;
     bool logOutWindow = false;
     bool quitWindow = false;
@@ -53,6 +54,8 @@ class pause
     char currentPasswd[64] = "";
     char createPasswd[64] = "";
     char confirmPasswd[64] = "";
+
+    vector<string> notebook;
 
     void mainControls();
     void drawSettingsWindow();
