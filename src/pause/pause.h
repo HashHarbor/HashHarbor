@@ -40,7 +40,6 @@ class pause
     ImDrawList* draw_list = nullptr;
 
     bool settingsWindow = false;
-    bool userProfileWindow = false;
     bool notebookWindow = false;
     bool characterWindow = false;
     bool logOutWindow = false;
@@ -58,7 +57,7 @@ class pause
     vector<string> notebook;
 
     void mainControls();
-    void drawSettingsWindow();
+    void drawSettingsWindow(imageHandler *image, characterBuilder *charBuild, characterManager *character);
     void drawNotebookWindow();
     void drawCharacterCreatorWindow(imageHandler *image, characterBuilder *charBuild, bool *updateCharacter);
     void drawLogOutWindow(bool* reset);
@@ -66,6 +65,8 @@ class pause
 
     void updateUserUsername(float profileWidth, float profileHeight) ;
     void updateUserPassword(float profileWidth, float profileHeight);
+    void settingsMain();
+    void settingsUser(imageHandler *image, characterBuilder *charBuild, characterManager *character);
 
 public:
     pause(int width, int height);

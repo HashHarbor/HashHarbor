@@ -37,6 +37,21 @@ using std::string;
 using std::vector;
 using std::regex;
 
+static void HelpMarker(const char* desc)
+{
+    ImGui::TextDisabled(ICON_FA_CIRCLE_QUESTION);
+    if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort))
+    {
+        ImGui::BeginTooltip();
+        ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,1.0f));
+        ImGui::PushTextWrapPos(ImGui::GetFontSize() * 50.0f);
+        ImGui::TextUnformatted(desc);
+        ImGui::PopTextWrapPos();
+        ImGui::PopStyleColor();
+        ImGui::EndTooltip();
+    }
+}
+
 pause::pause(int width, int height)
 {
     width_px = width;
@@ -56,123 +71,7 @@ void pause::drawPauseMenu(imageHandler *image, characterManager *character, char
 
     if(settingsWindow)
     {
-        drawSettingsWindow();
-    }
-    else if(userProfileWindow)
-    {
-        const float profileWidth = windowWidth + paddingWidth + 10.f;
-        const float profileHeight = paddingHeight;
-        ImGui::SetNextWindowSize({850.f, 620.f});
-        ImGui::SetNextWindowPos({profileWidth, profileHeight});
-
-        ImGui::Begin("User Profile", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
-        {
-            draw_list = ImGui::GetWindowDrawList();
-            draw_list->AddRectFilled(ImVec2(profileWidth + 20.f, profileHeight + 70.f), ImVec2(profileWidth + 300.f, profileHeight + 230.f), ImColor(ImVec4(0.6f, 0.6f, 0.6f, 1.0f)), 20.0f);
-            draw_list->AddRectFilled(ImVec2(profileWidth + 35.f, profileHeight + 85.f), ImVec2(profileWidth + 109.f, profileHeight + 218.f), ImColor(ImVec4(0.9f, 0.9f, 0.9f, 1.0f)), 20.0f);
-
-            charBuild->drawCharacterAnimation(image, ImVec2(40.f, 85.f), {ImVec2(0.1f / 192.f, 0.1f/320.f),ImVec2(31.99f/192.f, 64.f/320.f)}, 2.f, character->getMainPlayer()->dynamicIndex);
-            // show username
-            //ICON_FA_ID_CARD
-            ImGui::SetCursorPos(ImVec2(270.f, 85.f));
-            ImGui::Text(ICON_FA_USER);
-
-            ImGui::SetCursorPos(ImVec2(124.f, 110.f));
-            ImGui::Text("Username: ");
-            ImGui::SameLine();
-            ImGui::Text("%s", usrProfile.getUsername().c_str());
-
-            ImGui::SetCursorPos(ImVec2(124.f, 130.f));
-            ImGui::Text("Date Joined: ");
-            ImGui::SameLine();
-            ImGui::Text("%s", usrProfile.getJoinDate().c_str()); // todo - get from database
-
-            ImGui::SetCursorPos(ImVec2(124.f, 150.f));
-            ImGui::Text("Level: "); // todo - change to whatever gets implemented
-            ImGui::SameLine();
-            ImGui::Text("0");
-
-            ImGui::SetCursorPos(ImVec2(124.f, 170.f));
-            ImGui::Text("Problems Solved: "); // todo - get from database
-            ImGui::SameLine();
-            ImGui::Text("0");
-
-            // change username
-
-            ImGui::SetCursorPos(ImVec2(360.f, 40.f));
-            ImGui::PushID(11);
-            ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
-            if(ImGui::Button("Change Username", ImVec2(130.f, 20.f)))
-            {
-                usr_Username = !usr_Username;
-                usr_Password = false;
-
-                createUsername[0] = '\0';
-            }
-            ImGui::PopStyleColor(3);
-            ImGui::PopID();
-            // change password
-            ImGui::SameLine();
-            ImGui::PushID(22);
-            ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
-            if(ImGui::Button("Change Password", ImVec2(130.f, 20.f)))
-            {
-                usr_Username = false;
-                usr_Password = !usr_Password;
-
-                currentPasswd[0] = '\0';
-                createPasswd[0] = '\0';
-                confirmPasswd[0] = '\0';
-            }
-            ImGui::PopStyleColor(3);
-            ImGui::PopID();
-
-            ImGui::SameLine();
-            ImGui::PushID(33);
-            ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
-            if(ImGui::Button("Change Character", ImVec2(130.f, 20.f)))
-            {
-                usr_Username = false;
-                usr_Password = false;
-                userProfileWindow = false;
-                characterWindow = true;
-            }
-            ImGui::PopStyleColor(3);
-            ImGui::PopID();
-
-            // todo - change to have its own window for each instead of current layout
-            if(usr_Username)
-            {
-                updateUserUsername(profileWidth, profileHeight);
-            }
-            else if(usr_Password)
-            {
-                updateUserPassword(profileWidth, profileHeight);
-            }
-
-            // see progress
-            // have a child window to list and selectg the problems to see how the user did
-            draw_list->AddRectFilled(ImVec2(profileWidth + 20.f, profileHeight + 260.f), ImVec2(profileWidth + 405.f, profileHeight + 600.f), ImColor(ImVec4(0.6f, 0.6f, 0.6f, 1.0f)), 20.0f);
-            ImGui::SetCursorPos(ImVec2(30.f, 270.f));
-            ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,0.0f));
-            ImGui::Text("Solved Problems");
-            ImGui::PopStyleColor();
-
-            draw_list->AddRectFilled(ImVec2(profileWidth + 425.f, profileHeight + 260.f), ImVec2(profileWidth + 830.f, profileHeight + 600.f), ImColor(ImVec4(0.6f, 0.6f, 0.6f, 1.0f)), 20.0f);
-            ImGui::SetCursorPos(ImVec2(435.f, 270.f));
-            ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,0.0f));
-            ImGui::Text("Inventory");
-            ImGui::PopStyleColor();
-            // possibly see inventory
-            // use a child window to view the items
-        }
-        ImGui::End();
+        drawSettingsWindow(image, charBuild, character);
     }
     else if(notebookWindow)
     {
@@ -195,7 +94,6 @@ void pause::drawPauseMenu(imageHandler *image, characterManager *character, char
 void pause::reset()
 {
     settingsWindow = false;
-    userProfileWindow = false;
     notebookWindow = false;
     characterWindow = false;
     logOutWindow = false;
@@ -316,72 +214,30 @@ void pause::mainControls()
     }
     ImGui::End();
 }
-void pause::drawSettingsWindow()
+void pause::drawSettingsWindow(imageHandler *image, characterBuilder *charBuild, characterManager *character)
 {
     // todo - change to real audio controls from audio class
-    static int tempMain = 20;
-    static int tempMusic = 20;
-    static int tempSoundEffect = 20;
 
     ImGui::SetNextWindowSize({850.f, 620.f});
     ImGui::SetNextWindowPos({windowWidth + paddingWidth + 10.f, paddingHeight});
 
     ImGui::Begin("Settings", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
     {
-        ImGui::SetCursorPos(ImVec2(20.f, 40.f));
-        ImGui::Text("Change Screen Resolution");
-
-        ImGui::SetCursorPos(ImVec2(30.f, 60.f));
-        static int e = 0;
-        static int k = 0;
-#if defined(__APPLE__)
-        ImGui::RadioButton("2480 x 1440", &e, 0);
-        ImGui::SameLine();
-        ImGui::RadioButton("2560 x 1800", &e, 1);
-#else
-        ImGui::RadioButton("1280 x 720", &e, 0);
-            ImGui::SameLine();
-            ImGui::RadioButton("1440 x 900", &e, 1);
-            ImGui::SameLine();
-            ImGui::RadioButton("1920 x 1080", &e, 2);
-#endif
-        // Disabled due to issues with SDL and MAC Retina Displays
-/*
-            if(k != e)
+        ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
+        if (ImGui::BeginTabBar("Settings", tab_bar_flags))
+        {
+            if (ImGui::BeginTabItem("Main Game"))
             {
-                switch(e)
-                {
-                    case 0:
-                        width_px = 1280;
-                        height_px = 720;
-                        Login.updateResolution(1280, 720);
-                        break;
-                    case 1:
-                        width_px = 1440;
-                        height_px = 800;
-                        Login.updateResolution(1440, 800);
-                        break;
-                    case 2:
-                        width_px = 1920;
-                        height_px = 1080;
-                        Login.updateResolution(1920, 1080);
-                        break;
-                }
-                changeResolution = true;
-                k = e;
+                settingsMain();
+                ImGui::EndTabItem();
             }
-*/
-        ImGui::SetCursorPos(ImVec2(20.f, 100.f));
-        ImGui::Text("Volume Controls: ");
-
-        ImGui::SetCursorPos(ImVec2(30.f, 120.f));
-        ImGui::SliderInt("Main", &tempMain, 0, 20);
-        ImGui::SetCursorPos(ImVec2(30.f, 145.f));
-        ImGui::SliderInt("Music", &tempMusic, 0, 20);
-        ImGui::SetCursorPos(ImVec2(30.f, 170.f));
-        ImGui::SliderInt("Sound Effects", &tempSoundEffect, 0, 20);
-        // Change resolution
-        // give warning on mac that resolution exceeds display size on anything over 1440x900 or just double the number displayed
+            if (ImGui::BeginTabItem("User Account"))
+            {
+                settingsUser(image, charBuild, character);
+                ImGui::EndTabItem();
+            }
+            ImGui::EndTabBar();
+        }
     }
     ImGui::End();
 }
@@ -561,19 +417,23 @@ void pause::updateUserUsername(float profileWidth, float profileHeight)
 {
     //todo - get rid of profile
     userProfile& usrProfile = userProfile::getInstance();
-    draw_list->AddRectFilled(ImVec2(profileWidth + 350.f, profileHeight + 70.f), ImVec2(profileWidth + 800.f, profileHeight + 200.f), ImColor(ImVec4(0.6f, 0.6f, 0.6f, 1.0f)), 20.0f);
+    draw_list->AddRectFilled(ImVec2(profileWidth + 20.f, profileHeight + 260.f), ImVec2(profileWidth + 830.f, profileHeight + 600.f), ImColor(ImVec4(0.6f, 0.6f, 0.6f, 1.0f)), 20.0f);
 
-    ImGui::SetCursorPos(ImVec2(380.f, 80.f));
+    ImGui::SetCursorPos(ImVec2(425.f - (ImGui::CalcTextSize("Create New Username").x / 2.f) , 280.f));
     ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,0.0f));
-    ImGui::Text("Enter New Username");
+    ImGui::Text("Create New Username");
+
+    ImGui::SetCursorPos(ImVec2(425.f - (ImGui::CalcTextSize("New Username").x / 2.f) , 390.f));
+    ImGui::Text("New Username");
+    ImGui::SameLine(); HelpMarker("A username should be between 3 and 48 character\nA Username MAY contain:\n  Lowercase letters: a-z\n  Uppercase letters: A-Z\n  Digits: 0-9\n  Special character: - _ .");
     ImGui::PopStyleColor();
 
-    ImGui::SetCursorPos(ImVec2(380.f, 105.f));
+    ImGui::SetCursorPos(ImVec2(425.f - 150.f, 410.f));
     ImGui::PushItemWidth(300);
     ImGui::InputText(" ",createUsername, IM_ARRAYSIZE(createUsername), ImGuiInputTextFlags_None);
     ImGui::PopItemWidth();
 
-    ImGui::SetCursorPos(ImVec2(380.f, 140.f));
+    ImGui::SetCursorPos(ImVec2(425.f - 65.f, 550.f));
     ImGui::PushID(44);
     ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
@@ -599,39 +459,45 @@ void pause::updateUserUsername(float profileWidth, float profileHeight)
 }
 void pause::updateUserPassword(float profileWidth, float profileHeight)
 {
-    draw_list->AddRectFilled(ImVec2(profileWidth + 350.f, profileHeight + 70.f), ImVec2(profileWidth + 800.f, profileHeight + 255.f), ImColor(ImVec4(0.6f, 0.6f, 0.6f, 1.0f)), 20.0f);
+    draw_list->AddRectFilled(ImVec2(profileWidth + 20.f, profileHeight + 260.f), ImVec2(profileWidth + 830.f, profileHeight + 600.f), ImColor(ImVec4(0.6f, 0.6f, 0.6f, 1.0f)), 20.0f);
 
-    ImGui::SetCursorPos(ImVec2(380.f, 75.f));
+    ImGui::SetCursorPos(ImVec2(425.f - (ImGui::CalcTextSize("Create New Password").x / 2.f) , 280.f));
+    ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,0.0f));
+    ImGui::Text("Create New Password");
+    ImGui::PopStyleColor();
+
+    ImGui::SetCursorPos(ImVec2(425.f - (ImGui::CalcTextSize("Enter Current Password").x / 2.f) , 310.f));
     ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,0.0f));
     ImGui::Text("Enter Current Password");
     ImGui::PopStyleColor();
 
-    ImGui::SetCursorPos(ImVec2(380.f, 95.f));
+    ImGui::SetCursorPos(ImVec2(425.f - 150.f, 330.f));
     ImGui::PushItemWidth(300);
     ImGui::InputText(" ",currentPasswd, IM_ARRAYSIZE(currentPasswd), ImGuiInputTextFlags_None);
     ImGui::PopItemWidth();
 
-    ImGui::SetCursorPos(ImVec2(380.f, 120.f));
+    ImGui::SetCursorPos(ImVec2(425.f - (ImGui::CalcTextSize("Enter New Password").x / 2.f) , 360.f));
     ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,0.0f));
     ImGui::Text("Enter New Password");
+    ImGui::SameLine(); HelpMarker("Password must be at least 8 characters\nPassword must be no more than 48 character\nPassword MUST contain at least one from each group below:\n  lowercase letter: a-z\n  Uppercase letter: A-Z\n  Digit: 0-9\n  Special character: ~ ` ! @ # $ % & * ^ ( ) _ - + = \n                   { } : ; < > ?");
     ImGui::PopStyleColor();
 
-    ImGui::SetCursorPos(ImVec2(380.f, 140.f));
+    ImGui::SetCursorPos(ImVec2(425.f - 150.f, 380.f));
     ImGui::PushItemWidth(300);
     ImGui::InputText("  ",createPasswd, IM_ARRAYSIZE(createPasswd), ImGuiInputTextFlags_None);
     ImGui::PopItemWidth();
 
-    ImGui::SetCursorPos(ImVec2(380.f, 170.f));
+    ImGui::SetCursorPos(ImVec2(425.f - (ImGui::CalcTextSize("Confirm New Password").x / 2.f) , 410.f));
     ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,0.0f));
     ImGui::Text("Confirm New Password");
     ImGui::PopStyleColor();
 
-    ImGui::SetCursorPos(ImVec2(380.f, 190.f));
+    ImGui::SetCursorPos(ImVec2(425.f - 150.f, 430.f));
     ImGui::PushItemWidth(300);
     ImGui::InputText("   ",confirmPasswd, IM_ARRAYSIZE(confirmPasswd), ImGuiInputTextFlags_None);
     ImGui::PopItemWidth();
 
-    ImGui::SetCursorPos(ImVec2(380.f, 220.f));
+    ImGui::SetCursorPos(ImVec2(425.f - 65.f, 550.f));
     ImGui::PushID(44);
     ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
@@ -659,6 +525,165 @@ void pause::updateUserPassword(float profileWidth, float profileHeight)
     }
     ImGui::PopStyleColor(3);
     ImGui::PopID();
+}
+
+void pause::settingsMain()
+{
+    static int tempMain = 20;
+    static int tempMusic = 20;
+    static int tempSoundEffect = 20;
+
+    ImGui::SetCursorPos(ImVec2(20.f, 60.f));
+    ImGui::Text("Change Screen Resolution");
+
+    ImGui::SetCursorPos(ImVec2(30.f, 80.f));
+    static int e = 0;
+    static int k = 0;
+#if defined(__APPLE__)
+    ImGui::RadioButton("2480 x 1440", &e, 0);
+    ImGui::SameLine();
+    ImGui::RadioButton("2560 x 1800", &e, 1);
+#else
+    ImGui::RadioButton("1280 x 720", &e, 0);
+            ImGui::SameLine();
+            ImGui::RadioButton("1440 x 900", &e, 1);
+            ImGui::SameLine();
+            ImGui::RadioButton("1920 x 1080", &e, 2);
+#endif
+    // Disabled due to issues with SDL and MAC Retina Displays
+/*
+            if(k != e)
+            {
+                switch(e)
+                {
+                    case 0:
+                        width_px = 1280;
+                        height_px = 720;
+                        Login.updateResolution(1280, 720);
+                        break;
+                    case 1:
+                        width_px = 1440;
+                        height_px = 800;
+                        Login.updateResolution(1440, 800);
+                        break;
+                    case 2:
+                        width_px = 1920;
+                        height_px = 1080;
+                        Login.updateResolution(1920, 1080);
+                        break;
+                }
+                changeResolution = true;
+                k = e;
+            }
+
+
+*/
+    ImGui::SetCursorPos(ImVec2(20.f, 120.f));
+    ImGui::Text("Volume Controls: ");
+
+    ImGui::SetCursorPos(ImVec2(30.f, 140.f));
+    ImGui::SliderInt("Main", &tempMain, 0, 20);
+    ImGui::SetCursorPos(ImVec2(30.f, 165.f));
+    ImGui::SliderInt("Music", &tempMusic, 0, 20);
+    ImGui::SetCursorPos(ImVec2(30.f, 190.f));
+    ImGui::SliderInt("Sound Effects", &tempSoundEffect, 0, 20);
+    // Change resolution
+    // give warning on mac that resolution exceeds display size on anything over 1440x900 or just double the number displayed
+}
+void pause::settingsUser(imageHandler *image, characterBuilder *charBuild, characterManager *character)
+{
+    userProfile& usrProfile = userProfile::getInstance();
+    const float profileWidth = windowWidth + paddingWidth + 10.f;
+    const float profileHeight = paddingHeight;
+
+    draw_list = ImGui::GetWindowDrawList();
+    draw_list->AddRectFilled(ImVec2(profileWidth + 20.f, profileHeight + 70.f), ImVec2(profileWidth + 320.f, profileHeight + 230.f), ImColor(ImVec4(0.6f, 0.6f, 0.6f, 1.0f)), 20.0f);
+    draw_list->AddRectFilled(ImVec2(profileWidth + 35.f, profileHeight + 85.f), ImVec2(profileWidth + 109.f, profileHeight + 218.f), ImColor(ImVec4(0.9f, 0.9f, 0.9f, 1.0f)), 20.0f);
+
+    charBuild->drawCharacterAnimation(image, ImVec2(40.f, 85.f), {ImVec2(0.1f / 192.f, 0.1f/320.f),ImVec2(31.99f/192.f, 64.f/320.f)}, 2.f, character->getMainPlayer()->dynamicIndex);
+    // show username
+    //ICON_FA_ID_CARD
+    ImGui::SetCursorPos(ImVec2(270.f, 85.f));
+    ImGui::Text(ICON_FA_USER);
+
+    ImGui::SetCursorPos(ImVec2(124.f, 110.f));
+    ImGui::Text("Username: ");
+    ImGui::SameLine();
+    ImGui::Text("%s", usrProfile.getUsername().c_str());
+
+    ImGui::SetCursorPos(ImVec2(124.f, 130.f));
+    ImGui::Text("Date Joined: ");
+    ImGui::SameLine();
+    ImGui::Text("%s", usrProfile.getJoinDate().c_str());
+
+    ImGui::SetCursorPos(ImVec2(124.f, 150.f));
+    ImGui::Text("Level: "); // todo - change to whatever gets implemented
+    ImGui::SameLine();
+    ImGui::Text("0");
+
+    ImGui::SetCursorPos(ImVec2(124.f, 170.f));
+    ImGui::Text("Problems Solved: "); // todo - get from database
+    ImGui::SameLine();
+    ImGui::Text("0");
+
+    // change username
+
+    ImGui::SetCursorPos(ImVec2(360.f, 90.f));
+    ImGui::PushID(11);
+    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
+    if(ImGui::Button("Change Username", ImVec2(150.f, 50.f)))
+    {
+        usr_Username = !usr_Username;
+        usr_Password = false;
+
+        createUsername[0] = '\0';
+    }
+    ImGui::PopStyleColor(3);
+    ImGui::PopID();
+
+    ImGui::SetCursorPos(ImVec2(360.f, 160.f));
+    ImGui::PushID(22);
+    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
+    if(ImGui::Button("Change Password", ImVec2(150.f, 50.f)))
+    {
+        usr_Username = false;
+        usr_Password = !usr_Password;
+
+        currentPasswd[0] = '\0';
+        createPasswd[0] = '\0';
+        confirmPasswd[0] = '\0';
+    }
+    ImGui::PopStyleColor(3);
+    ImGui::PopID();
+
+    ImGui::SetCursorPos(ImVec2(530.f, 90.f));
+    ImGui::PushID(33);
+    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
+    if(ImGui::Button("Change Character", ImVec2(150.f, 50.f)))
+    {
+        usr_Username = false;
+        usr_Password = false;
+        notebookWindow = false;
+        characterWindow = true;
+    }
+    ImGui::PopStyleColor(3);
+    ImGui::PopID();
+
+    // todo - change to have its own window for each instead of current layout
+    if(usr_Username)
+    {
+        updateUserUsername(profileWidth, profileHeight);
+    }
+    else if(usr_Password)
+    {
+        updateUserPassword(profileWidth, profileHeight);
+    }
 }
 
 void pause::drawCharacterCreatorWindow(imageHandler *image, characterBuilder *charBuild, bool *updateCharacter)
@@ -715,7 +740,7 @@ void pause::drawLogOutWindow(bool* reset)
         if(ImGui::Button("Keep Playing", ImVec2(120.f, 40.f)))
         {
             settingsWindow = false;
-            userProfileWindow = false;
+            notebookWindow = false;
             characterWindow = false;
             logOutWindow = false;
             quitWindow = false;
@@ -754,7 +779,7 @@ void pause::drawQuitWindow(bool* done)
         if(ImGui::Button("Keep Playing", ImVec2(120.f, 40.f)))
         {
             settingsWindow = false;
-            userProfileWindow = false;
+            notebookWindow = false;
             characterWindow = false;
             logOutWindow = false;
             quitWindow = false;
