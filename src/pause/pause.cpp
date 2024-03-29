@@ -39,7 +39,9 @@ using std::regex;
 
 static void HelpMarker(const char* desc)
 {
-    ImGui::TextDisabled(ICON_FA_CIRCLE_QUESTION);
+    ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(226.f / 360.f,1.0f,0.88f));
+    ImGui::Text(ICON_FA_CIRCLE_QUESTION);
+    ImGui::PopStyleColor();
     if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort))
     {
         ImGui::BeginTooltip();
@@ -101,6 +103,12 @@ void pause::reset()
 
     usr_Username = false;
     usr_Password = false;
+
+    usr_Password_Success = false;
+    usr_Password_Fail = false;
+    usr_Password_FailCmp = false;
+    usr_Username_Success = false;
+    usr_Username_Fail = false;
 
     createUsername[0] = '\0';
     currentPasswd[0] = '\0';
@@ -415,7 +423,6 @@ void pause::drawNotebookWindow()
 
 void pause::updateUserUsername(float profileWidth, float profileHeight)
 {
-    //todo - get rid of profile
     userProfile& usrProfile = userProfile::getInstance();
     draw_list->AddRectFilled(ImVec2(profileWidth + 20.f, profileHeight + 260.f), ImVec2(profileWidth + 830.f, profileHeight + 600.f), ImColor(ImVec4(0.6f, 0.6f, 0.6f, 1.0f)), 20.0f);
 
@@ -440,26 +447,34 @@ void pause::updateUserUsername(float profileWidth, float profileHeight)
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
     if(ImGui::Button("Update Username", ImVec2(130.f, 30.f)))
     {
+        usr_Username_Success = false;
+        usr_Username_Fail = false;
         authentication auth = authentication();
         if(auth.changeUsername(createUsername, usrProfile.getId()))
         {
-            // todo - display success
-            cout << "Username Change Success" << endl;
-            usr_Username = false;
+            usr_Username_Success = true;
         }
         else
         {
-            cout << "Username Error\n";
-            // todo - display error message
+            usr_Username_Fail = true;
         }
         createUsername[0] = '\0';
     }
     ImGui::PopStyleColor(3);
     ImGui::PopID();
+
+    if(usr_Username_Success)
+    {
+        updateUsernameSuccess(profileWidth, profileHeight);
+    }
+    else if(usr_Username_Fail)
+    {
+        updateUsernameError(profileWidth, profileHeight);
+    }
 }
 void pause::updateUserPassword(float profileWidth, float profileHeight)
 {
-    draw_list->AddRectFilled(ImVec2(profileWidth + 20.f, profileHeight + 260.f), ImVec2(profileWidth + 830.f, profileHeight + 600.f), ImColor(ImVec4(0.6f, 0.6f, 0.6f, 1.0f)), 20.0f);
+    draw_list->AddRectFilled(ImVec2(profileWidth + 20.f, profileHeight + 260.f), ImVec2(profileWidth + 830.f, profileHeight + 600.f), ImColor(ImVec4(1.f, 1.f, 1.f, 0.6f)), 20.0f);
 
     ImGui::SetCursorPos(ImVec2(425.f - (ImGui::CalcTextSize("Create New Password").x / 2.f) , 280.f));
     ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,0.0f));
@@ -471,31 +486,74 @@ void pause::updateUserPassword(float profileWidth, float profileHeight)
     ImGui::Text("Enter Current Password");
     ImGui::PopStyleColor();
 
-    ImGui::SetCursorPos(ImVec2(425.f - 150.f, 330.f));
-    ImGui::PushItemWidth(300);
-    ImGui::InputText(" ",currentPasswd, IM_ARRAYSIZE(currentPasswd), ImGuiInputTextFlags_None);
-    ImGui::PopItemWidth();
-
     ImGui::SetCursorPos(ImVec2(425.f - (ImGui::CalcTextSize("Enter New Password").x / 2.f) , 360.f));
     ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,0.0f));
     ImGui::Text("Enter New Password");
     ImGui::SameLine(); HelpMarker("Password must be at least 8 characters\nPassword must be no more than 48 character\nPassword MUST contain at least one from each group below:\n  lowercase letter: a-z\n  Uppercase letter: A-Z\n  Digit: 0-9\n  Special character: ~ ` ! @ # $ % & * ^ ( ) _ - + = \n                   { } : ; < > ?");
     ImGui::PopStyleColor();
 
-    ImGui::SetCursorPos(ImVec2(425.f - 150.f, 380.f));
-    ImGui::PushItemWidth(300);
-    ImGui::InputText("  ",createPasswd, IM_ARRAYSIZE(createPasswd), ImGuiInputTextFlags_None);
-    ImGui::PopItemWidth();
-
     ImGui::SetCursorPos(ImVec2(425.f - (ImGui::CalcTextSize("Confirm New Password").x / 2.f) , 410.f));
     ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,0.0f));
     ImGui::Text("Confirm New Password");
     ImGui::PopStyleColor();
 
-    ImGui::SetCursorPos(ImVec2(425.f - 150.f, 430.f));
-    ImGui::PushItemWidth(300);
-    ImGui::InputText("   ",confirmPasswd, IM_ARRAYSIZE(confirmPasswd), ImGuiInputTextFlags_None);
-    ImGui::PopItemWidth();
+
+    if(!viewPasswd)
+    {
+        ImGui::SetCursorPos(ImVec2(425.f + 200.f, 375.f));
+        ImGui::PushID(54321);
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,1.0f));
+        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0,0,0,255));
+        if(ImGui::Button(ICON_FA_EYE_SLASH, ImVec2(50.f,30.f)))
+        {
+            viewPasswd = true;
+        }
+        ImGui::PopStyleColor(2);
+        ImGui::PopID();
+
+        ImGui::SetCursorPos(ImVec2(425.f - 150.f, 330.f));
+        ImGui::PushItemWidth(300);
+        ImGui::InputText(" ",currentPasswd, IM_ARRAYSIZE(currentPasswd), ImGuiInputTextFlags_Password);
+        ImGui::PopItemWidth();
+
+        ImGui::SetCursorPos(ImVec2(425.f - 150.f, 380.f));
+        ImGui::PushItemWidth(300);
+        ImGui::InputText("  ",createPasswd, IM_ARRAYSIZE(createPasswd), ImGuiInputTextFlags_Password);
+        ImGui::PopItemWidth();
+
+        ImGui::SetCursorPos(ImVec2(425.f - 150.f, 430.f));
+        ImGui::PushItemWidth(300);
+        ImGui::InputText("   ",confirmPasswd, IM_ARRAYSIZE(confirmPasswd), ImGuiInputTextFlags_Password);
+        ImGui::PopItemWidth();
+    }
+    else
+    {
+        ImGui::SetCursorPos(ImVec2(425.f + 200.f, 375.f));
+        ImGui::PushID(654321);
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,1.0f));
+        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0,0,0,255));
+        if(ImGui::Button(ICON_FA_EYE, ImVec2(50.f,30.f)))
+        {
+            viewPasswd = false;
+        }
+        ImGui::PopStyleColor(2);
+        ImGui::PopID();
+
+        ImGui::SetCursorPos(ImVec2(425.f - 150.f, 330.f));
+        ImGui::PushItemWidth(300);
+        ImGui::InputText(" ",currentPasswd, IM_ARRAYSIZE(currentPasswd), ImGuiInputTextFlags_None);
+        ImGui::PopItemWidth();
+
+        ImGui::SetCursorPos(ImVec2(425.f - 150.f, 380.f));
+        ImGui::PushItemWidth(300);
+        ImGui::InputText("  ",createPasswd, IM_ARRAYSIZE(createPasswd), ImGuiInputTextFlags_None);
+        ImGui::PopItemWidth();
+
+        ImGui::SetCursorPos(ImVec2(425.f - 150.f, 430.f));
+        ImGui::PushItemWidth(300);
+        ImGui::InputText("   ",confirmPasswd, IM_ARRAYSIZE(confirmPasswd), ImGuiInputTextFlags_None);
+        ImGui::PopItemWidth();
+    }
 
     ImGui::SetCursorPos(ImVec2(425.f - 65.f, 550.f));
     ImGui::PushID(44);
@@ -504,19 +562,24 @@ void pause::updateUserPassword(float profileWidth, float profileHeight)
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
     if(ImGui::Button("Update Password", ImVec2(130.f, 30.f)))
     {
+        usr_Password_Success = false;
+        usr_Password_Fail = false;
+        usr_Password_FailCmp = false;
+        viewPasswd = false;
         if(strcmp(createPasswd,confirmPasswd) != 0) // if new password and confirmation dont match
         {
-            // todo - display error message
-            cout << "New Passwords Dont Match" << endl;
+            usr_Password_FailCmp = true;
         }
         else
         {
             authentication auth = authentication();
             if(auth.changePassword(currentPasswd, createPasswd))
             {
-                // todo - display success
-                cout << "Success" << endl;
-                usr_Password = false;
+                usr_Password_Success = true;
+            }
+            else
+            {
+                usr_Password_Fail = true;
             }
         }
         currentPasswd[0] = '\0';
@@ -525,6 +588,80 @@ void pause::updateUserPassword(float profileWidth, float profileHeight)
     }
     ImGui::PopStyleColor(3);
     ImGui::PopID();
+
+    if(usr_Password_Success)
+    {
+        updatePasswordSuccess(profileWidth, profileHeight);
+    }
+    else if(usr_Password_Fail)
+    {
+        updatePasswordError(profileWidth, profileHeight);
+    }
+    else if(usr_Password_FailCmp)
+    {
+        updatePasswordError_Cmp(profileWidth, profileHeight);
+    }
+}
+
+void pause::updateUsernameSuccess(float profileWidth, float profileHeight)
+{
+    draw_list->AddRectFilled(ImVec2(profileWidth + 150, profileHeight + 470.f), ImVec2(profileWidth + 700.f, profileHeight + 530.f), ImColor(ImVec4(0.0f, 1.0f, 0.0f, 1.0f)), 20.0f);
+    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0,0,0,255));
+    ImGui::SetCursorPos(ImVec2(175.f, 495.f));
+    ImGui::Text(ICON_FA_USER_CHECK);
+    ImGui::SetCursorPos(ImVec2(425.f - ((ImGui::CalcTextSize("Hooray!").x) / 2.f), 482.f));
+    ImGui::Text("Hooray!");
+    ImGui::SetCursorPos(ImVec2(425.f - ((ImGui::CalcTextSize("You've successfully set up your new username.").x) / 2.f), 502.f));
+    ImGui::Text("You've successfully set up your new username.");
+    ImGui::PopStyleColor();
+}
+void pause::updateUsernameError(float profileWidth, float profileHeight)
+{
+    draw_list->AddRectFilled(ImVec2(profileWidth + 150, profileHeight + 470.f), ImVec2(profileWidth + 700.f, profileHeight + 530.f), ImColor(ImVec4(1.0f, 0.0f, 0.0f, 1.0f)), 20.0f);
+    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0,0,0,255));
+    ImGui::SetCursorPos(ImVec2(175.f, 495.f));
+    ImGui::Text(ICON_FA_TRIANGLE_EXCLAMATION);
+    ImGui::SetCursorPos(ImVec2(425.f - ((ImGui::CalcTextSize("Oops! We couldn't process your username request.").x) / 2.f), 482.f));
+    ImGui::Text("Oops! We couldn't process your username request.");
+    ImGui::SetCursorPos(ImVec2(425.f - ((ImGui::CalcTextSize("Please try again later.").x) / 2.f), 502.f));
+    ImGui::Text("Please try again later.");
+    ImGui::PopStyleColor();
+}
+void pause::updatePasswordError(float profileWidth, float profileHeight)
+{
+    draw_list->AddRectFilled(ImVec2(profileWidth + 150, profileHeight + 470.f), ImVec2(profileWidth + 700.f, profileHeight + 530.f), ImColor(ImVec4(1.0f, 0.0f, 0.0f, 1.0f)), 20.0f);
+    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0,0,0,255));
+    ImGui::SetCursorPos(ImVec2(175.f, 495.f));
+    ImGui::Text(ICON_FA_TRIANGLE_EXCLAMATION);
+    ImGui::SetCursorPos(ImVec2(425.f - ((ImGui::CalcTextSize("Account creation failed.").x) / 2.f), 482.f));
+    ImGui::Text("Account creation failed.");
+    ImGui::SetCursorPos(ImVec2(425.f - ((ImGui::CalcTextSize("Please double-check your information and try again.").x) / 2.f), 502.f));
+    ImGui::Text("Please double-check your information and try again.");
+    ImGui::PopStyleColor();
+}
+void pause::updatePasswordError_Cmp(float profileWidth, float profileHeight)
+{
+    draw_list->AddRectFilled(ImVec2(profileWidth + 150, profileHeight + 470.f), ImVec2(profileWidth + 700.f, profileHeight + 530.f), ImColor(ImVec4(1.0f, 0.0f, 0.0f, 1.0f)), 20.0f);
+    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0,0,0,255));
+    ImGui::SetCursorPos(ImVec2(175.f, 495.f));
+    ImGui::Text(ICON_FA_TRIANGLE_EXCLAMATION);
+    ImGui::SetCursorPos(ImVec2(425.f - ((ImGui::CalcTextSize("Uh-oh! The passwords entered do not match.").x) / 2.f), 482.f));
+    ImGui::Text("Uh-oh! The passwords entered do not match.");
+    ImGui::SetCursorPos(ImVec2(425.f - ((ImGui::CalcTextSize("Please re-enter them.").x) / 2.f), 502.f));
+    ImGui::Text("Please re-enter them.");
+    ImGui::PopStyleColor();
+}
+void pause::updatePasswordSuccess(float profileWidth, float profileHeight)
+{
+    draw_list->AddRectFilled(ImVec2(profileWidth + 150, profileHeight + 470.f), ImVec2(profileWidth + 700.f, profileHeight + 530.f), ImColor(ImVec4(0.0f, 1.0f, 0.0f, 1.0f)), 20.0f);
+    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0,0,0,255));
+    ImGui::SetCursorPos(ImVec2(175.f, 495.f));
+    ImGui::Text(ICON_FA_KEY);
+    ImGui::SetCursorPos(ImVec2(425.f - ((ImGui::CalcTextSize("Password updated!").x) / 2.f), 482.f));
+    ImGui::Text("Password updated!");
+    ImGui::SetCursorPos(ImVec2(425.f - ((ImGui::CalcTextSize("You can now access your account with your new password.").x) / 2.f), 502.f));
+    ImGui::Text("You can now access your account with your new password.");
+    ImGui::PopStyleColor();
 }
 
 void pause::settingsMain()
@@ -639,6 +776,12 @@ void pause::settingsUser(imageHandler *image, characterBuilder *charBuild, chara
         usr_Password = false;
 
         createUsername[0] = '\0';
+
+        usr_Password_Success = false;
+        usr_Password_Fail = false;
+        usr_Password_FailCmp = false;
+        usr_Username_Success = false;
+        usr_Username_Fail = false;
     }
     ImGui::PopStyleColor(3);
     ImGui::PopID();
@@ -652,10 +795,17 @@ void pause::settingsUser(imageHandler *image, characterBuilder *charBuild, chara
     {
         usr_Username = false;
         usr_Password = !usr_Password;
+        viewPasswd = false;
 
         currentPasswd[0] = '\0';
         createPasswd[0] = '\0';
         confirmPasswd[0] = '\0';
+
+        usr_Password_Success = false;
+        usr_Password_Fail = false;
+        usr_Password_FailCmp = false;
+        usr_Username_Success = false;
+        usr_Username_Fail = false;
     }
     ImGui::PopStyleColor(3);
     ImGui::PopID();
@@ -671,11 +821,16 @@ void pause::settingsUser(imageHandler *image, characterBuilder *charBuild, chara
         usr_Password = false;
         notebookWindow = false;
         characterWindow = true;
+
+        usr_Password_Success = false;
+        usr_Password_Fail = false;
+        usr_Password_FailCmp = false;
+        usr_Username_Success = false;
+        usr_Username_Fail = false;
     }
     ImGui::PopStyleColor(3);
     ImGui::PopID();
 
-    // todo - change to have its own window for each instead of current layout
     if(usr_Username)
     {
         updateUserUsername(profileWidth, profileHeight);

@@ -46,13 +46,21 @@ class pause
     bool quitWindow = false;
 
     bool usr_Username = false;
+    bool usr_Username_Success = false;
+    bool usr_Username_Fail = false;
+
     bool usr_Password = false;
+    bool usr_Password_Success = false;
+    bool usr_Password_FailCmp = false;
+    bool usr_Password_Fail = false;
 
     char createUsername[64] = "";
 
     char currentPasswd[64] = "";
     char createPasswd[64] = "";
     char confirmPasswd[64] = "";
+
+    bool viewPasswd = false;
 
     vector<string> notebook;
 
@@ -63,8 +71,15 @@ class pause
     void drawLogOutWindow(bool* reset);
     void drawQuitWindow(bool* done);
 
-    void updateUserUsername(float profileWidth, float profileHeight) ;
+    void updateUserUsername(float profileWidth, float profileHeight);
+    void updateUsernameSuccess(float profileWidth, float profileHeight);
+    void updateUsernameError(float profileWidth, float profileHeight);
+
     void updateUserPassword(float profileWidth, float profileHeight);
+    void updatePasswordSuccess(float profileWidth, float profileHeight);
+    void updatePasswordError_Cmp(float profileWidth, float profileHeight); // error message for password comparison failing
+    void updatePasswordError(float profileWidth, float profileHeight); // general error: either database or passwords dont match
+
     void settingsMain();
     void settingsUser(imageHandler *image, characterBuilder *charBuild, characterManager *character);
 
