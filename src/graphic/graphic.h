@@ -60,10 +60,11 @@ public:
 
     void makeUserProfile();
     string executeCPP(string code);
-    void makeSettings(pause& Pause, imageHandler& image, characterManager& character, characterBuilder& charBuild, login& Login, bool& done);
+    void makeSettings(pause& Pause, imageHandler& image, characterManager& character, characterBuilder& charBuild, movementHandler& movement, login& Login, bool& done);
 
 private:
     bool resetPauseScreen = false;
-    bool changeResolution = false;
     bool reset = false;
+    bool changeScreenRes = false;
+    pair<int,int> res;
 };

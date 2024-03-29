@@ -65,7 +65,7 @@ pause::pause(int width, int height)
     paddingWidth = ((float)width_px - (320.f + 860.f)) / 2.f;
 }
 
-void pause::drawPauseMenu(imageHandler *image, characterManager *character, characterBuilder *charBuild, bool *resetPauseScreen,bool *updateCharacter, bool *reset, bool *done)
+void pause::drawPauseMenu(imageHandler *image, characterManager *character, characterBuilder *charBuild, bool *changeScreenRes, pair<int,int>* res,bool *updateCharacter, bool *reset, bool *done)
 {
     userProfile& usrProfile = userProfile::getInstance();
 
@@ -73,7 +73,7 @@ void pause::drawPauseMenu(imageHandler *image, characterManager *character, char
 
     if(settingsWindow)
     {
-        drawSettingsWindow(image, charBuild, character);
+        drawSettingsWindow(image, charBuild, character, changeScreenRes, res);
     }
     else if(notebookWindow)
     {
@@ -222,7 +222,7 @@ void pause::mainControls()
     }
     ImGui::End();
 }
-void pause::drawSettingsWindow(imageHandler *image, characterBuilder *charBuild, characterManager *character)
+void pause::drawSettingsWindow(imageHandler *image, characterBuilder *charBuild, characterManager *character, bool* changeScreenRes, pair<int,int>* res)
 {
     // todo - change to real audio controls from audio class
 
@@ -236,7 +236,7 @@ void pause::drawSettingsWindow(imageHandler *image, characterBuilder *charBuild,
         {
             if (ImGui::BeginTabItem("Main Game"))
             {
-                settingsMain();
+                settingsMain(changeScreenRes, res);
                 ImGui::EndTabItem();
             }
             if (ImGui::BeginTabItem("User Account"))
@@ -664,8 +664,12 @@ void pause::updatePasswordSuccess(float profileWidth, float profileHeight)
     ImGui::PopStyleColor();
 }
 
-void pause::settingsMain()
+void pause::settingsMain(bool* changeScreenRes, pair<int,int>* res)
 {
+    draw_list = ImGui::GetWindowDrawList();
+    const float profileWidth = windowWidth + paddingWidth + 10.f;
+    const float profileHeight = paddingHeight;
+
     static int tempMain = 20;
     static int tempMusic = 20;
     static int tempSoundEffect = 20;
@@ -674,55 +678,94 @@ void pause::settingsMain()
     ImGui::Text("Change Screen Resolution");
 
     ImGui::SetCursorPos(ImVec2(30.f, 80.f));
-    static int e = 0;
-    static int k = 0;
 #if defined(__APPLE__)
-    ImGui::RadioButton("2480 x 1440", &e, 0);
-    ImGui::SameLine();
-    ImGui::RadioButton("2560 x 1800", &e, 1);
+    static int e = 1;
+    static int k = 0;
+
+    ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
+    if (ImGui::BeginTabBar("Screen Resolution", tab_bar_flags))
+    {
+        if (ImGui::BeginTabItem("Mac Retina Display"))
+        {
+            if(e > 1)
+            {
+                draw_list->AddRectFilled(ImVec2(profileWidth + 2.f, profileHeight + 100.f), ImVec2(profileWidth + (ImGui::CalcTextSize("Current Settings Exceed recommended settings for Mac Retina Displays").x) + 15.f, profileHeight + 119.f), ImColor(ImVec4(1.f, 0.0f, 0.0f, 0.5f)), 20.0f);
+                ImGui::Text("Current Settings Exceed recommended settings for Mac Retina Displays");
+            }
+
+            ImGui::RadioButton("Small", &e, 0);
+            ImGui::SameLine();
+            ImGui::RadioButton("Mac Retina Default", &e, 1);
+
+            ImGui::EndTabItem();
+        }
+        if (ImGui::BeginTabItem("External Display"))
+        {
+            ImGui::RadioButton("Small", &e, 0);
+            ImGui::SameLine();
+            ImGui::RadioButton("Medium", &e, 1);
+            ImGui::SameLine();
+            ImGui::RadioButton("Default", &e, 2);
+            ImGui::SameLine();
+            ImGui::RadioButton("Large", &e, 3);
+            ImGui::EndTabItem();
+        }
+        ImGui::EndTabBar();
+    }
 #else
-    ImGui::RadioButton("1280 x 720", &e, 0);
-            ImGui::SameLine();
-            ImGui::RadioButton("1440 x 900", &e, 1);
-            ImGui::SameLine();
-            ImGui::RadioButton("1920 x 1080", &e, 2);
+    static int e = 1;
+    static int k = 0;
+    ImGui::RadioButton("Small", &e, 0);
+    ImGui::SameLine();
+    ImGui::RadioButton("Medium", &e, 1);
+    ImGui::SameLine();
+    ImGui::RadioButton("Default", &e, 2);
+    ImGui::SameLine();
+    ImGui::RadioButton("Large", &e, 3);
+    ImGui::EndTabItem();
 #endif
-    // Disabled due to issues with SDL and MAC Retina Displays
-/*
             if(k != e)
             {
                 switch(e)
                 {
                     case 0:
-                        width_px = 1280;
-                        height_px = 720;
-                        Login.updateResolution(1280, 720);
+                        width_px = 1180;
+                        height_px = 686;
+                        *changeScreenRes = true;
+                        *res = {1180, 686};
                         break;
                     case 1:
-                        width_px = 1440;
-                        height_px = 800;
-                        Login.updateResolution(1440, 800);
+                        width_px = 1320;
+                        height_px = 768;
+                        *changeScreenRes = true;
+                        *res = {1320, 768};
                         break;
                     case 2:
-                        width_px = 1920;
-                        height_px = 1080;
-                        Login.updateResolution(1920, 1080);
+                        width_px = 1760;
+                        height_px = 1024;
+                        *changeScreenRes = true;
+                        *res = {1760, 1024};
+                        break;
+                    case 3:
+                        width_px = 2048;
+                        height_px = 1191;
+                        *changeScreenRes = true;
+                        *res = {2048, 1191};
                         break;
                 }
-                changeResolution = true;
                 k = e;
+                paddingHeight = ((float)height_px - windowHeight) / 2.f;
+                paddingWidth = ((float)width_px - (320.f + 860.f)) / 2.f;
             }
 
-
-*/
-    ImGui::SetCursorPos(ImVec2(20.f, 120.f));
+    ImGui::SetCursorPos(ImVec2(20.f, 150.f));
     ImGui::Text("Volume Controls: ");
 
-    ImGui::SetCursorPos(ImVec2(30.f, 140.f));
+    ImGui::SetCursorPos(ImVec2(30.f, 170.f));
     ImGui::SliderInt("Main", &tempMain, 0, 20);
-    ImGui::SetCursorPos(ImVec2(30.f, 165.f));
+    ImGui::SetCursorPos(ImVec2(30.f, 195.f));
     ImGui::SliderInt("Music", &tempMusic, 0, 20);
-    ImGui::SetCursorPos(ImVec2(30.f, 190.f));
+    ImGui::SetCursorPos(ImVec2(30.f, 220.f));
     ImGui::SliderInt("Sound Effects", &tempSoundEffect, 0, 20);
     // Change resolution
     // give warning on mac that resolution exceeds display size on anything over 1440x900 or just double the number displayed

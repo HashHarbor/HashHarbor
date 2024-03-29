@@ -90,6 +90,7 @@ void login::drawLoginScreen(imageHandler* imgHandler)
 
             strcpy(username, s.c_str());
             strcpy(passwd, p.c_str());
+            DEV = false;
         }
 
         if(!createAccount)
@@ -198,6 +199,12 @@ void login::drawLogin()
         {
             STATUS = true;
             CHAR = true;
+
+            username[0] = '\0';
+            passwd[0] = '\0';
+            createUsername[0] = '\0';
+            createPasswd[0] = '\0';
+            confirmPasswd[0] = '\0';
         }
         else
         {
@@ -219,6 +226,12 @@ void login::drawCreateUser()
         errorCreate = false;
         errorCmp = false;
         viewPasswd = false; // turn off both the new account and viewing passwd
+
+        username[0] = '\0';
+        passwd[0] = '\0';
+        createUsername[0] = '\0';
+        createPasswd[0] = '\0';
+        confirmPasswd[0] = '\0';
     }
     ImGui::PopStyleColor(1);
     ImGui::PopID();
@@ -321,10 +334,22 @@ void login::drawCreateUser()
             if(auth.inputValidation( createUsername, createPasswd, false))
             {
                 STATUS = true;
+
+                username[0] = '\0';
+                passwd[0] = '\0';
+                createUsername[0] = '\0';
+                createPasswd[0] = '\0';
+                confirmPasswd[0] = '\0';
             }
             else
             {
                 errorCreate = true;
+
+                username[0] = '\0';
+                passwd[0] = '\0';
+                createUsername[0] = '\0';
+                createPasswd[0] = '\0';
+                confirmPasswd[0] = '\0';
             }
         }
     }
@@ -491,6 +516,9 @@ void login::updateResolution(int width, int height)
 {
     width_px = width;
     height_px = height;
+
+    minWidth = (width / 2.f) - 200.f;
+    minHeight = (height / 2.f) - 240.f;
 }
 void login::reset()
 {

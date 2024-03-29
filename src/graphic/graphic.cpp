@@ -253,10 +253,16 @@ void graphic::setup(){
                 done = true;
         }
 
-        if(changeResolution)
+        if(changeScreenRes)
         {
+            this->width_px = res.first;
+            this->height_px = res.second;
+
             SDL_SetWindowSize(window, width_px, height_px);
-            changeResolution = false;
+
+            Login.updateResolution(res.first, res.second);
+            move.adjustResolution(res.first, res.second);
+            changeScreenRes = false;
         }
 
         if(reset)
@@ -336,7 +342,7 @@ void graphic::setup(){
 
         if(show_settings)
         {
-            makeSettings(Pause, image, character, builder, Login, done);
+            makeSettings(Pause, image, character, builder, move, Login, done);
         }
 
         if(show_charSelector)
@@ -774,16 +780,20 @@ void graphic::makeLogIn(login& Login, imageHandler& image, characterManager &cha
     }
 }
 
-void graphic::makeSettings(pause& Pause, imageHandler& image, characterManager &character, characterBuilder& charBuild, login& Login, bool& done)
+void graphic::makeSettings(pause& Pause, imageHandler& image, characterManager &character, characterBuilder& charBuild, movementHandler& movement, login& Login, bool& done)
 {
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.FrameRounding = 7.5f;
+
     static bool updateCharacter = false;
+
     if(resetPauseScreen)
     {
         Pause.reset();
         resetPauseScreen = false;
     }
 
-    Pause.drawPauseMenu(&image, &character, &charBuild, &resetPauseScreen, &updateCharacter, &reset, &done);
+    Pause.drawPauseMenu(&image, &character, &charBuild, &changeScreenRes, &res, &updateCharacter, &reset, &done);
 
     if(updateCharacter)
     {
@@ -796,6 +806,6 @@ void graphic::makeSettings(pause& Pause, imageHandler& image, characterManager &
 
         resetPauseScreen = true;
         // todo - change to show message
-
     }
+    style.FrameRounding = 0.f;
 }

@@ -65,7 +65,7 @@ class pause
     vector<string> notebook;
 
     void mainControls();
-    void drawSettingsWindow(imageHandler *image, characterBuilder *charBuild, characterManager *character);
+    void drawSettingsWindow(imageHandler *image, characterBuilder *charBuild, characterManager *character, bool* changeScreenRes, pair<int,int>* res);
     void drawNotebookWindow();
     void drawCharacterCreatorWindow(imageHandler *image, characterBuilder *charBuild, bool *updateCharacter);
     void drawLogOutWindow(bool* reset);
@@ -80,11 +80,11 @@ class pause
     void updatePasswordError_Cmp(float profileWidth, float profileHeight); // error message for password comparison failing
     void updatePasswordError(float profileWidth, float profileHeight); // general error: either database or passwords dont match
 
-    void settingsMain();
+    void settingsMain(bool* changeScreenRes, pair<int,int>* res);
     void settingsUser(imageHandler *image, characterBuilder *charBuild, characterManager *character);
 
 public:
     pause(int width, int height);
-    void drawPauseMenu(imageHandler *image,characterManager *character, characterBuilder *charBuild, bool* resetPauseScreen, bool* updateCharacter, bool* reset, bool* done);
+    void drawPauseMenu(imageHandler *image,characterManager *character, characterBuilder *charBuild, bool* changeScreenRes, pair<int,int>* res, bool* updateCharacter, bool* reset, bool* done);
     void reset();
 };
