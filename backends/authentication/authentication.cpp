@@ -1,9 +1,9 @@
 #include "authentication.h"
-
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
 #include "database/database.h"
+#include "userProfile/userProfile.h"
 
 #if defined(__APPLE__)
 #include <iostream>
@@ -41,7 +41,12 @@ bool authentication::inputValidation(string usr, string passwd, bool mode)
         {
             if(mode)
             {
-                return auth(usr, passwd);
+                if(auth(usr, passwd))
+                {
+                    database& db = database::getInstance();
+                    db.getUserData();
+                    return true;
+                }
             }
             else
             {
@@ -55,8 +60,9 @@ bool authentication::inputValidation(string usr, string passwd, bool mode)
 bool authentication::auth(string usr, string passwd)
 {
     database& db = database::getInstance();
-
     database::usrProfile profile;
+
+    userProfile& usrProfile = userProfile::getInstance();
 
     if(db.getUserAuth(usr, profile)) // if profile is in database
     {
@@ -66,8 +72,8 @@ bool authentication::auth(string usr, string passwd)
             if(profile.hash == authHash)
             {
                 profile.completeAuth(); // clears password and salt to not store after auth
-                _id = profile._id;
-                username = profile.username;
+                usrProfile.setUsername(profile.username);
+                usrProfile.setId(profile._id);
                 return true;
             }
         }
@@ -92,7 +98,22 @@ bool authentication::createUser(string usr, string passwd)
 
     profile.hash = hashPasswd;
     profile.salt = salt;
-    return db.makeUser(profile);
+    if(db.makeUser(profile))
+    {
+        userProfile& usrProfile = userProfile::getInstance();
+        usrProfile.setId(profile._id);
+        usrProfile.setUsername(profile.username);
+
+        auto time_point = std::chrono::system_clock::time_point(std::chrono::system_clock::now());
+        auto time = std::chrono::system_clock::to_time_t(time_point);
+        std::tm* tmPtr = std::localtime(&time);
+        std::stringstream ss;
+        ss << std::setfill('0') << std::setw(2) << tmPtr->tm_mon + 1 << "/" << std::setw(2) << tmPtr->tm_mday << "/" << std::setw(4) << tmPtr->tm_year + 1900;
+        usrProfile.setJoinDate(ss.str());
+
+        return true;
+    }
+    return false;
 }
 
 string authentication::saltGenerator()
@@ -151,8 +172,39 @@ string authentication::hash(string passwd, string salt)
     return hashConverted.str();
 }
 
-void authentication::getUser(std::string &usr, std::string &id)
+bool authentication::changePassword(string oldPasswd, string newPasswd)
 {
-    usr = username;
-    id = _id;
+    if(std::regex_search(oldPasswd, regex("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[~`!@#$%^&*()_+={}:;<>?-])[A-Za-z0-9~`!@#$%^&*()_+={}:;<>?-]{8,48}$"))) // if old password is within allowed parameters
+    {
+        if(std::regex_search(newPasswd, regex("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[~`!@#$%^&*()_+={}:;<>?-])[A-Za-z0-9~`!@#$%^&*()_+={}:;<>?-]{8,48}$"))) // if new password is within allowed params
+        {
+            userProfile& usrProfile = userProfile::getInstance();
+
+            if(auth(usrProfile.getUsername(), oldPasswd))
+            {
+                database &db = database::getInstance();
+                database::usrProfile profile;
+
+                string newSalt = saltGenerator();
+                string authHash = hash(newPasswd, newSalt);
+
+                profile._id = usrProfile.getId();
+                profile.hash = authHash;
+                profile.salt = newSalt;
+
+                return db.updatePassword(profile);
+            }
+        }
+    }
+    return false;
+}
+
+bool authentication::changeUsername(string newUsr, string id)
+{
+    if(regex_search(newUsr, regex("^[A-Za-z0-9_.-]{3,48}$")))
+    {
+        database &db = database::getInstance();
+        return db.updateUsername(newUsr);
+    }
+    return false;
 }

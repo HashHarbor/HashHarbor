@@ -1,5 +1,6 @@
 # API KEYS
 /backends/database/db.toml
+/assets/api.toml
 
 # Build Files
 /src/characterBuilder.o
@@ -21,3 +22,6 @@
 /src/TextEditor.o
 /src/abc
 /src/authentication.o
+/assets/api.toml
+/src/assets/
+/src/pause.o

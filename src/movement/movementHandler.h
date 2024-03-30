@@ -13,12 +13,15 @@
 
 #if defined(__APPLE__)
 #include <iostream>
-using std::string;
-using std::vector;
+#include <vector>
+#include <filesystem>
 using std::cout;
 using std::endl;
+using std::pair;
 #else
 #include <bits/stdc++.h>
+using std::pair;
+#include <utility>
 #endif
 #include <opencv2/opencv.hpp>
 
@@ -35,9 +38,15 @@ public:
     int tileSize = 32;
     string filepath = "";
 
-    movementHandler(string filepath);
+    bool adjust = false;
+
+    int width_px = 0;
+    int height_px = 0;
+
+    movementHandler(string filepath, int width, int height);
     std::vector<std::vector<int>> getGrid();
-    void mapMovement(int key, imageHandler image, float &gridX, float &gridY);
+    void adjustResolution(int width, int height);
+    void mapMovement(int key, imageHandler image, double &gridX, double &gridY, int rows, int cols, int &lastAction);
 
 private:
     

@@ -74,30 +74,17 @@ void characterManager::setMainPlayer(std::string name)
 }
 
 
-void characterManager::moveMainCharacter(imageHandler* imgHandler, characterBuilder* charBuild,float frameTimer)
-
+void characterManager::moveMainCharacter(imageHandler* imgHandler, characterBuilder* charBuild,float frameTimer, bool canMove)
 {
-#ifdef IMGUI_DISABLE_OBSOLETE_KEYIO
-    struct funcs { static bool IsLegacyNativeDupe(ImGuiKey) { return false; } };
-            const ImGuiKey key_first = ImGuiKey_NamedKey_BEGIN;
-#else
-    struct funcs { static bool IsLegacyNativeDupe(ImGuiKey key) { return key < 512 && ImGui::GetIO().KeyMap[key] != -1; } };
-    // Hide Native<>ImGuiKey duplicates when both exists in the array
-    const ImGuiKey key_first = 0;
-    //ImGui::Text("Legacy raw:");       for (ImGuiKey key = key_first; key < ImGuiKey_COUNT; key++) { if (io.KeysDown[key]) { ImGui::SameLine(); ImGui::Text("\"%s\" %d", ImGui::GetKeyName(key), key); } }
-#endif
+
 
     int keyDown = 0; // used to identify which direction the character is moving
-    for (ImGuiKey key = key_first; key < ImGuiKey_COUNT; key++)
-    {
-        if (funcs::IsLegacyNativeDupe(key)) continue;
-        if(ImGui::IsKeyDown(ImGuiKey_UpArrow) || ImGui::IsKeyDown(ImGuiKey_W)) { keyDown = 1; }
-        else if(ImGui::IsKeyDown(ImGuiKey_DownArrow) || ImGui::IsKeyDown(ImGuiKey_S)) { keyDown = 2; }
-        else if(ImGui::IsKeyDown(ImGuiKey_RightArrow) || ImGui::IsKeyDown(ImGuiKey_D)) { keyDown = 3; }
-        else if(ImGui::IsKeyDown(ImGuiKey_LeftArrow) || ImGui::IsKeyDown(ImGuiKey_A)) { keyDown = 4; }
-        else { keyDown = 0; }
+    if(canMove){
+        if(ImGui::IsKeyDown(ImGuiKey_W)) { keyDown = 1; }
+            else if(ImGui::IsKeyDown(ImGuiKey_S)) { keyDown = 2; }
+            else if(ImGui::IsKeyDown(ImGuiKey_D)) { keyDown = 3; }
+            else if(ImGui::IsKeyDown(ImGuiKey_A)) { keyDown = 4; }
     }
-
 
     float factor = 1.f;
     //Draw Order: Body -> Eyes -> Outfit -> Hair -> Accessories

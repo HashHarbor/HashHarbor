@@ -34,7 +34,9 @@ using std::ofstream;
 #include "../movement/movementHandler.h"
 #include "../assets/font/IconsFontAwesome6.h"
 #include "../login/login.h"
+#include "userProfile/userProfile.h"
 #include "database/database.h"
+#include "authentication/authentication.h"
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui_internal.h"
@@ -101,7 +103,7 @@ void graphic::setup(){
     vector<string> cppStart;
     cppStart.push_back("#include <iostream>");
     cppStart.push_back("int main() {");
-    cppStart.push_back("\tstd::cout << \"Hello World!\";");
+    cppStart.push_back("\tstd::cout << \"Hello HashHarbor!\";");
     cppStart.push_back("\treturn 0;");
     cppStart.push_back("}");
     editor.SetTextLines(cppStart);
@@ -184,25 +186,35 @@ void graphic::setup(){
     imageHandler image = imageHandler();
     characterManager character = characterManager();
     characterBuilder builder = characterBuilder(&image);
-
+    userProfile& usrProfile = userProfile::getInstance();
     database& db = database::getInstance();
     db.connect();
     login Login = login(width_px, height_px, &image);
 
     string pathMap;
+    string obsMap;
+    string overlapMap;
 #if defined(__APPLE__)
     pathMap = imgPth.currentPath.string() + "/assets/map/abc.png";
+    obsMap = imgPth.currentPath.string() + "/assets/map/obs.png";
+    overlapMap = imgPth.currentPath.string() + "/assets/map/overlap.png";
 #else
     pathMap = "../src/abc.png";
+    obsMap = "../src/obs.png";
+    overlapMap = "../src/overlap.png";
 #endif
     imageHandler background = imageHandler(pathMap.c_str());
+    imageHandler overlap = imageHandler(overlapMap.c_str());
     background.loadTexture(background.filepath, &background);
+    overlap.loadTexture(overlap.filepath, &overlap);
 
-    character.createCharacter("Bob", false, true, &image);
-    character.setMainPlayer("Bob");
+    character.createCharacter("USER", false, true, &image);
+    character.setMainPlayer("USER");
 
-    movementHandler move = movementHandler(pathMap);
-    // auto gr = obs.getGrid();
+    movementHandler move = movementHandler(obsMap, width_px, height_px);
+    int lastAction = 0;
+    // auto gr = move.getGrid();
+    // cout << gr.size() << ", " << gr[0].size() << endl;
     // for(uint i = 0; i < gr.size(); i++){
     //     for(uint j = 0; j < gr[0].size(); j++){
     //         cout << gr[i][j] << " ";
@@ -210,11 +222,12 @@ void graphic::setup(){
     //     cout << endl;
     // }
 
-    float mapGridX = 15.0f;
-    float mapGridY = 8.0f;
+    double mapGridX = 44.0f;
+    double mapGridY = 42.0f;
     
     // Main loop
     bool done = false;
+    auto lastFrameTime = std::chrono::steady_clock::now();
     while (!done)
     {
         // Poll and handle events (inputs, window resize, etc.)
@@ -232,40 +245,95 @@ void graphic::setup(){
                 done = true;
         }
 
+        if(changeResolution)
+        {
+            SDL_SetWindowSize(window, width_px, height_px);
+            changeResolution = false;
+        }
+
+        if(reset)
+        {
+            usrProfile.clear();
+            Login.reset();
+            builder.reset();
+            character.selectMainCharacter(&builder);
+            // todo - add anything else that needs to be reeset
+
+            allowMovement = false;
+            show_login = true;
+            show_display = false;
+            show_codeEditor = false;
+            show_config = false;
+            show_charSelector = false;
+            show_settings = false;
+            show_blur = false;
+            show_userProfile = false;
+
+            reset = false;
+        }
 
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
 
+        auto currentTime = std::chrono::steady_clock::now();
+        float deltaTime = std::chrono::duration<float>(currentTime - lastFrameTime).count();
+        if (deltaTime < 1.0f / 60.0f) {
+            std::this_thread::sleep_for(std::chrono::duration<float>(1.0f / 70.0f - deltaTime));
+            currentTime = std::chrono::steady_clock::now();
+            deltaTime = std::chrono::duration<float>(currentTime - lastFrameTime).count();
+        }
+        lastFrameTime = currentTime;
+
+        if(ImGui::IsKeyPressedEx(ImGuiKey_Escape, false))
+        {
+            if(!show_charSelector && !show_login)
+            {
+                show_blur = !show_blur;
+                show_settings = !show_settings;
+                allowMovement= !allowMovement;
+
+                resetPauseScreen = true;
+            }
+        }
+
         if(show_login)
         {
-            makeLogIn(Login, image);
+            makeLogIn(Login, image, character, builder);
         }
 
         if(show_display){
-            makeBackground(background, move, mapGridX, mapGridY);
-            makeDisplay(image, character, builder);
+            makeCharacter(image, overlap, mapGridX, mapGridY, move, lastAction, character, builder,  allowMovement);
+            makeBackground(background, move.getGrid(), mapGridX, mapGridY, allowMovement);
         }
-        
-        if(show_process){
-            makeProcess(editor, fileToEdit); 
+
+        if(show_codeEditor){
+            makeQuestion();
+            makeCodeEditor(editor, fileToEdit);
+
+        }
+
+        if(show_userProfile){
+            makeUserProfile();
         }
 
         if(show_config){
-            makeConfig();
+            makeConfig(cppStart, editor);
+        }
+
+        if(show_blur){
+            makeBlur();
+        }
+
+        if(show_settings)
+        {
+            makeSettings(image, character, builder, Login, done);
         }
 
         if(show_charSelector)
         {
             makeCharacterSelector(image, character, builder);
-        }
-
-        if(ImGui::IsKeyDown(ImGuiKey_Escape))
-        {
-            //todo move settings menu when created
-            show_charSelector = true;
-            characterCreated = false;
         }
         
         // Rendering
@@ -288,8 +356,18 @@ void graphic::setup(){
     SDL_Quit();
 }
 
+void graphic::makeBlur(){
+    ImGui::SetNextWindowSize({(float)width_px, (float)height_px});
+    ImGui::SetNextWindowPos({0, 0});
 
-void graphic::makeDisplay(imageHandler& image, characterManager &character, characterBuilder& charBuild)
+    ImGui::Begin("Blur", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoInputs);
+    {
+    }
+
+    ImGui::End();
+}
+
+void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, double &gridX, double &gridY, movementHandler move, int &lastAction, characterManager &character, characterBuilder& charBuild, bool canMove)
 {
     // Graphics window calculation
     ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
@@ -298,39 +376,169 @@ void graphic::makeDisplay(imageHandler& image, characterManager &character, char
     const float frameLength = 1.f / 10.f; // In seconds, so  FPS
     static float frameTimer = frameLength;
 
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | 
+                            ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNav;
+    if(show_blur){
+        flags |= ImGuiWindowFlags_NoInputs;
+    }
+
     // Window - Graphics
-    ImGui::Begin("Graphics", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
+    ImGui::Begin("Graphics", NULL, flags);
     {
-        if(characterCreated)
+        if(characterCreated && !show_settings)
         {
             frameTimer -= ImGui::GetIO().DeltaTime;
 
-            ImVec2 characterPos = ImVec2((ImGui::GetContentRegionAvail() - ImVec2(32, 64)) * 0.5f);
+            ImVec2 characterPos = ImVec2((ImGui::GetContentRegionAvail() - ImVec2(32, 64)) * 0.5f) + ImVec2(8, 0) - ImVec2(0, 8);
             character.drawPos = characterPos;
 
             ImGui::SetCursorPos(characterPos);
-            character.moveMainCharacter(&image, &charBuild, frameTimer);
+            character.moveMainCharacter(&image, &charBuild, frameTimer, canMove);
 
             if (frameTimer <= 0.f)
             {
-                frameTimer = 2.5f / 10.f;
+                frameTimer = frameLength;
             }
         }
+
+        ImGui::SetCursorPos(ImVec2(0, 0));
+
+        int keyDown = 0; // used to identify which direction the character is moving
+
+        if(canMove){
+            if(ImGui::IsKeyDown(ImGuiKey_W)) { keyDown = 1; }
+            else if(ImGui::IsKeyDown(ImGuiKey_S)) { keyDown = 2; }
+            else if(ImGui::IsKeyDown(ImGuiKey_D)) { keyDown = 3; }
+            else if(ImGui::IsKeyDown(ImGuiKey_A)) { keyDown = 4; }
+        }
+
+        move.mapMovement(keyDown, overlap, gridX, gridY, move.getGrid().size(), move.getGrid()[0].size(), lastAction);
+
     }
     ImGui::End();
 }
 
-string result = "";
+void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, double gridX, double gridY, bool canMove){
+    ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
+    ImGui::SetNextWindowPos({0, 0});
 
-void graphic::makeProcess(TextEditor &editor, const char* fileToEdit){
-    // Processor information window calculation
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus;
+    if(show_blur){
+        flags |= ImGuiWindowFlags_NoInputs;
+    }
+
+    ImGui::Begin("Background", NULL, flags);
+    {
+        ImGui::SetCursorPos(ImVec2(0,0));
+        background.DrawMap(background, gridX, gridY, (width_px / 2), (height_px / 2), grid.size(), grid[0].size());
+
+    }
+
+    ImGui::End();
+}
+
+void graphic::makeQuestion() {
+    int horizontalIndent = 20;
+    int verticalIndent = 20;
+    ImGui::SetNextWindowSize({(float)width_px / 2 - (2 * horizontalIndent), (float)height_px - (2 * verticalIndent)});
+    ImGui::SetNextWindowPos({(float)horizontalIndent, (float)verticalIndent});
+
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar;
+    if(show_blur){
+        flags |= ImGuiWindowFlags_NoInputs;
+    }
+
+    ImGui::Begin("Question", NULL, flags);
+    {
+        ImGui::TextWrapped("Given an integer n, return a string array answer (1-indexed) where:\n"
+                           "\n"
+                           "    answer[i] == \"HashHarbor\" if i is divisible by 3 and 5.\n"
+                           "    answer[i] == \"Hash\" if i is divisible by 3.\n"
+                           "    answer[i] == \"Harbor\" if i is divisible by 5.\n"
+                           "    answer[i] == i (as a string) if none of the above conditions are true.\n"
+                           "\n"
+                           "Example 1:\n"
+                           "\n"
+                           "Input: n = 3\n"
+                           "Output: [\"1\",\"2\",\"Hash\"]\n"
+                           "\n"
+                           "Example 2:\n"
+                           "\n"
+                           "Input: n = 5\n"
+                           "Output: [\"1\",\"2\",\"Hash\",\"4\",\"Harbor\"]\n"
+                           "\n"
+                           "Example 3:\n"
+                           "\n"
+                           "Input: n = 15\n"
+                           "Output: [\"1\",\"2\",\"Hash\",\"4\",\"Harbor\",\"Hash\",\"7\",\"8\",\"Hash\",\"Harbor\",\"11\",\"Hash\",\"13\",\"14\",\"HashHarbor\"]\n"
+                           "\n"
+                           "Constraints:\n"
+                           "\n"
+                           "    1 <= n <= 104");
+        ImGui::SetWindowFontScale(1.1f); // Increase the font scale
+    }
+
+    ImGui::End();
+}
+
+void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit){
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus;
+    if(show_blur){
+        flags |= ImGuiWindowFlags_NoInputs;
+    }
+
+    ImGui::SetNextWindowSize({(float)width_px / 2, (float)height_px / 4});
+    ImGui::SetNextWindowPos({(float)width_px / 2, (float)height_px / 4 * 3});
+
+    // Submission window
+    ImGui::Begin("Submission details", NULL, flags |= ImGuiWindowFlags_NoTitleBar );
+    {
+
+        if (ImGui::BeginTabBar("SubWindowTabs"))
+        {
+
+            if (ImGui::BeginTabItem("Code Execution"))
+            {
+                if (ImGui::Button("Run Code"))
+                {
+                    string textToSave = editor.GetText();
+                    result = executeCPP(textToSave);
+                }
+
+                ImGui::Text("Results:");
+                ImGui::InputTextMultiline(" ", const_cast<char*>(result.c_str()), result.size() + 1, ImVec2((float)width_px / 2 - 20, (height_px / 4) - 100), ImGuiInputTextFlags_ReadOnly);
+
+                ImGui::EndTabItem();
+            }
+
+            if (ImGui::BeginTabItem("Custom Test Case"))
+            {
+                ImGui::Text("To be implemented");
+
+                ImGui::EndTabItem();
+            }
+
+            if (ImGui::BeginTabItem("Run All Tests"))
+            {
+
+                ImGui::Text("To be implemented");
+
+                ImGui::EndTabItem();
+            }
+
+            ImGui::EndTabBar();
+        }
+    }
+    ImGui::End();
+
+    // Code Editor
     ImGui::SetNextWindowSize({(float)width_px / 2,(float)height_px / 4 * 3});
     ImGui::SetNextWindowPos({(float)width_px / 2, 0});
 
     auto cpos = editor.GetCursorPosition();
     editor.GetText();
 
-    ImGui::Begin("Sandbox", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar);
+    ImGui::Begin("Sandbox", NULL, flags);
     {
         // if (ImGui::BeginMenu("File")) {
         //     if (ImGui::MenuItem("New", "Ctrl+N")) {
@@ -351,35 +559,89 @@ void graphic::makeProcess(TextEditor &editor, const char* fileToEdit){
 
         ImGui::Text("%6d/%-6d %6d lines  | %s | %s | %s | %s", cpos.mLine + 1, cpos.mColumn + 1, editor.GetTotalLines(),
 			editor.IsOverwrite() ? "Ovr" : "Ins",
-			editor.CanUndo() ? "*" : " ",
+			editor.CanUndo() ? " " : " ",
 			editor.GetLanguageDefinition().mName.c_str(), fileToEdit);
 
-		editor.Render("TextEditor");
+        if(!show_blur){
+            editor.Render("TextEditor");
+        }
+		
     }
     ImGui::End();
 
-    ImGui::SetNextWindowSize({(float)width_px / 2, (float)height_px / 4});
-    ImGui::SetNextWindowPos({(float)width_px / 2, (float)height_px / 4 * 3});
+}
 
-    // Window - Processor Information
-    ImGui::Begin("Submission details", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+void graphic::makeUserProfile(){
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus;
+    if(show_blur){
+        flags |= ImGuiWindowFlags_NoInputs;
+    }
+
+    ImGui::SetNextWindowSize({(float)width_px / 2, (float)height_px / 3});
+    ImGui::SetNextWindowPos({(float)width_px / 2, (float)height_px / 3 * 2});
+
+    // Submission window
+    ImGui::Begin("Inventory", NULL, flags);
     {
-        if(ImGui::Button("Run Code")){
-            string textToSave = editor.GetText();
 
-            result = executeCPP(textToSave);
-            cout << result << endl;
+    }
+    ImGui::End();
+
+    // Code Editor
+    ImGui::SetNextWindowSize({(float)width_px / 2,(float)height_px / 3 * 2});
+    ImGui::SetNextWindowPos({(float)width_px / 2, 0});
+
+    ImGui::Begin("Profile", NULL, flags);
+    {
+
+    }
+    ImGui::End();
+
+}
+
+void graphic::makeConfig(vector<string> &codeStarter, TextEditor &editor){
+    // Config window calculation
+    ImGui::SetNextWindowSize({(float)width_px / 2, (float)height_px / 2});
+
+    ImGui::SetNextWindowPos({0, (float)height_px/2});
+
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus;
+    if(show_blur){
+        flags |= ImGuiWindowFlags_NoInputs;
+    }
+
+    // Window - Config
+    ImGui::Begin("Interactions", NULL, flags);
+    {
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
+        ImGui::Text(" ");
+        if(ImGui::Button("leetcode")){
+            show_codeEditor = !show_codeEditor;
+            show_userProfile = !show_userProfile;
+            allowMovement = !allowMovement;
+
+            codeStarter.clear();
+
+            codeStarter.push_back("#include <iostream>");
+            codeStarter.push_back("int main() {");
+            codeStarter.push_back("\tstd::cout << \"Hello HashHarbor!\";");
+            codeStarter.push_back("\treturn 0;");
+            codeStarter.push_back("}");
+            editor.SetTextLines(codeStarter);
+
+            result = "";
         }
 
-        ImGui::InputTextMultiline("Result", const_cast<char*>(result.c_str()), result.size() + 1, ImVec2(500, 200), ImGuiInputTextFlags_ReadOnly);
     }
     ImGui::End();
+
 }
 
 void graphic::makeCharacterSelector(imageHandler& image, characterManager &character, characterBuilder& charBuild)
 {
-    ImGui::SetNextWindowSize({ImGui::GetIO().DisplaySize.x-550.f, ImGui::GetIO().DisplaySize.y-200.f});
-    ImGui::SetNextWindowPos({275.f,100.f});
+    ImGui::SetNextWindowSize({850.f, 520.f});
+    ImGui::SetNextWindowPos({((float)width_px - 850.f) / 2.f,((float)height_px - 520.f) / 2.f});
 
     float factor = 4.f;
     const float frameLength = 5.f / 10.f; // In seconds, so  FPS
@@ -399,84 +661,26 @@ void graphic::makeCharacterSelector(imageHandler& image, characterManager &chara
         }
 
         //---setchar
-        ImGui::SetCursorPos(ImVec2(290.f,390.f));
+        ImGui::SetCursorPos(ImVec2(characterPos.x * 3.f - 10.f, 420.f));
         ImGui::PushID(8);
         ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
         if(ImGui::Button("Select Character", ImVec2(150.f, 40.f)))
         {
+            database& db = database::getInstance();
             character.selectMainCharacter(&charBuild);
             characterCreated = true;
             show_charSelector = false;
+            show_blur = false;
+            allowMovement = true;
+            db.updateCharacter();
         }
         ImGui::PopStyleColor(3);
         
         ImGui::PopID();
     }
     ImGui::End();
-}
-
-void graphic::makeBackground(imageHandler background, movementHandler move, float &gridX, float &gridY){
-    ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
-    ImGui::SetNextWindowPos({0, 0});
-
-    static auto lastKeyEventTime = std::chrono::steady_clock::now();
-
-    // Get the current time
-    auto currentTime = std::chrono::steady_clock::now();
-
-    // Calculate the time elapsed since the last key event
-    auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastKeyEventTime).count();
-
-    // Define the cooldown duration between key events in milliseconds
-    const int cooldownMilliseconds = 1000; // 1 second cooldown
-
-
-    #ifdef IMGUI_DISABLE_OBSOLETE_KEYIO
-    struct funcs { static bool IsLegacyNativeDupe(ImGuiKey) { return false; } };
-            const ImGuiKey key_first = ImGuiKey_NamedKey_BEGIN;
-    #else
-        struct funcs { static bool IsLegacyNativeDupe(ImGuiKey key) { return key < 512 && ImGui::GetIO().KeyMap[key] != -1; } };
-        const ImGuiKey key_first = 0;
-    #endif
-
-    int keyDown = 0; // used to identify which direction the character is moving
-    for (ImGuiKey key = key_first; key < ImGuiKey_COUNT; key++)
-    {
-        if (elapsedTime >= cooldownMilliseconds) {
-            if (funcs::IsLegacyNativeDupe(key)) continue;
-
-            if(ImGui::IsKeyDown(ImGuiKey_UpArrow) || ImGui::IsKeyDown(ImGuiKey_W)) { keyDown = 1; }
-            else if(ImGui::IsKeyDown(ImGuiKey_DownArrow) || ImGui::IsKeyDown(ImGuiKey_S)) { keyDown = 2; }
-            else if(ImGui::IsKeyDown(ImGuiKey_RightArrow) || ImGui::IsKeyDown(ImGuiKey_D)) { keyDown = 3; }
-            else if(ImGui::IsKeyDown(ImGuiKey_LeftArrow) || ImGui::IsKeyDown(ImGuiKey_A)) { keyDown = 4; }
-            
-        }
-    }
-
-    ImGui::Begin("Background", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);
-    {
-        move.mapMovement(keyDown, background, gridX, gridY);
-    }
-
-    ImGui::End();
-}
-
-void graphic::makeConfig(){
-    // Config window calculation
-    ImGui::SetNextWindowSize({(float)width_px / 2, (float)height_px / 2});
-
-    ImGui::SetNextWindowPos({0, (float)height_px/2});
-
-    // Window - Config
-    ImGui::Begin("Config", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
-    {
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-        
-    }
-    ImGui::End();
-
 }
 
 string graphic::executeCPP(string code){
@@ -529,7 +733,7 @@ string graphic::executeCPP(string code){
     return executeOutput;
 }
 
-void graphic::makeLogIn(login& Login, imageHandler& image)
+void graphic::makeLogIn(login& Login, imageHandler& image, characterManager &character, characterBuilder& charBuild)
 {
     ImGuiStyle& style = ImGui::GetStyle();
     style.FrameRounding = 7.5f;
@@ -539,13 +743,572 @@ void graphic::makeLogIn(login& Login, imageHandler& image)
     if(Login.checkAuth())
     {
         show_display = true;
-        show_process = true;
+        show_userProfile = true;
         show_config = true;
-        show_charSelector = true;
+
+        if(Login.checkChar())
+        {
+            charBuild.setCharacterFromDb();
+            character.selectMainCharacter(&charBuild);
+            characterCreated = true;
+            show_charSelector = false;
+            allowMovement = true;
+        }
+        else
+        {
+            characterCreated = false;
+            show_charSelector = true;
+        }
 
         style.FrameRounding = 0.f;
         style.Colors[ImGuiCol_Text] = ImVec4(1.0f, 1.0f, 1.0f, 1.00f);
 
         show_login = false;
     }
+}
+
+void graphic::makeSettings(imageHandler& image, characterManager &character, characterBuilder& charBuild, login& Login, bool& done)
+{
+    // todo - change background color
+    float windowWidth = 320.f;
+    float windowHeight = 620.f; // allow for 50px padding on a 1280x720 window
+    float paddingHeight = ((float)height_px - windowHeight) / 2.f;
+    float paddingWidth = ((float)width_px - (320.f + 860.f)) / 2.f;
+
+    static bool settingsWindow = false;
+    static bool userProfileWindow = false;
+    static bool characterWindow = false;
+    static bool logOutWindow = false;
+    static bool quitWindow = false;
+
+    static bool usr_Username = false;
+    static bool usr_Password = false;
+
+    if(resetPauseScreen)
+    {
+        settingsWindow = false;
+        userProfileWindow = false;
+        characterWindow = false;
+        logOutWindow = false;
+        quitWindow = false;
+
+        usr_Username = false;
+        usr_Password = false;
+
+        resetPauseScreen = false;
+    }
+
+    userProfile& usrProfile = userProfile::getInstance();
+
+    ImGui::SetNextWindowSize({windowWidth, windowHeight});
+    ImGui::SetNextWindowPos({paddingWidth, paddingHeight});
+
+    ImGui::Begin("Pause", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+    {
+        ImGui::SetCursorPos(ImVec2(85.f, (620.f / 6.f) * 1.f - 20.f));
+        ImGui::PushID(1111);
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
+        if(ImGui::Button("Settings", ImVec2(150.f, 40.f)))
+        {
+            settingsWindow = true;
+            userProfileWindow = false;
+            characterWindow = false;
+            logOutWindow = false;
+            quitWindow = false;
+        }
+        ImGui::PopStyleColor(3);
+        ImGui::PopID();
+
+        ImGui::SetCursorPos(ImVec2(85.f, (620.f / 6.f) * 2.f - 20.f));
+        ImGui::PushID(2222);
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
+        if(ImGui::Button("User Profile", ImVec2(150.f, 40.f)))
+        {
+            settingsWindow = false;
+            userProfileWindow = true;
+            characterWindow = false;
+            logOutWindow = false;
+            quitWindow = false;
+        }
+        ImGui::PopStyleColor(3);
+        ImGui::PopID();
+
+        ImGui::SetCursorPos(ImVec2(85.f, (620.f / 6.f) * 3.f - 20.f));
+        ImGui::PushID(3333);
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
+        if(ImGui::Button("Change Character", ImVec2(150.f, 40.f)))
+        {
+            settingsWindow = false;
+            userProfileWindow = false;
+            characterWindow = true;
+            logOutWindow = false;
+            quitWindow = false;
+        }
+        ImGui::PopStyleColor(3);
+        ImGui::PopID();
+
+        ImGui::SetCursorPos(ImVec2(85.f, (620.f / 6.f) * 4.f - 20.f));
+        ImGui::PushID(4444);
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
+        if(ImGui::Button("Log Out", ImVec2(150.f, 40.f)))
+        {
+            settingsWindow = false;
+            userProfileWindow = false;
+            characterWindow = false;
+            logOutWindow = true;
+            quitWindow = false;
+        }
+        ImGui::PopStyleColor(3);
+        ImGui::PopID();
+
+        ImGui::SetCursorPos(ImVec2(85.f, (620.f / 6.f) * 5.f - 20.f));
+        ImGui::PushID(5555);
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.f / 360.f, 1.0f, 0.76f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.f / 360.f, 1.f, 1.f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.f / 360.f, 1.f, 0.384f));
+        if(ImGui::Button("Quit", ImVec2(150.f, 40.f)))
+        {
+            settingsWindow = false;
+            userProfileWindow = false;
+            characterWindow = false;
+            logOutWindow = false;
+            quitWindow = true;
+        }
+        ImGui::PopStyleColor(3);
+        ImGui::PopID();
+
+        ImGui::SetCursorPos(ImVec2(90.f, ((620.f / 6.f) * 1.f - 20.f) + 15.f));
+        ImGui::Text(ICON_FA_GEAR);
+
+        ImGui::SetCursorPos(ImVec2(90.f, ((620.f / 6.f) * 2.f - 20.f) + 15.f));
+        ImGui::Text(ICON_FA_USER);
+
+        ImGui::SetCursorPos(ImVec2(86.f, ((620.f / 6.f) * 3.f - 20.f) + 15.f));
+        ImGui::Text(ICON_FA_PERSON);
+
+        ImGui::SetCursorPos(ImVec2(90.f, ((620.f / 6.f) * 4.f - 20.f) + 15.f));
+        ImGui::Text(ICON_FA_CIRCLE_ARROW_LEFT);
+
+        ImGui::SetCursorPos(ImVec2(90.f, ((620.f / 6.f) * 5.f - 20.f) + 15.f));
+        ImGui::Text(ICON_FA_POWER_OFF);
+    }
+    ImGui::End();
+
+
+    if(settingsWindow)
+    {
+        // todo - change to real audio controls from audio class
+        static int tempMain = 20;
+        static int tempMusic = 20;
+        static int tempSoundEffect = 20;
+
+        ImGui::SetNextWindowSize({850.f, 620.f});
+        ImGui::SetNextWindowPos({windowWidth + paddingWidth + 10.f, paddingHeight});
+
+        ImGui::Begin("Settings", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+        {
+            ImGui::SetCursorPos(ImVec2(20.f, 40.f));
+            ImGui::Text("Change Screen Resolution");
+
+            ImGui::SetCursorPos(ImVec2(30.f, 60.f));
+            static int e = 0;
+            static int k = 0;
+#if defined(__APPLE__)
+            ImGui::RadioButton("2480 x 1440", &e, 0);
+            ImGui::SameLine();
+            ImGui::RadioButton("2560 x 1800", &e, 1);
+#else
+            ImGui::RadioButton("1280 x 720", &e, 0);
+            ImGui::SameLine();
+            ImGui::RadioButton("1440 x 900", &e, 1);
+            ImGui::SameLine();
+            ImGui::RadioButton("1920 x 1080", &e, 2);
+#endif
+            // Disabled due to issues with SDL and MAC Retina Displays
+/*
+            if(k != e)
+            {
+                switch(e)
+                {
+                    case 0:
+                        width_px = 1280;
+                        height_px = 720;
+                        Login.updateResolution(1280, 720);
+                        break;
+                    case 1:
+                        width_px = 1440;
+                        height_px = 800;
+                        Login.updateResolution(1440, 800);
+                        break;
+                    case 2:
+                        width_px = 1920;
+                        height_px = 1080;
+                        Login.updateResolution(1920, 1080);
+                        break;
+                }
+                changeResolution = true;
+                k = e;
+            }
+*/
+            ImGui::SetCursorPos(ImVec2(20.f, 100.f));
+            ImGui::Text("Volume Controls: ");
+
+            ImGui::SetCursorPos(ImVec2(30.f, 120.f));
+            ImGui::SliderInt("Main", &tempMain, 0, 20);
+            ImGui::SetCursorPos(ImVec2(30.f, 145.f));
+            ImGui::SliderInt("Music", &tempMusic, 0, 20);
+            ImGui::SetCursorPos(ImVec2(30.f, 170.f));
+            ImGui::SliderInt("Sound Effects", &tempSoundEffect, 0, 20);
+            // Change resolution
+                // give warning on mac that resolution exceeds display size on anything over 1440x900 or just double the number displayed
+        }
+        ImGui::End();
+    }
+    else if(userProfileWindow)
+    {
+        const float profileWidth = windowWidth + paddingWidth + 10.f;
+        const float profileHeight = paddingHeight;
+        ImGui::SetNextWindowSize({850.f, 620.f});
+        ImGui::SetNextWindowPos({profileWidth, profileHeight});
+
+        static char createUsername[64] = "";
+
+        static char currentPasswd[64] = "";
+        static char createPasswd[64] = "";
+        static char confirmPasswd[64] = "";
+
+        ImGui::Begin("User Profile", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+        {
+            ImDrawList* draw_list = ImGui::GetWindowDrawList();
+            draw_list->AddRectFilled(ImVec2(profileWidth + 20.f, profileHeight + 70.f), ImVec2(profileWidth + 300.f, profileHeight + 230.f), ImColor(ImVec4(0.6f, 0.6f, 0.6f, 1.0f)), 20.0f);
+            draw_list->AddRectFilled(ImVec2(profileWidth + 35.f, profileHeight + 85.f), ImVec2(profileWidth + 109.f, profileHeight + 218.f), ImColor(ImVec4(0.9f, 0.9f, 0.9f, 1.0f)), 20.0f);
+
+            charBuild.drawCharacterAnimation(&image, ImVec2(40.f, 85.f), {ImVec2(0.1f / 192.f, 0.1f/320.f),ImVec2(31.99f/192.f, 64.f/320.f)}, 2.f, character.getMainPlayer()->dynamicIndex);
+            // show username
+            //ICON_FA_ID_CARD
+            ImGui::SetCursorPos(ImVec2(270.f, 85.f));
+            ImGui::Text(ICON_FA_USER);
+
+            ImGui::SetCursorPos(ImVec2(124.f, 110.f));
+            ImGui::Text("Username: ");
+            ImGui::SameLine();
+            ImGui::Text("%s", usrProfile.getUsername().c_str());
+
+            ImGui::SetCursorPos(ImVec2(124.f, 130.f));
+            ImGui::Text("Date Joined: ");
+            ImGui::SameLine();
+            ImGui::Text("%s", usrProfile.getJoinDate().c_str()); // todo - get from database
+
+            ImGui::SetCursorPos(ImVec2(124.f, 150.f));
+            ImGui::Text("Level: "); // todo - change to whatever gets implemented
+            ImGui::SameLine();
+            ImGui::Text("0");
+
+            ImGui::SetCursorPos(ImVec2(124.f, 170.f));
+            ImGui::Text("Problems Solved: "); // todo - get from database
+            ImGui::SameLine();
+            ImGui::Text("0");
+
+            // change username
+
+            ImGui::SetCursorPos(ImVec2(360.f, 40.f));
+            ImGui::PushID(11);
+            ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
+            if(ImGui::Button("Change Username", ImVec2(130.f, 20.f)))
+            {
+                usr_Username = !usr_Username;
+                usr_Password = false;
+
+                createUsername[0] = '\0';
+            }
+            ImGui::PopStyleColor(3);
+            ImGui::PopID();
+            // change password
+            ImGui::SameLine();
+            ImGui::PushID(22);
+            ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
+            if(ImGui::Button("Change Password", ImVec2(130.f, 20.f)))
+            {
+                usr_Username = false;
+                usr_Password = !usr_Password;
+
+                currentPasswd[0] = '\0';
+                createPasswd[0] = '\0';
+                confirmPasswd[0] = '\0';
+            }
+            ImGui::PopStyleColor(3);
+            ImGui::PopID();
+
+            ImGui::SameLine();
+            ImGui::PushID(33);
+            ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
+            if(ImGui::Button("Change Character", ImVec2(130.f, 20.f)))
+            {
+                usr_Username = false;
+                usr_Password = false;
+                userProfileWindow = false;
+                characterWindow = true;
+            }
+            ImGui::PopStyleColor(3);
+            ImGui::PopID();
+
+            // todo - change to have its own window for each instead of current layout
+            if(usr_Username)
+            {
+                draw_list->AddRectFilled(ImVec2(profileWidth + 350.f, profileHeight + 70.f), ImVec2(profileWidth + 800.f, profileHeight + 200.f), ImColor(ImVec4(0.6f, 0.6f, 0.6f, 1.0f)), 20.0f);
+
+                ImGui::SetCursorPos(ImVec2(380.f, 80.f));
+                ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,0.0f));
+                ImGui::Text("Enter New Username");
+                ImGui::PopStyleColor();
+
+                ImGui::SetCursorPos(ImVec2(380.f, 105.f));
+                ImGui::PushItemWidth(300);
+                ImGui::InputText(" ",createUsername, IM_ARRAYSIZE(createUsername), ImGuiInputTextFlags_None);
+                ImGui::PopItemWidth();
+
+                ImGui::SetCursorPos(ImVec2(380.f, 140.f));
+                ImGui::PushID(44);
+                ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
+                if(ImGui::Button("Update Username", ImVec2(130.f, 30.f)))
+                {
+                    authentication auth = authentication();
+                    if(auth.changeUsername(createUsername, usrProfile.getId()))
+                    {
+                        // todo - display success
+                        cout << "Username Change Success" << endl;
+                        usr_Username = false;
+                    }
+                    else
+                    {
+                        cout << "Username Error\n";
+                        // todo - display error message
+                    }
+                    createUsername[0] = '\0';
+                }
+                ImGui::PopStyleColor(3);
+                ImGui::PopID();
+
+            }
+            else if(usr_Password)
+            {
+                draw_list->AddRectFilled(ImVec2(profileWidth + 350.f, profileHeight + 70.f), ImVec2(profileWidth + 800.f, profileHeight + 255.f), ImColor(ImVec4(0.6f, 0.6f, 0.6f, 1.0f)), 20.0f);
+
+                ImGui::SetCursorPos(ImVec2(380.f, 75.f));
+                ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,0.0f));
+                ImGui::Text("Enter Current Password");
+                ImGui::PopStyleColor();
+
+                ImGui::SetCursorPos(ImVec2(380.f, 95.f));
+                ImGui::PushItemWidth(300);
+                ImGui::InputText(" ",currentPasswd, IM_ARRAYSIZE(currentPasswd), ImGuiInputTextFlags_None);
+                ImGui::PopItemWidth();
+
+                ImGui::SetCursorPos(ImVec2(380.f, 120.f));
+                ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,0.0f));
+                ImGui::Text("Enter New Password");
+                ImGui::PopStyleColor();
+
+                ImGui::SetCursorPos(ImVec2(380.f, 140.f));
+                ImGui::PushItemWidth(300);
+                ImGui::InputText("  ",createPasswd, IM_ARRAYSIZE(createPasswd), ImGuiInputTextFlags_None);
+                ImGui::PopItemWidth();
+
+                ImGui::SetCursorPos(ImVec2(380.f, 170.f));
+                ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,0.0f));
+                ImGui::Text("Confirm New Password");
+                ImGui::PopStyleColor();
+
+                ImGui::SetCursorPos(ImVec2(380.f, 190.f));
+                ImGui::PushItemWidth(300);
+                ImGui::InputText("   ",confirmPasswd, IM_ARRAYSIZE(confirmPasswd), ImGuiInputTextFlags_None);
+                ImGui::PopItemWidth();
+
+                ImGui::SetCursorPos(ImVec2(380.f, 220.f));
+                ImGui::PushID(44);
+                ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
+                if(ImGui::Button("Update Password", ImVec2(130.f, 30.f)))
+                {
+                    if(strcmp(createPasswd,confirmPasswd) != 0) // if new password and confirmation dont match
+                    {
+                        // todo - display error message
+                        cout << "New Passwords Dont Match" << endl;
+                    }
+                    else
+                    {
+                        authentication auth = authentication();
+                        if(auth.changePassword(currentPasswd, createPasswd))
+                        {
+                            // todo - display success
+                            cout << "Success" << endl;
+                            usr_Password = false;
+                        }
+                    }
+                    currentPasswd[0] = '\0';
+                    createPasswd[0] = '\0';
+                    confirmPasswd[0] = '\0';
+                }
+                ImGui::PopStyleColor(3);
+                ImGui::PopID();
+            }
+
+            // see progress
+            // have a child window to list and selectg the problems to see how the user did
+            draw_list->AddRectFilled(ImVec2(profileWidth + 20.f, profileHeight + 260.f), ImVec2(profileWidth + 405.f, profileHeight + 600.f), ImColor(ImVec4(0.6f, 0.6f, 0.6f, 1.0f)), 20.0f);
+            ImGui::SetCursorPos(ImVec2(30.f, 270.f));
+            ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,0.0f));
+            ImGui::Text("Solved Problems");
+            ImGui::PopStyleColor();
+
+            draw_list->AddRectFilled(ImVec2(profileWidth + 425.f, profileHeight + 260.f), ImVec2(profileWidth + 830.f, profileHeight + 600.f), ImColor(ImVec4(0.6f, 0.6f, 0.6f, 1.0f)), 20.0f);
+            ImGui::SetCursorPos(ImVec2(435.f, 270.f));
+            ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,0.0f));
+            ImGui::Text("Inventory");
+            ImGui::PopStyleColor();
+            // possibly see inventory
+                // use a child window to view the items
+        }
+        ImGui::End();
+    }
+    else if(characterWindow)
+    {
+        float factor = 4.f;
+        const float frameLength = 5.f / 10.f; // In seconds, so  FPS
+        static float frameTimer = frameLength;
+
+        ImGui::SetNextWindowSize({850.f, 620.f});
+        ImGui::SetNextWindowPos({windowWidth + paddingWidth + 10.f, paddingHeight});
+
+        ImGui::Begin("Change Character", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+        {
+            frameTimer -= ImGui::GetIO().DeltaTime;
+            ImVec2 characterPos = ImVec2((ImGui::GetContentRegionAvail() - ImVec2((32.f * factor), (64.f * factor))) * 0.25f);
+            charBuild.drawPos = ImVec2(characterPos.x * 3.f, characterPos.y * 2.f);
+            charBuild.drawCharacterBuilder(&image, frameTimer);
+
+            if (frameTimer <= 0.f)
+            {
+                frameTimer = 5.f / 10.f;
+            }
+
+            ImGui::SetCursorPos(ImVec2(350.f, 550.f));
+            ImGui::PushID(8);
+            ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
+            if(ImGui::Button("Select Character", ImVec2(150.f, 40.f)))
+            {
+                database& db = database::getInstance();
+                character.selectMainCharacter(&charBuild);
+                db.updateCharacter();
+                show_settings = !show_settings;
+                show_blur = !show_blur;
+                allowMovement = !allowMovement;
+
+                resetPauseScreen = true;
+                // todo - change to show message that character changed instead of closing
+            }
+            ImGui::PopStyleColor(3);
+            ImGui::PopID();
+        }
+        ImGui::End();
+    }
+    else if (logOutWindow)
+    {
+        ImGui::SetNextWindowSize({320.f, 110.f});
+        ImGui::SetNextWindowPos({windowWidth + paddingWidth + 10.f, paddingHeight});
+        ImGui::Begin("Log Out", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+        {
+            ImGui::SetCursorPos(ImVec2(20.f, 20.f));
+            ImGui::Text("Are You Sure You Want to Log Out?");
+
+            ImGui::SetCursorPos(ImVec2( 20.f,50.f));
+            ImGui::PushID(77);
+            ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
+            if(ImGui::Button("Keep Playing", ImVec2(120.f, 40.f)))
+            {
+                settingsWindow = false;
+                userProfileWindow = false;
+                characterWindow = false;
+                logOutWindow = false;
+                quitWindow = false;
+            }
+            ImGui::PopStyleColor(3);
+            ImGui::PopID();
+
+            ImGui::SetCursorPos(ImVec2( 160.f,50.f));
+            ImGui::PushID(66);
+            ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.f / 360.f, 1.0f, 0.76f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.f / 360.f, 1.f, 1.f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.f / 360.f, 1.f, 0.384f));
+            if(ImGui::Button("Log Out", ImVec2(120.f, 40.f)))
+            {
+                reset = true;
+            }
+            ImGui::PopStyleColor(3);
+            ImGui::PopID();
+        }
+        ImGui::End();
+    }
+    else if(quitWindow)
+    {
+        ImGui::SetNextWindowSize({320.f, 110.f});
+        ImGui::SetNextWindowPos({windowWidth + paddingWidth + 10.f, paddingHeight});
+        ImGui::Begin("Quit", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+        {
+            ImGui::SetCursorPos(ImVec2(20.f, 20.f));
+            ImGui::Text("Are You Sure You Want to Quit?");
+
+            ImGui::SetCursorPos(ImVec2( 20.f,50.f));
+            ImGui::PushID(77);
+            ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
+            if(ImGui::Button("Keep Playing", ImVec2(120.f, 40.f)))
+            {
+                settingsWindow = false;
+                userProfileWindow = false;
+                characterWindow = false;
+                logOutWindow = false;
+                quitWindow = false;
+            }
+            ImGui::PopStyleColor(3);
+            ImGui::PopID();
+
+            ImGui::SetCursorPos(ImVec2( 160.f,50.f));
+            ImGui::PushID(66);
+            ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.f / 360.f, 1.0f, 0.76f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.f / 360.f, 1.f, 1.f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.f / 360.f, 1.f, 0.384f));
+            if(ImGui::Button("Quit", ImVec2(120.f, 40.f)))
+            {
+                done = true;
+            }
+            ImGui::PopStyleColor(3);
+            ImGui::PopID();
+        }
+        ImGui::End();
+    }
+
+    // todo - remove backgroind color
 }

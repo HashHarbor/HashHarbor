@@ -11,30 +11,58 @@
 
 class graphic {
 public:
-    int width_px = 1280;
-    int height_px = 720;
+    int width_px = 1760;
+    int height_px = 1024;
 
+    // int width_px = 1320;
+    // int height_px = 768;
+
+    bool allowMovement = false;
     bool show_login = true;
     bool show_display = false;
-    bool show_process = false;
+    bool show_codeEditor = false;
     bool show_config = false;
     bool show_charSelector = false;
+    bool show_settings = false;
+    bool show_blur = false;
+    bool show_userProfile = false;
+
+    // bool allowMovement = false;
+    // bool show_login = false;
+    // bool show_display = true;
+    // bool show_codeEditor = false;
+    // bool show_config = true;
+    // bool show_charSelector = true;
+    // bool show_blur = true;
+    // bool show_userProfile = true;
+
 
     bool characterCreated = false;
 
     std::string rom_file;
 
+    string result = "";
+
     //graphic functions
     void setup();
 
-    void makeDisplay(imageHandler& image, characterManager &character, characterBuilder& charBuild);
-    void makeConfig();
-    void makeProcess(TextEditor &editor, const char* fileToEdit);
+    void makeBackground(imageHandler background, vector<vector<int>> grid, double gridX, double gridY, bool canMove);
+    void makeConfig(vector<string> &codeStarter, TextEditor &editor);
+    void makeCodeEditor(TextEditor &editor, const char* fileToEdit);
+    void makeCharacter(imageHandler& image, imageHandler& overlap, double &gridX, double &gridY, movementHandler move, int &lastAction, characterManager &character, characterBuilder& charBuild, bool canMove);
     void makeCharacterSelector(imageHandler& image, characterManager &character, characterBuilder& charBuild);
     void makeBackground(imageHandler background, movementHandler move, float &gridX, float &gridY);
-    void makeLogIn(login& Login, imageHandler& image);
+    void makeLogIn(login& Login, imageHandler& image, characterManager &character, characterBuilder& charBuild);
+    void makeQuestion();
+
+    void makeBlur();
+
+    void makeUserProfile();
     string executeCPP(string code);
+    void makeSettings(imageHandler& image, characterManager& character, characterBuilder& charBuild, login& Login, bool& done);
 
 private:
-
+    bool resetPauseScreen = false;
+    bool changeResolution = false;
+    bool reset = false;
 };

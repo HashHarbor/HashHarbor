@@ -1,6 +1,7 @@
 #include "characterBuilder.h"
 #include "../imageHandler/imageHandler.h"
 #include "../imageHandler/imagePath.h"
+#include "userProfile/userProfile.h"
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
@@ -139,14 +140,14 @@ characterBuilder::characterBuilder(imageHandler* imgHandler)
 
 void characterBuilder::changeBody(int i)
 {
-    if(i < body.size())
+    if(i < (int)body.size())
     {
         indexBody = i;
     }
 }
 void characterBuilder::changeEyes(int i)
 {
-    if(i < eyes.size())
+    if(i < (int)eyes.size())
     {
         indexEyes = i;
     }
@@ -164,7 +165,7 @@ void characterBuilder::changeOutfit(int i)
     else if(i == 1)
     {
         indexOutfit ++;
-        if(indexOutfit == outfit.size())
+        if(indexOutfit == (int)outfit.size())
         {
             indexOutfit = 0;
         }
@@ -183,7 +184,7 @@ void characterBuilder::changeHair(int i)
     else if(i == 1)
     {
         indexHair ++;
-        if(indexHair > hair.size())
+        if(indexHair > (int)hair.size())
         {
             indexHair = 0;
         }
@@ -202,7 +203,7 @@ void characterBuilder::changeAccessories(int i)
     else if(i == 1)
     {
         indexAccessories ++;
-        if(indexAccessories > accessories.size())
+        if(indexAccessories > (int)accessories.size())
         {
             indexAccessories = 0;
         }
@@ -211,21 +212,21 @@ void characterBuilder::changeAccessories(int i)
 
 void characterBuilder::changeHairColor(int i)
 {
-    if(i < hair.at(indexHair).size())
+    if(i < (int)hair.at(indexHair).size())
     {
         indexHairColor = i;
     }
 }
 void characterBuilder::changeOutfitColor(int i)
 {
-    if(i < outfit.at(indexOutfit).size())
+    if(i < (int)outfit.at(indexOutfit).size())
     {
         indexOutfitColor = i;
     }
 }
 void characterBuilder::changeAccessoriesColor(int i)
 {
-    if(i < accessories.at(indexAccessories).size())
+    if(i < (int)accessories.at(indexAccessories).size())
     {
         indexAccessoriesColor = i;
     }
@@ -234,6 +235,15 @@ void characterBuilder::changeAccessoriesColor(int i)
 void characterBuilder::drawCharacter(imageHandler *imgHandler, float frameTimer)
 {
     float factor = 4.f;
+
+    ImGui::SetCursorPos(ImVec2(drawPos.x + 20.f,drawPos.y - 20.f));
+    static bool animate = true;
+    ImGui::Checkbox("Animate", &animate);
+
+    if(!animate)
+    {
+        frameCount_4 = 0 ;
+    }
 
     ImGui::SetCursorPos(drawPos);
     imgHandler->DrawAnimationFrame(*body.at(indexBody), cordsAnim.at(frameCount_4), factor); // body
@@ -244,13 +254,13 @@ void characterBuilder::drawCharacter(imageHandler *imgHandler, float frameTimer)
     ImGui::SetCursorPos(drawPos);
     imgHandler->DrawAnimationFrame(*outfit.at(indexOutfit).at(indexOutfitColor), cordsAnim.at(frameCount_4), factor); // outfit
 
-    if(indexHair != hair.size())
+    if(indexHair != (int)hair.size())
     {
         ImGui::SetCursorPos(drawPos);
         imgHandler->DrawAnimationFrame(*hair.at(indexHair).at(indexHairColor), cordsAnim.at(frameCount_4), factor); // hair
     }
 
-    if(indexAccessories != accessories.size())
+    if(indexAccessories != (int)accessories.size())
     {
         ImGui::SetCursorPos(drawPos);
         imgHandler->DrawAnimationFrame(*accessories.at(indexAccessories).at(indexAccessoriesColor), cordsAnim.at(frameCount_4), factor); // accessories
@@ -273,103 +283,106 @@ void characterBuilder::drawHairControls()
     if (ImGui::ArrowButton("##Hright", ImGuiDir_Right)) { changeHair(1); }
     ImGui::PopButtonRepeat();
 
-    // hairstyle_x_1
-    ImGui::SetCursorPos(ImVec2(30.f,372.f));
-    ImGui::PushID(1);
-    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(31.f / 360.f, 0.648f, 0.702f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(32.f / 360.f, 0.564f, 0.8f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(25.f / 360.f, 0.684f, 0.671f));
-    if(ImGui::Button("  "))
+    if(indexHair != (int)hair.size())
     {
-        changeHairColor(0);
-    }
-    ImGui::PopStyleColor(3);
-    ImGui::PopID();
+        // hairstyle_x_1
+        ImGui::SetCursorPos(ImVec2(30.f,372.f));
+        ImGui::PushID(1);
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(31.f / 360.f, 0.648f, 0.702f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(32.f / 360.f, 0.564f, 0.8f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(25.f / 360.f, 0.684f, 0.671f));
+        if(ImGui::Button("  "))
+        {
+            changeHairColor(0);
+        }
+        ImGui::PopStyleColor(3);
+        ImGui::PopID();
 
-    // hairstyle_x_2
-    ImGui::SetCursorPos(ImVec2(60.f,372.f));
-    ImGui::PushID(2);
-    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(30.f / 360.f, 0.463f, 0.584f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(31.f / 360.f, 0.495f, 0.729f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(20.f / 360.f, 0.406f, 0.541f));
-    if(ImGui::Button("  "))
-    {
-        changeHairColor(1);
-    }
-    ImGui::PopStyleColor(3);
-    ImGui::PopID();
+        // hairstyle_x_2
+        ImGui::SetCursorPos(ImVec2(60.f,372.f));
+        ImGui::PushID(2);
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(30.f / 360.f, 0.463f, 0.584f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(31.f / 360.f, 0.495f, 0.729f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(20.f / 360.f, 0.406f, 0.541f));
+        if(ImGui::Button("  "))
+        {
+            changeHairColor(1);
+        }
+        ImGui::PopStyleColor(3);
+        ImGui::PopID();
 
-    // hairstyle_x_3
-    ImGui::SetCursorPos(ImVec2(90.f,372.f));
-    ImGui::PushID(3);
-    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(12.f / 360.f, 0.43f, 0.502f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(19.f / 360.f, 0.403f, 0.525f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(12.f / 360.f, 0.439f, 0.447f));
-    if(ImGui::Button("  "))
-    {
-        changeHairColor(2);
-    }
-    ImGui::PopStyleColor(3);
-    ImGui::PopID();
+        // hairstyle_x_3
+        ImGui::SetCursorPos(ImVec2(90.f,372.f));
+        ImGui::PushID(3);
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(12.f / 360.f, 0.43f, 0.502f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(19.f / 360.f, 0.403f, 0.525f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(12.f / 360.f, 0.439f, 0.447f));
+        if(ImGui::Button("  "))
+        {
+            changeHairColor(2);
+        }
+        ImGui::PopStyleColor(3);
+        ImGui::PopID();
 
-    // hairstyle_x_4
-    ImGui::SetCursorPos(ImVec2(120.f,372.f));
-    ImGui::PushID(4);
-    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(8.f / 360.f, 0.291f, 0.404f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(17.f / 360.f, 0.342f, 0.435f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(8.f / 360.f, 0.264f, 0.357f));
-    if(ImGui::Button("  "))
-    {
-        changeHairColor(3);
-    }
-    ImGui::PopStyleColor(3);
-    ImGui::PopID();
+        // hairstyle_x_4
+        ImGui::SetCursorPos(ImVec2(120.f,372.f));
+        ImGui::PushID(4);
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(8.f / 360.f, 0.291f, 0.404f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(17.f / 360.f, 0.342f, 0.435f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(8.f / 360.f, 0.264f, 0.357f));
+        if(ImGui::Button("  "))
+        {
+            changeHairColor(3);
+        }
+        ImGui::PopStyleColor(3);
+        ImGui::PopID();
 
-    // hairstyle_x_5
-    ImGui::SetCursorPos(ImVec2(150.f,372.f));
-    ImGui::PushID(5);
-    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(60.f / 360.f, 0.007f, 0.588f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(60.f / 360.f, 0.012f, 0.635f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(30.f / 360.f, 0.015f, 0.537f));
-    if(ImGui::Button("  "))
-    {
-        changeHairColor(4);
-    }
-    ImGui::PopStyleColor(3);
-    ImGui::PopID();
+        // hairstyle_x_5
+        ImGui::SetCursorPos(ImVec2(150.f,372.f));
+        ImGui::PushID(5);
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(60.f / 360.f, 0.007f, 0.588f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(60.f / 360.f, 0.012f, 0.635f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(30.f / 360.f, 0.015f, 0.537f));
+        if(ImGui::Button("  "))
+        {
+            changeHairColor(4);
+        }
+        ImGui::PopStyleColor(3);
+        ImGui::PopID();
 
-    // hairstyle_x_6
-    ImGui::SetCursorPos(ImVec2(180.f,372.f));
-    ImGui::PushID(6);
-    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(30.f / 360.f, 0.083f, 0.475f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(40.f / 360.f, 0.175f, 0.537f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(14.f / 360.f, 0.116f, 0.439f));
-    if(ImGui::Button("  "))
-    {
-        changeHairColor(5);
-    }
-    ImGui::PopStyleColor(3);
-    ImGui::PopID();
+        // hairstyle_x_6
+        ImGui::SetCursorPos(ImVec2(180.f,372.f));
+        ImGui::PushID(6);
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(30.f / 360.f, 0.083f, 0.475f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(40.f / 360.f, 0.175f, 0.537f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(14.f / 360.f, 0.116f, 0.439f));
+        if(ImGui::Button("  "))
+        {
+            changeHairColor(5);
+        }
+        ImGui::PopStyleColor(3);
+        ImGui::PopID();
 
-    // hairstyle_x_7
-    ImGui::SetCursorPos(ImVec2(210.f,372.f));
-    ImGui::PushID(7);
-    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
-    if(ImGui::Button("  "))
-    {
-        changeHairColor(6);
+        // hairstyle_x_7
+        ImGui::SetCursorPos(ImVec2(210.f,372.f));
+        ImGui::PushID(7);
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
+        if(ImGui::Button("  "))
+        {
+            changeHairColor(6);
+        }
+        ImGui::PopStyleColor(3);
+        ImGui::PopID();
     }
-    ImGui::PopStyleColor(3);
-    ImGui::PopID();
 }
 void characterBuilder::drawBodyEyeControl()
 {
     ImGui::SetCursorPos(ImVec2(50.f,138.f));
     ImGui::Text("Body       ");
 
-    for(int i = 0; i < body.size(); i++)
+    for(int i = 0; i < (int)body.size(); i++)
     {
         float x = 30.f + (30.f * (float)i);
         ImGui::SetCursorPos(ImVec2(x,168.f));
@@ -391,7 +404,7 @@ void characterBuilder::drawBodyEyeControl()
     ImGui::SetCursorPos(ImVec2(50.f,206.f));
     ImGui::Text("Eyes       ");
 
-    for(int i = 0; i < eyes.size(); i++)
+    for(int i = 0; i < (int)eyes.size(); i++)
     {
         float x = 30.f + (30.f * (float)i);
         ImGui::SetCursorPos(ImVec2(x,236.f));
@@ -427,7 +440,7 @@ void characterBuilder::drawOutfitControls()
     }
     ImGui::PopButtonRepeat();
 
-    for(int i = 0; i < outfit.at(indexOutfit).size(); i++)
+    for(int i = 0; i < (int)outfit.at(indexOutfit).size(); i++)
     {
         float x = 30.f + (30.f * (float)i);
         ImGui::SetCursorPos(ImVec2(x,304.f));
@@ -463,9 +476,9 @@ void characterBuilder::drawAccessoriesControl()
     }
     ImGui::PopButtonRepeat();
 
-    if(indexAccessories != accessories.size())
+    if(indexAccessories != (int)accessories.size())
     {
-        for(int i = 0; i < accessories.at(indexAccessories).size(); i++)
+        for(int i = 0; i < (int)accessories.at(indexAccessories).size(); i++)
         {
             float x = 30.f + (30.f * (float)i);
             ImGui::SetCursorPos(ImVec2(x,100.f));
@@ -496,6 +509,8 @@ void characterBuilder::drawCharacterBuilder(imageHandler* imgHandler, float fram
 
 void characterBuilder::setAsMainCharacter(vector<int>& index)
 {
+    userProfile& usrProfile = userProfile::getInstance();
+
     index[0] = indexBody;
     index[1] = indexEyes;
     index[2] = indexOutfit;
@@ -504,6 +519,15 @@ void characterBuilder::setAsMainCharacter(vector<int>& index)
     index[5] = indexHairColor;
     index[6] = indexAccessories;
     index[7] = indexAccessoriesColor;
+
+    usrProfile.setCharacter(0, indexBody);
+    usrProfile.setCharacter(1, indexEyes);
+    usrProfile.setCharacter(2, indexOutfit);
+    usrProfile.setCharacter(3, indexOutfitColor);
+    usrProfile.setCharacter(4, indexHair);
+    usrProfile.setCharacter(5, indexHairColor);
+    usrProfile.setCharacter(6, indexAccessories);
+    usrProfile.setCharacter(7, indexAccessoriesColor);
 }
 void characterBuilder::cleanUp()
 {
@@ -548,8 +572,7 @@ void characterBuilder::cleanUp()
    // cout << body.size() << ", " << eyes.size() << ", " << outfit.size() << ", " << hair.size() << ", " << accessories.size() << endl;
 }
 
-void
-characterBuilder::drawCharacterAnimation(imageHandler *imgHandler, ImVec2 pos, pair<ImVec2, ImVec2> cords, float scale,vector<int>& characterIndex)
+void characterBuilder::drawCharacterAnimation(imageHandler *imgHandler, ImVec2 pos, pair<ImVec2, ImVec2> cords, float scale,vector<int>& characterIndex)
 {
     ImGui::SetCursorPos(pos);
     imgHandler->DrawAnimationFrame(*body[characterIndex[0]], cords, scale);
@@ -560,14 +583,45 @@ characterBuilder::drawCharacterAnimation(imageHandler *imgHandler, ImVec2 pos, p
     ImGui::SetCursorPos(pos);
     imgHandler->DrawAnimationFrame(*outfit[characterIndex[2]][characterIndex[3]], cords, scale);
 
-    if(indexHair != hair.size())
+    if(indexHair != (int)hair.size())
     {
         ImGui::SetCursorPos(pos);
         imgHandler->DrawAnimationFrame(*hair[characterIndex[4]][characterIndex[5]], cords, scale);
     }
-    if(indexAccessories != accessories.size())
+    if(indexAccessories != (int)accessories.size())
     {
         ImGui::SetCursorPos(pos);
         imgHandler->DrawAnimationFrame(*accessories[characterIndex[6]][characterIndex[7]], cords, scale);
     }
+}
+
+void characterBuilder::setCharacterFromDb()
+{
+    userProfile& usrProfile = userProfile::getInstance();
+
+    indexBody = usrProfile.getCharacter()[0];
+    indexEyes = usrProfile.getCharacter()[1];
+    indexOutfit = usrProfile.getCharacter()[2];
+    indexOutfitColor = usrProfile.getCharacter()[3];
+    indexHair = usrProfile.getCharacter()[4];
+    indexHairColor = usrProfile.getCharacter()[5];
+    indexAccessories = usrProfile.getCharacter()[6];
+    indexAccessoriesColor = usrProfile.getCharacter()[7];
+}
+
+void characterBuilder::reset()
+{
+    indexBody = 0;
+    indexEyes = 5;
+
+    indexOutfit = 8;
+    indexOutfitColor = 0;
+
+    indexHair = 2;
+    indexHairColor = 2;
+
+    indexAccessories = 0;
+    indexAccessoriesColor = 3;
+
+    frameCount_4 = 0;
 }

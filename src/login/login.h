@@ -34,6 +34,15 @@ class login
     float minHeight = 0.f;
     float txtPos_x = 0.f;
 
+    char username[64] = "";
+    char passwd[64] = "";
+
+    char createUsername[64] = "";
+    char createPasswd[64] = "";
+    char confirmPasswd[64] = "";
+
+    bool viewPasswd = false; // keep password hidden by default
+
     bool createAccount = false;
     bool errorAuth = false;
     bool errorCmp = false;
@@ -43,6 +52,7 @@ class login
     imageHandler* img;
 
     bool STATUS = false;
+    bool CHAR = false;
 
     void drawLogin() ;// screen for existing users to login
     void drawCreateUser(); // screen for new users
@@ -53,10 +63,12 @@ class login
     void error_Comp();
     void error_Create();
 public:
-    string _username;
-    string _id;
     login(int width, int height, imageHandler* imgHandler);
+    void updateResolution(int width, int height);
 
     void drawLoginScreen(imageHandler* imgHandler);
     bool checkAuth();
+    bool checkChar(); // used to check if an account
+
+    void reset();
 };

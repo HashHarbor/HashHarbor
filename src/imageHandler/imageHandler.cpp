@@ -117,16 +117,18 @@ void imageHandler::cleanUp()
 {
     glDeleteTextures(1, &texture);
 }
-void imageHandler::DrawMap(imageHandler _image, int tileX, int tileY, float width, float height){
+void imageHandler::DrawMap(imageHandler _image, double tileX, double tileY, float width, float height, int mapRows, int mapCols){
     //ImGui::Image((void*)(intptr_t)_image.texture, ImVec2(_image.width, _image.height));
+    
+    //((height / 32) - 1) / 2 finds the number of pixels our resolution can support and takes the half of it needed relative from the center
+    
+    float topLeft = (float)(tileX - ((width / 32) - 1) / 2)/ mapCols;  //ex. topLeft corner is 15 pixels to the left out of the total number of columns
+    float top = (float)(tileY - ((height / 32) - 1) / 2) / mapRows;
 
-    float topLeft = (float)(tileX - 15)/ 42;
-    float topRight = (float)(tileY - 8) / 28;
+    float botRight = (float)(tileX + ((width / 32) - 1) / 2 + 1)/ mapCols;
+    float bot = (float)(tileY + ((height / 32) - 1) / 2 + 1) / mapRows;
 
-    float botLeft = (float)(tileX + 15)/ 42;
-    float botRight = (float)(tileY + 8) / 28;
+    ImGui::Image((void*)(intptr_t)_image.texture, ImVec2(width, height), ImVec2(topLeft, top), ImVec2(botRight, bot));
 
-    ImGui::Image((void*)(intptr_t)_image.texture, ImVec2(width, height), ImVec2(topLeft, topRight), ImVec2(botLeft, botRight));
-
-    //cout << botLeft << " " << botRight << endl;
+    //calculated by where the corners of the grid are, out of the total grid size, done by percentages
 }

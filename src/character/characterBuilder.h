@@ -214,6 +214,8 @@ public:
     void drawCharacterAnimation(imageHandler* imgHandler, ImVec2 pos, pair<ImVec2,ImVec2> cords, float scale, vector<int>& characterIndex);
         // Character Index 0=Body, 1=Eyes, 2=Outfit, 3=OutfitColor, 4=Hair, 5=HairColor, 6=Accessories, 7=AccessoriesColor
 
-    void cleanUp();
-        // destructor to delete all image textures
+    void cleanUp(); // destructor to delete all image textures
+
+    void setCharacterFromDb();
+    void reset(); // used to reset to default character
 };
