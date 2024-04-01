@@ -54,7 +54,7 @@ public:
     void makeBackground(imageHandler background, vector<vector<int>> grid, double gridX, double gridY, bool canMove);
     void makeConfig(vector<string> &codeStarter, TextEditor &editor);
     void makeCodeEditor(TextEditor &editor, const char* fileToEdit);
-    void makeCharacter(imageHandler& image, imageHandler& overlap, double &gridX, double &gridY, movementHandler move, int &lastAction, characterManager &character, characterBuilder& charBuild, bool canMove);
+    void makeCharacter(imageHandler& image, imageHandler& overlap, double &gridX, double &gridY, movementHandler& move, int &lastAction, characterManager &character, characterBuilder& charBuild, bool canMove);
     void makeCharacterSelector(imageHandler& image, characterManager &character, characterBuilder& charBuild);
     void makeBackground(imageHandler background, movementHandler move, float &gridX, float &gridY);
     void makeLogIn(login& Login, imageHandler& image, characterManager &character, characterBuilder& charBuild);

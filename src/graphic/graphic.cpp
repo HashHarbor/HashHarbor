@@ -321,7 +321,7 @@ void graphic::makeBlur(){
     ImGui::End();
 }
 
-void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, double &gridX, double &gridY, movementHandler move, int &lastAction, characterManager &character, characterBuilder& charBuild, bool canMove)
+void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, double &gridX, double &gridY, movementHandler& move, int &lastAction, characterManager &character, characterBuilder& charBuild, bool canMove)
 {
     // Graphics window calculation
     ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
@@ -370,17 +370,21 @@ void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, double &
 
         move.mapMovement(keyDown, overlap, gridX, gridY, move.getGrid().size(), move.getGrid()[0].size(), lastAction, interact);
 
-        cout << gridX << ", " << gridY << " and last action " << lastAction << endl;
+        // cout << gridX << ", " << gridY << " and last action " << lastAction << endl;
 
         if(interact != 0){
             ImVec2 interactPos = ImVec2((ImGui::GetContentRegionAvail() - ImVec2(32, 64)) * 0.5f) + ImVec2(8, 0) - ImVec2(0, 8);
-            ImGui::SetCursorPos(ImVec2((float)width_px/ 4, (float)height_px / 4));
+            // ImGui::SetCursorPos(ImVec2((float)width_px/ 4 , (float)height_px / 4 ));
+            ImGui::SetCursorPos(ImVec2((float)width_px/ 4 - 16, (float)height_px / 4 - 54));
 
-            // ImGui::SetCursorPos(ImVec2(300, 300));
-
+            frameTimer -= ImGui::GetIO().DeltaTime;
             move.drawArrows(interactPos, frameTimer, lastAction);
+            if (frameTimer <= 0.f)
+            {
+                frameTimer = frameLength;
+            }
 
-            cout << "interact true" << endl;
+            cout << "interact true and timer is: " << frameTimer << endl;
         }
 
         ImGui::SetCursorPos(ImVec2(0, 0));
