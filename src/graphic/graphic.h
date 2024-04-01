@@ -42,6 +42,11 @@ public:
     std::string rom_file;
 
     string result = "";
+    vector<TextEditor::LanguageDefinition> languages;
+
+    string arrowsPath = "../assets/map/arrows.png";
+    imageHandler arrows = imageHandler(arrowsPath.c_str());
+    
 
     //graphic functions
     void setup();
@@ -53,12 +58,12 @@ public:
     void makeCharacterSelector(imageHandler& image, characterManager &character, characterBuilder& charBuild);
     void makeBackground(imageHandler background, movementHandler move, float &gridX, float &gridY);
     void makeLogIn(login& Login, imageHandler& image, characterManager &character, characterBuilder& charBuild);
-    void makeQuestion();
 
     void makeBlur();
 
     void makeUserProfile();
     string executeCPP(string code);
+    string executeJava(string code);
     void makeSettings(imageHandler& image, characterManager& character, characterBuilder& charBuild, login& Login, bool& done);
 
 private:

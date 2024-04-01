@@ -30,15 +30,22 @@ using std::pair;
 #include "../imageHandler/imageHandler.h"
 
 
-movementHandler::movementHandler(string filepath, int width, int height){
+movementHandler::movementHandler(string obspath, string intpath, int width, int height){
+
+    arrows.loadTexture(arrows.filepath, &arrows);
 
     width_px = width;
     height_px = height;
 
-    cv::Mat image = cv::imread(filepath, cv::IMREAD_UNCHANGED);
+    cv::Mat image = cv::imread(obspath, cv::IMREAD_UNCHANGED);
+    cv::Mat interactions = cv::imread(intpath, cv::IMREAD_UNCHANGED);
+
 
     if (image.empty()) {
         std::cerr << "Error: Could not load map obstacles." << std::endl;
+    }
+    if (interactions.empty()){
+        std::cerr << "Error: Could not load map interactions." << std::endl;
     }
 
     // Check if image has alpha channel for transparency
@@ -71,10 +78,45 @@ movementHandler::movementHandler(string filepath, int width, int height){
     } else {
         std::cerr << "Error: Image does not have an alpha channel." << std::endl;
     }
+
+    // Check if image has alpha channel for transparency
+    if (interactions.channels() == 4) {
+        
+        std::vector<cv::Mat> channels;
+        cv::split(interactions, channels);
+
+        // Alpha channel is the last one (index 3)
+        cv::Mat alpha = channels[3];
+
+        rows = interactions.rows/32;
+        cols = interactions.cols/32;
+
+        intGrid.resize(rows, std::vector<int>(cols));
+
+        // Process pixels
+        for (int y = 0; y < interactions.rows/32; ++y) {
+            for (int x = 0; x < interactions.cols/32; ++x) {
+
+                // Access alpha value of the pixel
+                uchar alphaValue = alpha.at<uchar>(y*32, x*32);
+
+                if (alphaValue != 0) {
+                    intGrid[y][x] = 1;
+                }
+            }
+        }
+
+    } else {
+        std::cerr << "Error: Image does not have an alpha channel." << std::endl;
+    }
 }
 
 std::vector<std::vector<int>> movementHandler::getGrid(){
     return this->grid;
+}
+
+std::vector<std::vector<int>> movementHandler::getIntGrid(){
+    return this->intGrid;
 }
 
 void movementHandler::adjustResolution(int width, int height){
@@ -82,7 +124,7 @@ void movementHandler::adjustResolution(int width, int height){
     height_px = height;
 }
 
-void movementHandler::mapMovement(int key, imageHandler map, double &gridX, double &gridY, int rows, int cols, int &lastAction){
+void movementHandler::mapMovement(int key, imageHandler map, double &gridX, double &gridY, int rows, int cols, int &lastAction, int &interact){
     
     static float speed = 0.2;
     const double tolerance = 0.00001;
@@ -162,6 +204,7 @@ void movementHandler::mapMovement(int key, imageHandler map, double &gridX, doub
                         
                     }
                     else{
+                        lastAction = 1;
                         //cout << "upwards " << gridY << endl;
                     }
                     
@@ -174,6 +217,7 @@ void movementHandler::mapMovement(int key, imageHandler map, double &gridX, doub
 
                     }
                     else{
+                        lastAction = 2;
                         //cout << "downwards " << gridY << endl;
                     }
                     
@@ -186,6 +230,7 @@ void movementHandler::mapMovement(int key, imageHandler map, double &gridX, doub
                         
                     }
                     else{
+                        lastAction = 3;
                         //cout << "right " << gridX << endl;
                     }
                     
@@ -198,6 +243,7 @@ void movementHandler::mapMovement(int key, imageHandler map, double &gridX, doub
                         
                     }
                     else{
+                        lastAction = 4;
                         //cout << "left " << gridX << endl;
                     }
                     
@@ -210,6 +256,34 @@ void movementHandler::mapMovement(int key, imageHandler map, double &gridX, doub
         }
     }
 
+    switch (lastAction)
+    {
+        case 1:
+            if(intGrid[gridY - 1][gridX] != 0){
+                interact = intGrid[gridY - 1][gridX];
+                break;
+            }
+            
+        
+        default:
+            interact = false;
+            break;
+    }
+
     map.DrawMap(map, gridX, gridY, (width_px / 2), (height_px / 2), rows, cols);
+
+}
+
+void movementHandler::drawArrows(ImVec2 pos, float frameTimer, int key)
+{
+    // ImGui::SetCursorPos(pos);
+    if(key == 1){
+        // ImGui::Image((void*)(intptr_t)arrows.texture, ImVec2((32.f * 1), (32.f * 1)),arrowUp[frameTimer].first, arrowUp[frameTimer].second);
+        arrows.DrawArrowFrame(arrows, arrowUp[frameTimer], 1.0f);
+        cout << arrowUp[frameTimer].first.x << " " << arrowUp[frameTimer].first.y  << " " << arrowUp[frameTimer].second.x  << " " << arrowUp[frameTimer].second.y << endl;
+        cout << "should be drawing... " << endl;
+        
+    }
+    // ImGui::SetCursorPos(ImVec2(0,0));
 
 }

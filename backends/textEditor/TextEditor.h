@@ -174,6 +174,9 @@ public:
 		}
 
 		static const LanguageDefinition& CPlusPlus();
+		static const LanguageDefinition& Python();
+		static const LanguageDefinition& Java();
+		static const LanguageDefinition& CSharp();
 		static const LanguageDefinition& HLSL();
 		static const LanguageDefinition& GLSL();
 		static const LanguageDefinition& C();

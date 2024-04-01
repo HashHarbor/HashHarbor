@@ -50,7 +50,7 @@ TextEditor::TextEditor()
 	, mStartTime(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count())
 {
 	SetPalette(GetDarkPalette());
-	SetLanguageDefinition(LanguageDefinition::HLSL());
+	SetLanguageDefinition(LanguageDefinition::CPlusPlus());
 	mLines.push_back(Line());
 }
 
@@ -2755,6 +2755,244 @@ const TextEditor::LanguageDefinition& TextEditor::LanguageDefinition::CPlusPlus(
 			"abort", "abs", "acos", "asin", "atan", "atexit", "atof", "atoi", "atol", "ceil", "clock", "cosh", "ctime", "div", "exit", "fabs", "floor", "fmod", "getchar", "getenv", "isalnum", "isalpha", "isdigit", "isgraph",
 			"ispunct", "isspace", "isupper", "kbhit", "log10", "log2", "log", "memcmp", "modf", "pow", "printf", "sprintf", "snprintf", "putchar", "putenv", "puts", "rand", "remove", "rename", "sinh", "sqrt", "srand", "strcat", "strcmp", "strerror", "time", "tolower", "toupper",
 			"std", "string", "vector", "map", "unordered_map", "set", "unordered_set", "min", "max"
+		};
+		for (auto& k : identifiers)
+		{
+			Identifier id;
+			id.mDeclaration = "Built-in function";
+			langDef.mIdentifiers.insert(std::make_pair(std::string(k), id));
+		}
+
+		langDef.mTokenize = [](const char * in_begin, const char * in_end, const char *& out_begin, const char *& out_end, PaletteIndex & paletteIndex) -> bool
+		{
+			paletteIndex = PaletteIndex::Max;
+
+			while (in_begin < in_end && isascii(*in_begin) && isblank(*in_begin))
+				in_begin++;
+
+			if (in_begin == in_end)
+			{
+				out_begin = in_end;
+				out_end = in_end;
+				paletteIndex = PaletteIndex::Default;
+			}
+			else if (TokenizeCStyleString(in_begin, in_end, out_begin, out_end))
+				paletteIndex = PaletteIndex::String;
+			else if (TokenizeCStyleCharacterLiteral(in_begin, in_end, out_begin, out_end))
+				paletteIndex = PaletteIndex::CharLiteral;
+			else if (TokenizeCStyleIdentifier(in_begin, in_end, out_begin, out_end))
+				paletteIndex = PaletteIndex::Identifier;
+			else if (TokenizeCStyleNumber(in_begin, in_end, out_begin, out_end))
+				paletteIndex = PaletteIndex::Number;
+			else if (TokenizeCStylePunctuation(in_begin, in_end, out_begin, out_end))
+				paletteIndex = PaletteIndex::Punctuation;
+
+			return paletteIndex != PaletteIndex::Max;
+		};
+
+		langDef.mCommentStart = "/*";
+		langDef.mCommentEnd = "*/";
+		langDef.mSingleLineComment = "//";
+
+		langDef.mCaseSensitive = true;
+		langDef.mAutoIndentation = true;
+
+		langDef.mName = "C++";
+
+		inited = true;
+	}
+	return langDef;
+}
+
+const TextEditor::LanguageDefinition& TextEditor::LanguageDefinition::Python()
+{
+	static bool inited = false;
+	static LanguageDefinition langDef;
+	if (!inited)
+	{
+		static const char* const pythonKeywords[] = {
+			"False", "None", "True", "and", "as", "assert", "async", "await", "break", "class", "continue", "def", "del",
+            "elif", "else", "except", "finally", "for", "from", "global", "if", "import", "in", "is", "lambda", "nonlocal",
+            "not", "or", "pass", "raise", "return", "try", "while", "with", "yield"
+		};
+		for (auto& k : pythonKeywords)
+			langDef.mKeywords.insert(k);
+
+		static const char* const identifiers[] = {
+			"abs", "all", "any", "ascii", "bin", "bool", "callable", "chr", "classmethod", "compile", "complex", "delattr",
+            "dict", "dir", "divmod", "enumerate", "eval", "exec", "filter", "float", "format", "frozenset", "getattr", "globals",
+            "hasattr", "hash", "help", "hex", "id", "input", "int", "isinstance", "issubclass", "iter", "len", "list", "locals",
+            "map", "max", "memoryview", "min", "next", "object", "oct", "open", "ord", "pow", "print", "property", "range",
+            "repr", "reversed", "round", "set", "setattr", "slice", "sorted", "staticmethod", "str", "sum", "super", "tuple",
+            "type", "vars", "zip"
+		};
+		for (auto& k : identifiers)
+		{
+			Identifier id;
+			id.mDeclaration = "Built-in function";
+			langDef.mIdentifiers.insert(std::make_pair(std::string(k), id));
+		}
+
+		langDef.mTokenize = [](const char * in_begin, const char * in_end, const char *& out_begin, const char *& out_end, PaletteIndex & paletteIndex) -> bool
+		{
+			paletteIndex = PaletteIndex::Max;
+
+			while (in_begin < in_end && isascii(*in_begin) && isblank(*in_begin))
+				in_begin++;
+
+			if (in_begin == in_end)
+			{
+				out_begin = in_end;
+				out_end = in_end;
+				paletteIndex = PaletteIndex::Default;
+			}
+			else if (TokenizeCStyleString(in_begin, in_end, out_begin, out_end))
+				paletteIndex = PaletteIndex::String;
+			else if (TokenizeCStyleCharacterLiteral(in_begin, in_end, out_begin, out_end))
+				paletteIndex = PaletteIndex::CharLiteral;
+			else if (TokenizeCStyleIdentifier(in_begin, in_end, out_begin, out_end))
+				paletteIndex = PaletteIndex::Identifier;
+			else if (TokenizeCStyleNumber(in_begin, in_end, out_begin, out_end))
+				paletteIndex = PaletteIndex::Number;
+			else if (TokenizeCStylePunctuation(in_begin, in_end, out_begin, out_end))
+				paletteIndex = PaletteIndex::Punctuation;
+
+			return paletteIndex != PaletteIndex::Max;
+		};
+
+		langDef.mCommentStart = "/*";
+		langDef.mCommentEnd = "*/";
+		langDef.mSingleLineComment = "//";
+
+		langDef.mCaseSensitive = true;
+		langDef.mAutoIndentation = true;
+
+		langDef.mName = "Python";
+
+		inited = true;
+	}
+	return langDef;
+}
+
+const TextEditor::LanguageDefinition& TextEditor::LanguageDefinition::Java()
+{
+	static bool inited = false;
+	static LanguageDefinition langDef;
+	if (!inited)
+	{
+		static const char* const javaKeywords[] = {
+			"abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue", "default",
+            "do", "double", "else", "enum", "extends", "final", "finally", "float", "for", "if", "implements", "import", "instanceof",
+            "int", "interface", "long", "native", "new", "package", "private", "protected", "public", "return", "short", "static",
+            "strictfp", "super", "switch", "synchronized", "this", "throw", "throws", "transient", "try", "void", "volatile", "while"
+		};
+		for (auto& k : javaKeywords)
+			langDef.mKeywords.insert(k);
+
+		static const char* const identifiers[] = {
+			"AbstractMethodError", "AssertionError", "Boolean", "Byte", "Character", "Class", "ClassLoader", "Cloneable", "Compiler",
+            "Double", "Exception", "Float", "Integer", "Long", "Math", "Number", "Object", "Package", "Process", "Runtime", "Runnable",
+            "SecurityManager", "Short", "StackTraceElement", "StrictMath", "String", "StringBuffer", "StringBuilder", "System", "Thread",
+            "ThreadGroup", "ThreadLocal", "Throwable", "Void"
+		};
+		for (auto& k : identifiers)
+		{
+			Identifier id;
+			id.mDeclaration = "Built-in function";
+			langDef.mIdentifiers.insert(std::make_pair(std::string(k), id));
+		}
+
+		langDef.mTokenize = [](const char * in_begin, const char * in_end, const char *& out_begin, const char *& out_end, PaletteIndex & paletteIndex) -> bool
+		{
+			paletteIndex = PaletteIndex::Max;
+
+			while (in_begin < in_end && isascii(*in_begin) && isblank(*in_begin))
+				in_begin++;
+
+			if (in_begin == in_end)
+			{
+				out_begin = in_end;
+				out_end = in_end;
+				paletteIndex = PaletteIndex::Default;
+			}
+			else if (TokenizeCStyleString(in_begin, in_end, out_begin, out_end))
+				paletteIndex = PaletteIndex::String;
+			else if (TokenizeCStyleCharacterLiteral(in_begin, in_end, out_begin, out_end))
+				paletteIndex = PaletteIndex::CharLiteral;
+			else if (TokenizeCStyleIdentifier(in_begin, in_end, out_begin, out_end))
+				paletteIndex = PaletteIndex::Identifier;
+			else if (TokenizeCStyleNumber(in_begin, in_end, out_begin, out_end))
+				paletteIndex = PaletteIndex::Number;
+			else if (TokenizeCStylePunctuation(in_begin, in_end, out_begin, out_end))
+				paletteIndex = PaletteIndex::Punctuation;
+
+			return paletteIndex != PaletteIndex::Max;
+		};
+
+		langDef.mCommentStart = "/*";
+        langDef.mCommentEnd = "*/";
+        langDef.mSingleLineComment = "//";
+
+		langDef.mCaseSensitive = true;
+		langDef.mAutoIndentation = true;
+
+		langDef.mName = "Java";
+
+		inited = true;
+	}
+	return langDef;
+}
+
+const TextEditor::LanguageDefinition& TextEditor::LanguageDefinition::CSharp()
+{
+	static bool inited = false;
+	static LanguageDefinition langDef;
+	if (!inited)
+	{
+		static const char* const csharpKeywords[] = {
+			"abstract", "as", "base", "bool", "break", "byte", "case", "catch", "char", "checked", "class", "const", "continue",
+            "decimal", "default", "delegate", "do", "double", "else", "enum", "event", "explicit", "extern", "false", "finally",
+            "fixed", "float", "for", "foreach", "goto", "if", "implicit", "in", "int", "interface", "internal", "is", "lock",
+            "long", "namespace", "new", "null", "object", "operator", "out", "override", "params", "private", "protected",
+            "public", "readonly", "ref", "return", "sbyte", "sealed", "short", "sizeof", "stackalloc", "static", "string",
+            "struct", "switch", "this", "throw", "true", "try", "typeof", "uint", "ulong", "unchecked", "unsafe", "ushort",
+            "using", "var", "virtual", "void", "volatile", "while"
+		};
+		for (auto& k : csharpKeywords)
+			langDef.mKeywords.insert(k);
+
+		static const char* const identifiers[] = {
+			"Action", "AggregateException", "AppDomain", "ArgumentException", "ArgumentNullException", "ArgumentOutOfRangeException",
+            "ArithmeticException", "Array", "ArrayList", "ArraySegment", "ArrayTypeMismatchException", "AsyncCallback", "Attribute",
+            "AttributeUsage", "BadImageFormatException", "Base64FormattingOptions", "BitConverter", "Boolean", "Buffer", "Byte",
+            "CannotUnloadAppDomainException", "Char", "CharEnumerator", "CLSCompliant", "CollectionBase", "Comparer", "Comparison",
+            "Console", "Convert", "CrossAppDomainDelegate", "DataMisalignedException", "DateTime", "DateTimeOffset", "DBNull",
+            "Decimal", "Delegate", "Dictionary", "Directory", "DirectoryInfo", "DivideByZeroException", "Double", "DriveInfo",
+            "DriveType", "DriveNotFoundException", "Empty", "EntryPointNotFoundException", "Enum", "Environment", "EventArgs",
+            "Exception", "ExecutionEngineException", "FieldAccessException", "File", "FileAttributes", "FileLoadException",
+            "FileMode", "FileNotFoundException", "FileOptions", "FileShare", "FileStream", "FileSystemInfo", "FileSystemWatcher",
+            "FlagsAttribute", "FormatException", "GC", "GenericUriParser", "GenericUriParserOptions", "Globalization",
+            "Guid", "HashSet", "ICloneable", "IComparable", "IComparable<T>", "IConvertible", "ICustomFormatter",
+            "ICollection", "IEnumerable", "IEnumerator", "IEquatable", "IEquatable<T>", "IFormatProvider",
+            "IFormattable", "IndexOutOfRangeException", "Int16", "Int32", "Int64", "IntPtr", "InvalidCastException",
+            "InvalidOperationException", "InvalidProgramException", "IObservable", "IOException", "IProgress", "InvalidOperationException",
+            "InvalidProgramException", "IObservable", "IOException", "IProgress", "IsolatedStorage", "KeyValuePair", "Lazy",
+            "LinkedList", "List", "LoaderOptimization", "LocalDataStoreSlot", "MarshalByRefObject", "Math", "MemberAccessException",
+            "MemoryStream", "MethodAccessException", "MidpointRounding", "MissingFieldException", "MissingMemberException",
+            "MissingMethodException", "ModuleHandle", "MulticastDelegate", "NotSupportedException", "Nullable", "Object",
+            "ObjectDisposedException", "ObservableCollection", "ObservableDictionary", "ObservableHashSet", "ObservableList",
+            "ObservableQueue", "ObservableStack", "Observer", "OperatingSystem", "OperationCanceledException", "OutOfMemoryException",
+            "OverflowException", "ParameterizedThreadStart", "Path", "PlatformID", "Predicate", "Progress", "Queue", "Random",
+            "RankException", "ReadOnlyCollection", "Regex", "RemoteException", "RemotingException", "ResolveEventArgs",
+            "ResolveEventHandler", "RuntimeFieldHandle", "RuntimeMethodHandle", "RuntimeTypeHandle", "SByte", "SearchOption",
+            "SeekOrigin", "Serializable", "SerializationException", "ServiceDomain", "Single", "SortedDictionary", "SortedList",
+            "Stack", "String", "StringComparer", "StringSplitOptions", "StringWriter", "StructLayoutAttribute", "SystemException",
+            "Task", "TaskFactory", "TaskScheduler", "Text", "TextReader", "TextWriter", "Thread", "ThreadAbortException",
+            "ThreadInterruptedException", "ThreadPriority", "ThreadStart", "TimeoutException", "TimeSpan", "TimeZone", "TimeZoneInfo",
+            "Type", "TypeCode", "TypedReference", "TypeInfo", "TypeInitializationException", "TypeLoadException", "TypeUnloadedException",
+            "UInt16", "UInt32", "UInt64", "UnauthorizedAccessException", "UnhandledExceptionEventHandler", "Uri", "UriBuilder",
+            "UriFormatException", "UriKind", "UriParser", "UriPartial", "UserException", "ValueType", "Version", "Void", "WeakReference",
+            "XmlNamespaceScope", "XmlNamespaceScopeAttribute", "XmlNamespaceScopeException", "XmlNamespaceScopeManager"
 		};
 		for (auto& k : identifiers)
 		{
