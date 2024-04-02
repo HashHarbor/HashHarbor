@@ -332,7 +332,7 @@ void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, TextEdit
     static float arrowTimer = frameLength;
 
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | 
-                            ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoNav;
+                            ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNav;
     if(show_blur){
         flags |= ImGuiWindowFlags_NoInputs;
     }
