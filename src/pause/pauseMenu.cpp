@@ -1,4 +1,4 @@
-#include "pause.h"
+#include "pauseMenu.h"
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
@@ -54,7 +54,7 @@ static void HelpMarker(const char* desc)
     }
 }
 
-pause::pause(int width, int height)
+pauseMenu::pauseMenu(int width, int height)
 {
     width_px = width;
     height_px = height;
@@ -65,7 +65,7 @@ pause::pause(int width, int height)
     paddingWidth = ((float)width_px - (320.f + 860.f)) / 2.f;
 }
 
-void pause::drawPauseMenu(imageHandler *image, characterManager *character, characterBuilder *charBuild, bool *changeScreenRes, pair<int,int>* res,bool *updateCharacter, bool *reset, bool *done)
+void pauseMenu::drawPauseMenu(imageHandler *image, characterManager *character, characterBuilder *charBuild, bool *changeScreenRes, pair<int,int>* res, bool *updateCharacter, bool *reset, bool *done)
 {
     userProfile& usrProfile = userProfile::getInstance();
 
@@ -93,7 +93,7 @@ void pause::drawPauseMenu(imageHandler *image, characterManager *character, char
     }
 }
 
-void pause::reset()
+void pauseMenu::reset()
 {
     settingsWindow = false;
     notebookWindow = false;
@@ -116,7 +116,7 @@ void pause::reset()
     confirmPasswd[0] = '\0';
 }
 
-void pause::mainControls()
+void pauseMenu::mainControls()
 {
     ImGui::SetNextWindowSize({windowWidth, windowHeight});
     ImGui::SetNextWindowPos({paddingWidth, paddingHeight});
@@ -222,7 +222,7 @@ void pause::mainControls()
     }
     ImGui::End();
 }
-void pause::drawSettingsWindow(imageHandler *image, characterBuilder *charBuild, characterManager *character, bool* changeScreenRes, pair<int,int>* res)
+void pauseMenu::drawSettingsWindow(imageHandler *image, characterBuilder *charBuild, characterManager *character, bool* changeScreenRes, pair<int,int>* res)
 {
     // todo - change to real audio controls from audio class
 
@@ -250,7 +250,7 @@ void pause::drawSettingsWindow(imageHandler *image, characterBuilder *charBuild,
     ImGui::End();
 }
 
-void pause::drawNotebookWindow()
+void pauseMenu::drawNotebookWindow()
 {
     const float profileWidth = windowWidth + paddingWidth + 10.f;
     const float profileHeight = paddingHeight;
@@ -421,7 +421,7 @@ void pause::drawNotebookWindow()
     ImGui::End();
 }
 
-void pause::updateUserUsername(float profileWidth, float profileHeight)
+void pauseMenu::updateUserUsername(float profileWidth, float profileHeight)
 {
     userProfile& usrProfile = userProfile::getInstance();
     draw_list->AddRectFilled(ImVec2(profileWidth + 20.f, profileHeight + 260.f), ImVec2(profileWidth + 830.f, profileHeight + 600.f), ImColor(ImVec4(0.6f, 0.6f, 0.6f, 1.0f)), 20.0f);
@@ -472,7 +472,7 @@ void pause::updateUserUsername(float profileWidth, float profileHeight)
         updateUsernameError(profileWidth, profileHeight);
     }
 }
-void pause::updateUserPassword(float profileWidth, float profileHeight)
+void pauseMenu::updateUserPassword(float profileWidth, float profileHeight)
 {
     draw_list->AddRectFilled(ImVec2(profileWidth + 20.f, profileHeight + 260.f), ImVec2(profileWidth + 830.f, profileHeight + 600.f), ImColor(ImVec4(1.f, 1.f, 1.f, 0.6f)), 20.0f);
 
@@ -603,7 +603,7 @@ void pause::updateUserPassword(float profileWidth, float profileHeight)
     }
 }
 
-void pause::updateUsernameSuccess(float profileWidth, float profileHeight)
+void pauseMenu::updateUsernameSuccess(float profileWidth, float profileHeight)
 {
     draw_list->AddRectFilled(ImVec2(profileWidth + 150, profileHeight + 470.f), ImVec2(profileWidth + 700.f, profileHeight + 530.f), ImColor(ImVec4(0.0f, 1.0f, 0.0f, 1.0f)), 20.0f);
     ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0,0,0,255));
@@ -615,7 +615,7 @@ void pause::updateUsernameSuccess(float profileWidth, float profileHeight)
     ImGui::Text("You've successfully set up your new username.");
     ImGui::PopStyleColor();
 }
-void pause::updateUsernameError(float profileWidth, float profileHeight)
+void pauseMenu::updateUsernameError(float profileWidth, float profileHeight)
 {
     draw_list->AddRectFilled(ImVec2(profileWidth + 150, profileHeight + 470.f), ImVec2(profileWidth + 700.f, profileHeight + 530.f), ImColor(ImVec4(1.0f, 0.0f, 0.0f, 1.0f)), 20.0f);
     ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0,0,0,255));
@@ -627,7 +627,7 @@ void pause::updateUsernameError(float profileWidth, float profileHeight)
     ImGui::Text("Please try again later.");
     ImGui::PopStyleColor();
 }
-void pause::updatePasswordError(float profileWidth, float profileHeight)
+void pauseMenu::updatePasswordError(float profileWidth, float profileHeight)
 {
     draw_list->AddRectFilled(ImVec2(profileWidth + 150, profileHeight + 470.f), ImVec2(profileWidth + 700.f, profileHeight + 530.f), ImColor(ImVec4(1.0f, 0.0f, 0.0f, 1.0f)), 20.0f);
     ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0,0,0,255));
@@ -639,7 +639,7 @@ void pause::updatePasswordError(float profileWidth, float profileHeight)
     ImGui::Text("Please double-check your information and try again.");
     ImGui::PopStyleColor();
 }
-void pause::updatePasswordError_Cmp(float profileWidth, float profileHeight)
+void pauseMenu::updatePasswordError_Cmp(float profileWidth, float profileHeight)
 {
     draw_list->AddRectFilled(ImVec2(profileWidth + 150, profileHeight + 470.f), ImVec2(profileWidth + 700.f, profileHeight + 530.f), ImColor(ImVec4(1.0f, 0.0f, 0.0f, 1.0f)), 20.0f);
     ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0,0,0,255));
@@ -651,7 +651,7 @@ void pause::updatePasswordError_Cmp(float profileWidth, float profileHeight)
     ImGui::Text("Please re-enter them.");
     ImGui::PopStyleColor();
 }
-void pause::updatePasswordSuccess(float profileWidth, float profileHeight)
+void pauseMenu::updatePasswordSuccess(float profileWidth, float profileHeight)
 {
     draw_list->AddRectFilled(ImVec2(profileWidth + 150, profileHeight + 470.f), ImVec2(profileWidth + 700.f, profileHeight + 530.f), ImColor(ImVec4(0.0f, 1.0f, 0.0f, 1.0f)), 20.0f);
     ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0,0,0,255));
@@ -664,7 +664,7 @@ void pause::updatePasswordSuccess(float profileWidth, float profileHeight)
     ImGui::PopStyleColor();
 }
 
-void pause::settingsMain(bool* changeScreenRes, pair<int,int>* res)
+void pauseMenu::settingsMain(bool* changeScreenRes, pair<int,int>* res)
 {
     draw_list = ImGui::GetWindowDrawList();
     const float profileWidth = windowWidth + paddingWidth + 10.f;
@@ -770,7 +770,7 @@ void pause::settingsMain(bool* changeScreenRes, pair<int,int>* res)
     // Change resolution
     // give warning on mac that resolution exceeds display size on anything over 1440x900 or just double the number displayed
 }
-void pause::settingsUser(imageHandler *image, characterBuilder *charBuild, characterManager *character)
+void pauseMenu::settingsUser(imageHandler *image, characterBuilder *charBuild, characterManager *character)
 {
     userProfile& usrProfile = userProfile::getInstance();
     const float profileWidth = windowWidth + paddingWidth + 10.f;
@@ -884,7 +884,7 @@ void pause::settingsUser(imageHandler *image, characterBuilder *charBuild, chara
     }
 }
 
-void pause::drawCharacterCreatorWindow(imageHandler *image, characterBuilder *charBuild, bool *updateCharacter)
+void pauseMenu::drawCharacterCreatorWindow(imageHandler *image, characterBuilder *charBuild, bool *updateCharacter)
 {
     float factor = 4.f;
     const float frameLength = 5.f / 10.f; // In seconds, so  FPS
@@ -921,7 +921,7 @@ void pause::drawCharacterCreatorWindow(imageHandler *image, characterBuilder *ch
     ImGui::End();
 }
 
-void pause::drawLogOutWindow(bool* reset)
+void pauseMenu::drawLogOutWindow(bool* reset)
 {
     ImGui::SetNextWindowSize({320.f, 110.f});
     ImGui::SetNextWindowPos({windowWidth + paddingWidth + 10.f, paddingHeight});
@@ -960,7 +960,7 @@ void pause::drawLogOutWindow(bool* reset)
     }
     ImGui::End();
 }
-void pause::drawQuitWindow(bool* done)
+void pauseMenu::drawQuitWindow(bool* done)
 {
     ImGui::SetNextWindowSize({320.f, 110.f});
     ImGui::SetNextWindowPos({windowWidth + paddingWidth + 10.f, paddingHeight});

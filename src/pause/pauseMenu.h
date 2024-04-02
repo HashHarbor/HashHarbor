@@ -28,8 +28,8 @@ using std::vector;
 
 using std::regex;
 
-// This will be used to refactor the pause screen
-class pause
+// This will be used to refactor the pauseMenu screen
+class pauseMenu
 {
     int width_px;
     int height_px;
@@ -84,7 +84,7 @@ class pause
     void settingsUser(imageHandler *image, characterBuilder *charBuild, characterManager *character);
 
 public:
-    pause(int width, int height);
+    pauseMenu(int width, int height);
     void drawPauseMenu(imageHandler *image,characterManager *character, characterBuilder *charBuild, bool* changeScreenRes, pair<int,int>* res, bool* updateCharacter, bool* reset, bool* done);
     void reset();
 };

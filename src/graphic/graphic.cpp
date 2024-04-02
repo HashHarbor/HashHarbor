@@ -36,7 +36,7 @@ using std::ofstream;
 #include "../movement/movementHandler.h"
 #include "../assets/font/IconsFontAwesome6.h"
 #include "../login/login.h"
-#include "../pause/pause.h"
+#include "../pause/pauseMenu.h"
 #include "userProfile/userProfile.h"
 #include "database/database.h"
 #include "authentication/authentication.h"
@@ -197,7 +197,7 @@ void graphic::setup(){
     database& db = database::getInstance();
     db.connect();
     login Login = login(width_px, height_px, &image);
-    pause Pause = pause(width_px, height_px);
+    pauseMenu Pause = pauseMenu(width_px, height_px);
 
     string pathMap;
     string obsMap;
@@ -780,7 +780,7 @@ void graphic::makeLogIn(login& Login, imageHandler& image, characterManager &cha
     }
 }
 
-void graphic::makeSettings(pause& Pause, imageHandler& image, characterManager &character, characterBuilder& charBuild, movementHandler& movement, login& Login, bool& done)
+void graphic::makeSettings(pauseMenu& Pause, imageHandler& image, characterManager &character, characterBuilder& charBuild, movementHandler& movement, login& Login, bool& done)
 {
     ImGuiStyle& style = ImGui::GetStyle();
     style.FrameRounding = 7.5f;
