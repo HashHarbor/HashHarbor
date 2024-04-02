@@ -806,7 +806,7 @@ void graphic::makeSettings(pauseMenu& Pause, imageHandler& image, characterManag
         allowMovement = !allowMovement;
 
         resetPauseScreen = true;
-        // todo - change to show message
+        updateCharacter = false;
     }
     style.FrameRounding = 0.f;
 }
