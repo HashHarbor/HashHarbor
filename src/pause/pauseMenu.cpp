@@ -852,26 +852,6 @@ void pauseMenu::settingsUser(imageHandler *image, characterBuilder *charBuild, c
     ImGui::PopStyleColor(3);
     ImGui::PopID();
 
-    ImGui::SetCursorPos(ImVec2(530.f, 90.f));
-    ImGui::PushID(33);
-    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
-    if(ImGui::Button("Change Character", ImVec2(150.f, 50.f)))
-    {
-        usr_Username = false;
-        usr_Password = false;
-        notebookWindow = false;
-        characterWindow = true;
-
-        usr_Password_Success = false;
-        usr_Password_Fail = false;
-        usr_Password_FailCmp = false;
-        usr_Username_Success = false;
-        usr_Username_Fail = false;
-    }
-    ImGui::PopStyleColor(3);
-    ImGui::PopID();
 
     if(usr_Username)
     {
@@ -912,7 +892,6 @@ void pauseMenu::drawCharacterCreatorWindow(imageHandler *image, characterBuilder
         if(ImGui::Button("Select Character", ImVec2(150.f, 40.f)))
         {
             *updateCharacter = true;
-            //todo that character changed instead of closing
         }
         ImGui::PopStyleColor(3);
         ImGui::PopID();
