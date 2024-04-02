@@ -8,6 +8,7 @@
 #include "textEditor/TextEditor.h"
 #include "../login/login.h"
 #include "database/database.h"
+#include "../pause/pauseMenu.h"
 
 class graphic {
 public:
@@ -59,10 +60,11 @@ public:
 
     void makeUserProfile();
     string executeCPP(string code);
-    void makeSettings(imageHandler& image, characterManager& character, characterBuilder& charBuild, login& Login, bool& done);
+    void makeSettings(pauseMenu& Pause, imageHandler& image, characterManager& character, characterBuilder& charBuild, movementHandler& movement, login& Login, bool& done);
 
 private:
     bool resetPauseScreen = false;
-    bool changeResolution = false;
     bool reset = false;
+    bool changeScreenRes = false;
+    pair<int,int> res;
 };
