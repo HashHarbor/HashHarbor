@@ -47,7 +47,7 @@ public:
     string arrowsPath = "../assets/map/arrows.png";
     imageHandler arrows = imageHandler(arrowsPath.c_str());
     
-    
+    int selectedLanguageIndex = 0;
 
     //graphic functions
     void setup();
@@ -64,7 +64,7 @@ public:
 
     void makeUserProfile();
 
-    void triggerQuestion(int question, vector<string> &codeStarter, TextEditor &editor);
+    void triggerQuestion(int question);
     string executeCPP(string code);
     string executeJava(string code);
     void makeSettings(imageHandler& image, characterManager& character, characterBuilder& charBuild, login& Login, bool& done);

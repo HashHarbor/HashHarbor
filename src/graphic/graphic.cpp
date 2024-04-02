@@ -383,8 +383,11 @@ void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, double &
                 arrowTimer = frameLength;
             }
 
-            if(ImGui::IsKeyDown(ImGuiKey_Q)){
+            if(ImGui::IsKeyDown(ImGuiKey_Q) && show_codeEditor == false){
                 cout << "trigger interaction here" << endl;
+                show_codeEditor = !show_codeEditor;
+                show_userProfile = !show_userProfile;
+                allowMovement = !allowMovement;
                 
             }
 
@@ -398,19 +401,7 @@ void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, double &
     ImGui::End();
 }
 
-void graphic::triggerQuestion(int question, vector<string> &codeStarter, TextEditor &editor){
-    show_codeEditor = !show_codeEditor;
-    show_userProfile = !show_userProfile;
-    allowMovement = !allowMovement;
-
-    codeStarter.clear();
-
-    codeStarter.push_back("#include <iostream>");
-    codeStarter.push_back("int main() {");
-    codeStarter.push_back("\tstd::cout << \"Hello HashHarbor!\";");
-    codeStarter.push_back("\treturn 0;");
-    codeStarter.push_back("}");
-    editor.SetTextLines(codeStarter);
+void graphic::triggerQuestion(int question){
 
     result = "";
 
@@ -496,12 +487,19 @@ void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit){
         flags |= ImGuiWindowFlags_NoInputs;
     }
 
-    static int selectedLanguageIndex = 0;
+    
 
     ImGui::Begin("Question", NULL, flags);
     {
         static const char* languages[] = { "C++", "Python", "Java", "C#" }; // Add more languages as needed
         const char* currentLanguage = languages[selectedLanguageIndex];
+
+        if (ImGui::Button("X")) {
+            show_codeEditor = !show_codeEditor;
+            show_userProfile = !show_userProfile;
+            allowMovement = !allowMovement;
+        }
+        ImGui::SameLine(); // Place subsequent widgets on the same line
 
         // Open combo box
         if (ImGui::BeginCombo("Choose Language", currentLanguage))
@@ -619,23 +617,24 @@ void graphic::makeConfig(vector<string> &codeStarter, TextEditor &editor){
     {
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
-        ImGui::Text(" ");
-        if(ImGui::Button("leetcode")){
-            show_codeEditor = !show_codeEditor;
-            show_userProfile = !show_userProfile;
-            allowMovement = !allowMovement;
 
-            codeStarter.clear();
+        // ImGui::Text(" ");
+        // if(ImGui::Button("leetcode")){
+        //     show_codeEditor = !show_codeEditor;
+        //     show_userProfile = !show_userProfile;
+        //     allowMovement = !allowMovement;
 
-            codeStarter.push_back("#include <iostream>");
-            codeStarter.push_back("int main() {");
-            codeStarter.push_back("\tstd::cout << \"Hello HashHarbor!\";");
-            codeStarter.push_back("\treturn 0;");
-            codeStarter.push_back("}");
-            editor.SetTextLines(codeStarter);
+        //     codeStarter.clear();
 
-            result = "";
-        }
+        //     codeStarter.push_back("#include <iostream>");
+        //     codeStarter.push_back("int main() {");
+        //     codeStarter.push_back("\tstd::cout << \"Hello HashHarbor!\";");
+        //     codeStarter.push_back("\treturn 0;");
+        //     codeStarter.push_back("}");
+        //     editor.SetTextLines(codeStarter);
+
+        //     result = "";
+        // }
 
     }
     ImGui::End();
