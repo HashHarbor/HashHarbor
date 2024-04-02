@@ -722,7 +722,6 @@ void pauseMenu::settingsMain(bool* changeScreenRes, pair<int,int>* res)
     ImGui::RadioButton("Default", &e, 2);
     ImGui::SameLine();
     ImGui::RadioButton("Large", &e, 3);
-    ImGui::EndTabItem();
 #endif
             if(k != e)
             {
