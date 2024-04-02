@@ -60,7 +60,7 @@ void graphic::setup(){
     cppStart.push_back("}");
     editor.SetTextLines(cppStart);
 
-    static const char* fileToEdit = "solution.cpp";
+    static const char* fileToEdit = "solution";
 
     //texteditor setup ends here
 
@@ -260,7 +260,7 @@ void graphic::setup(){
         }
 
         if(show_display){
-            makeCharacter(image, overlap, mapGridX, mapGridY, move, lastAction, character, builder,  allowMovement);
+            makeCharacter(image, overlap, editor, mapGridX, mapGridY, move, lastAction, character, builder,  allowMovement);
             makeBackground(background, move.getGrid(), mapGridX, mapGridY, allowMovement);
         }
 
@@ -321,7 +321,7 @@ void graphic::makeBlur(){
     ImGui::End();
 }
 
-void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, double &gridX, double &gridY, movementHandler& move, int &lastAction, characterManager &character, characterBuilder& charBuild, bool canMove)
+void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, TextEditor& editor, double &gridX, double &gridY, movementHandler& move, int &lastAction, characterManager &character, characterBuilder& charBuild, bool canMove)
 {
     // Graphics window calculation
     ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
@@ -388,6 +388,18 @@ void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, double &
                 show_codeEditor = !show_codeEditor;
                 show_userProfile = !show_userProfile;
                 allowMovement = !allowMovement;
+
+                // codeStarter.clear();
+
+                // codeStarter.push_back("#include <iostream>");
+                // codeStarter.push_back("int main() {");
+                // codeStarter.push_back("\tstd::cout << \"Hello HashHarbor!\";");
+                // codeStarter.push_back("\treturn 0;");
+                // codeStarter.push_back("}");
+                cout << selectedLanguageIndex << endl;
+                editor.SetTextLines(codeStarter);
+
+                result = "";
                 
             }
 
