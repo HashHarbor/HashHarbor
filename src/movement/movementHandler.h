@@ -65,7 +65,7 @@ public:
     std::vector<std::vector<int>> getIntGrid();
     void adjustResolution(int width, int height);
     void mapMovement(int key, imageHandler image, double &gridX, double &gridY, int rows, int cols, int &lastAction, int &interact);
-    void drawArrows(ImVec2 pos, float frameTimer, int key);
+    void drawArrows(float frameTimer, int key);
 
 private:
     

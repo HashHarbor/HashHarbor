@@ -329,6 +329,7 @@ void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, double &
 
     const float frameLength = 1.f / 10.f; // In seconds, so  FPS
     static float frameTimer = frameLength;
+    static float arrowTimer = frameLength;
 
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | 
                             ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoNav;
@@ -344,6 +345,7 @@ void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, double &
         if(characterCreated)
         {
             frameTimer -= ImGui::GetIO().DeltaTime;
+            arrowTimer = frameTimer;
 
             ImVec2 characterPos = ImVec2((ImGui::GetContentRegionAvail() - ImVec2(32, 64)) * 0.5f) + ImVec2(8, 0) - ImVec2(0, 8);
             character.drawPos = characterPos;
@@ -373,24 +375,45 @@ void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, double &
         // cout << gridX << ", " << gridY << " and last action " << lastAction << endl;
 
         if(interact != 0){
-            ImVec2 interactPos = ImVec2((ImGui::GetContentRegionAvail() - ImVec2(32, 64)) * 0.5f) + ImVec2(8, 0) - ImVec2(0, 8);
             // ImGui::SetCursorPos(ImVec2((float)width_px/ 4 , (float)height_px / 4 ));
             ImGui::SetCursorPos(ImVec2((float)width_px/ 4 - 16, (float)height_px / 4 - 54));
 
-            frameTimer -= ImGui::GetIO().DeltaTime;
-            move.drawArrows(interactPos, frameTimer, lastAction);
-            if (frameTimer <= 0.f)
-            {
-                frameTimer = frameLength;
+            move.drawArrows(arrowTimer, lastAction);
+            if (arrowTimer <= 0.f){
+                arrowTimer = frameLength;
             }
 
-            cout << "interact true and timer is: " << frameTimer << endl;
+            if(ImGui::IsKeyDown(ImGuiKey_Q)){
+                cout << "trigger interaction here" << endl;
+                
+            }
+
+
+            // cout << "interact true and timer is: " << frameTimer << endl;
         }
 
         ImGui::SetCursorPos(ImVec2(0, 0));
 
     }
     ImGui::End();
+}
+
+void graphic::triggerQuestion(int question, vector<string> &codeStarter, TextEditor &editor){
+    show_codeEditor = !show_codeEditor;
+    show_userProfile = !show_userProfile;
+    allowMovement = !allowMovement;
+
+    codeStarter.clear();
+
+    codeStarter.push_back("#include <iostream>");
+    codeStarter.push_back("int main() {");
+    codeStarter.push_back("\tstd::cout << \"Hello HashHarbor!\";");
+    codeStarter.push_back("\treturn 0;");
+    codeStarter.push_back("}");
+    editor.SetTextLines(codeStarter);
+
+    result = "";
+
 }
 
 void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, double gridX, double gridY, bool canMove){

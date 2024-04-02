@@ -274,15 +274,12 @@ void movementHandler::mapMovement(int key, imageHandler map, double &gridX, doub
 
 }
 
-void movementHandler::drawArrows(ImVec2 pos, float frameTimer, int key)
+void movementHandler::drawArrows(float frameTimer, int key)
 {
     // ImGui::SetCursorPos(pos);
     if(key == 1){
         // ImGui::Image((void*)(intptr_t)arrows.texture, ImVec2((32.f * 1), (32.f * 1)),arrowUp[frameTimer].first, arrowUp[frameTimer].second);
-        arrows.DrawArrowFrame(arrows, arrowUp[frameCount_6], 1.0f);
-        cout << arrowUp[frameTimer].first.x << " " << arrowUp[frameTimer].first.y  << " " << arrowUp[frameTimer].second.x  << " " << arrowUp[frameTimer].second.y << endl;
-        cout << "should be drawing... " << endl;
-        
+        arrows.DrawArrowFrame(arrows, arrowUp[frameCount_6], 1.0f);        
     }
     // ImGui::SetCursorPos(ImVec2(0,0));
 

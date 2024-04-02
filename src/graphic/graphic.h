@@ -47,6 +47,7 @@ public:
     string arrowsPath = "../assets/map/arrows.png";
     imageHandler arrows = imageHandler(arrowsPath.c_str());
     
+    
 
     //graphic functions
     void setup();
@@ -62,6 +63,8 @@ public:
     void makeBlur();
 
     void makeUserProfile();
+
+    void triggerQuestion(int question, vector<string> &codeStarter, TextEditor &editor);
     string executeCPP(string code);
     string executeJava(string code);
     void makeSettings(imageHandler& image, characterManager& character, characterBuilder& charBuild, login& Login, bool& done);
