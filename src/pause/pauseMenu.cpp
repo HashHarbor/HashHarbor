@@ -67,7 +67,7 @@ pauseMenu::pauseMenu(int width, int height)
 
 void pauseMenu::drawPauseMenu(imageHandler *image, characterManager *character, characterBuilder *charBuild, bool *changeScreenRes, pair<int,int>* res, bool *updateCharacter, bool *reset, bool *done)
 {
-    userProfile& usrProfile = userProfile::getInstance();
+    // userProfile& usrProfile = userProfile::getInstance();
 
     mainControls();
 
@@ -267,7 +267,7 @@ void pauseMenu::drawNotebookWindow()
 
         draw_list = ImGui::GetWindowDrawList();
 
-        static int page = 0;
+        static long unsigned int page = 0;
         static int maxPage = 1;
         static char text[2048] = "";
         static bool edit = true;
@@ -314,11 +314,11 @@ void pauseMenu::drawNotebookWindow()
         }
 
         ImGui::SetCursorPos(ImVec2(425.f - (ImGui::CalcTextSize("Characters: %d / 2048           Page: %d / %d").x / 2.f) , (ImGui::GetTextLineHeight() * 40) + 40.f));
-        if((page + 1) >= maxPage) // update page limit on display
+        if((int)(page + 1) >= maxPage) // update page limit on display
         {
             maxPage = page + 1;
         }
-        ImGui::Text("Characters: %d / 2048           Page: %d / %d", textSize, (page + 1), maxPage);
+        ImGui::Text("Characters: %d / 2048           Page: %d / %d", textSize, (int)(page + 1), maxPage);
 
         ImGui::SetCursorPos(ImVec2(425.f - (ImGui::CalcTextSize("In Editing mode the text will write as one big line, to view it  with edge wrapping use Reading mode").x / 2.f) , 600.f));
         ImGui::Text("In Editing mode the text will write as one big line, to view it  with edge wrapping use Reading mode");
@@ -667,8 +667,8 @@ void pauseMenu::updatePasswordSuccess(float profileWidth, float profileHeight)
 void pauseMenu::settingsMain(bool* changeScreenRes, pair<int,int>* res)
 {
     draw_list = ImGui::GetWindowDrawList();
-    const float profileWidth = windowWidth + paddingWidth + 10.f;
-    const float profileHeight = paddingHeight;
+    // const float profileWidth = windowWidth + paddingWidth + 10.f;
+    // const float profileHeight = paddingHeight;
 
     static int tempMain = 20;
     static int tempMusic = 20;
