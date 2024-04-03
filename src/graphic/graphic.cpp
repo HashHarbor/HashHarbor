@@ -157,6 +157,7 @@ void graphic::setup(){
     string overlapMap;    
 #if defined(__APPLE__)
     pathMap = imgPth.currentPath.string() + "/assets/map/abc.png";
+    intMap = imgPth.currentPath.string() + + "/assets/map/int.png";
     obsMap = imgPth.currentPath.string() + "/assets/map/obs.png";
     overlapMap = imgPth.currentPath.string() + "/assets/map/overlap.png";
 #else
@@ -669,6 +670,9 @@ void graphic::makeConfig(vector<string> &codeStarter, TextEditor &editor){
 
 void graphic::makeCharacterSelector(imageHandler& image, characterManager &character, characterBuilder& charBuild)
 {
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.FrameRounding = 7.5f;
+
     ImGui::SetNextWindowSize({850.f, 520.f});
     ImGui::SetNextWindowPos({((float)width_px - 850.f) / 2.f,((float)height_px - 520.f) / 2.f});
 
@@ -710,6 +714,7 @@ void graphic::makeCharacterSelector(imageHandler& image, characterManager &chara
         ImGui::PopID();
     }
     ImGui::End();
+    style.FrameRounding = 0.f;
 }
 
 string graphic::executeCPP(string code){

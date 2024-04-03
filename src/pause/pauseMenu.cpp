@@ -667,8 +667,6 @@ void pauseMenu::updatePasswordSuccess(float profileWidth, float profileHeight)
 void pauseMenu::settingsMain(bool* changeScreenRes, pair<int,int>* res)
 {
     draw_list = ImGui::GetWindowDrawList();
-    // const float profileWidth = windowWidth + paddingWidth + 10.f;
-    // const float profileHeight = paddingHeight;
 
     static int tempMain = 20;
     static int tempMusic = 20;
@@ -679,6 +677,9 @@ void pauseMenu::settingsMain(bool* changeScreenRes, pair<int,int>* res)
 
     ImGui::SetCursorPos(ImVec2(30.f, 80.f));
 #if defined(__APPLE__)
+    const float profileWidth = windowWidth + paddingWidth + 10.f;
+    const float profileHeight = paddingHeight;
+
     static int e = 1;
     static int k = 0;
 
@@ -713,7 +714,7 @@ void pauseMenu::settingsMain(bool* changeScreenRes, pair<int,int>* res)
         ImGui::EndTabBar();
     }
 #else
-    static int e = 1;
+    static int e = 2;
     static int k = 0;
     ImGui::RadioButton("Small", &e, 0);
     ImGui::SameLine();

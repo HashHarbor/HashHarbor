@@ -31,7 +31,6 @@ using std::pair;
 
 
 movementHandler::movementHandler(string obspath, string intpath, int width, int height){
-
     arrows.loadTexture(arrows.filepath, &arrows);
 
     width_px = width;

@@ -45,9 +45,6 @@ public:
     string result = "";
     vector<TextEditor::LanguageDefinition> languages;
 
-    string arrowsPath = "../assets/map/arrows.png";
-    imageHandler arrows = imageHandler(arrowsPath.c_str());
-
     vector<string> codeStarter;
     
     int selectedLanguageIndex = 0;

@@ -44,7 +44,11 @@ public:
     int width_px = 0;
     int height_px = 0;
 
+#if defined(__APPLE__)
+    string arrowsPath = std::filesystem::current_path().string() + "/assets/map/arrows.png";
+#else
     string arrowsPath = "../assets/map/arrows.png";
+#endif
     imageHandler arrows = imageHandler(arrowsPath.c_str()); 
 
     int frameCount_4 = 0; // animation control for 4 frame
