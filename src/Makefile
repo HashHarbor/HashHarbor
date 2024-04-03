@@ -17,7 +17,7 @@
 EXE = abc
 IMGUI_DIR = ../
 
-SOURCES = main.cpp graphic/graphic.cpp imageHandler/imageHandler.cpp character/characterManager.cpp character/characterBuilder.cpp movement/movementHandler.cpp login/login.cpp pause/pause.cpp
+SOURCES = main.cpp graphic/graphic.cpp imageHandler/imageHandler.cpp character/characterManager.cpp character/characterBuilder.cpp movement/movementHandler.cpp login/login.cpp pause/pauseMenu.cpp
 SOURCES += $(IMGUI_DIR)/imgui/imgui.cpp $(IMGUI_DIR)/imgui/imgui_demo.cpp $(IMGUI_DIR)/imgui/imgui_draw.cpp $(IMGUI_DIR)/imgui/imgui_tables.cpp $(IMGUI_DIR)/imgui/imgui_widgets.cpp
 SOURCES += $(IMGUI_DIR)/backends/imgui_impl_sdl.cpp $(IMGUI_DIR)/backends/imgui_impl_opengl3.cpp $(IMGUI_DIR)/backends/textEditor/TextEditor.cpp $(IMGUI_DIR)/backends/database/database.cpp $(IMGUI_DIR)/backends/authentication/authentication.cpp $(IMGUI_DIR)/backends/userProfile/userProfile.cpp
 OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))
