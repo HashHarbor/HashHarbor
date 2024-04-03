@@ -546,31 +546,11 @@ void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit){
             ImGui::EndCombo();
         }
 
-        ImGui::TextWrapped("Given an integer n, return a string array answer (1-indexed) where:\n"
-                        "\n"
-                        "    answer[i] == \"HashHarbor\" if i is divisible by 3 and 5.\n"
-                        "    answer[i] == \"Hash\" if i is divisible by 3.\n"
-                        "    answer[i] == \"Harbor\" if i is divisible by 5.\n"
-                        "    answer[i] == i (as a string) if none of the above conditions are true.\n"
-                        "\n"
-                        "Example 1:\n"
-                        "\n"
-                        "Input: n = 3\n"
-                        "Output: [\"1\",\"2\",\"Hash\"]\n"
-                        "\n"
-                        "Example 2:\n"
-                        "\n"
-                        "Input: n = 5\n"
-                        "Output: [\"1\",\"2\",\"Hash\",\"4\",\"Harbor\"]\n"
-                        "\n"
-                        "Example 3:\n"
-                        "\n"
-                        "Input: n = 15\n"
-                        "Output: [\"1\",\"2\",\"Hash\",\"\",\"Harbor\",\"Hash\",\"7\",\"8\",\"Hash\",\"Harbor\",\"11\",\"Hash\",\"13\",\"14\",\"HashHarbor\"]\n"
-                        "\n"
-                        "Constraints:\n"
-                        "\n"
-                        "    1 <= n <= 104");
+        // TODO - implement code for all questions
+        database &db = database::getInstance();
+        database::questionData qes;
+        db.getQuestion(1, qes);
+        ImGui::TextWrapped(qes.question.c_str());
     }
     ImGui::End();
 
