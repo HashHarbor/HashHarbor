@@ -264,7 +264,7 @@ bool database::getQuestion(int num, questionData& data)
             bsoncxx::document::element db_boiler = findQuestion.value()["boilerCoder"];
             data.boiler = db_boiler.get_string().value.data();
 
-            bsoncxx::document::element db_cases = findQuestion.value()["testInput"]
+            bsoncxx::document::element db_cases = findQuestion.value()["testInput"];
             assert(db_cases.type() == bsoncxx::type::k_array);
             bsoncxx::array::view cases = db_cases.get_array();
             int i = 0;
