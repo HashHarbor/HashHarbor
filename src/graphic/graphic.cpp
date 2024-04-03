@@ -398,8 +398,8 @@ void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, TextEdit
                 arrowTimer = frameLength;
             }
 
-            if(ImGui::IsKeyDown(ImGuiKey_Q) && show_codeEditor == false){
-                cout << "trigger interaction here" << endl;
+            if(ImGui::IsKeyDown(ImGuiKey_W) && show_codeEditor == false){
+                // cout << "trigger interaction here" << endl;
                 show_codeEditor = !show_codeEditor;
                 show_userProfile = !show_userProfile;
                 allowMovement = !allowMovement;
@@ -411,7 +411,7 @@ void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, TextEdit
                 // codeStarter.push_back("\tstd::cout << \"Hello HashHarbor!\";");
                 // codeStarter.push_back("\treturn 0;");
                 // codeStarter.push_back("}");
-                cout << selectedLanguageIndex << endl;
+                // cout << selectedLanguageIndex << endl;
                 editor.SetTextLines(codeStarter);
 
                 result = "";
