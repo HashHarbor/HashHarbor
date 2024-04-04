@@ -132,3 +132,8 @@ void imageHandler::DrawMap(imageHandler _image, double tileX, double tileY, floa
 
     //calculated by where the corners of the grid are, out of the total grid size, done by percentages
 }
+
+void imageHandler::DrawArrowFrame(imageHandler _image, pair<ImVec2,ImVec2> cords, float scaleFactor)
+{
+    ImGui::Image((void*)(intptr_t)_image.texture, ImVec2(32.0f * scaleFactor, 32.0f * scaleFactor), cords.first, cords.second);
+}

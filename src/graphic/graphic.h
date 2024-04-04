@@ -43,6 +43,11 @@ public:
     std::string rom_file;
 
     string result = "";
+    vector<TextEditor::LanguageDefinition> languages;
+
+    vector<string> codeStarter;
+    
+    int selectedLanguageIndex = 0;
 
     //graphic functions
     void setup();
@@ -50,15 +55,16 @@ public:
     void makeBackground(imageHandler background, vector<vector<int>> grid, double gridX, double gridY, bool canMove);
     void makeConfig(vector<string> &codeStarter, TextEditor &editor);
     void makeCodeEditor(TextEditor &editor, const char* fileToEdit);
-    void makeCharacter(imageHandler& image, imageHandler& overlap, double &gridX, double &gridY, movementHandler move, int &lastAction, characterManager &character, characterBuilder& charBuild, bool canMove);
+    void makeCharacter(imageHandler& image, imageHandler& overlap, TextEditor& editor, double &gridX, double &gridY, movementHandler& move, int &lastAction, characterManager &character, characterBuilder& charBuild, bool canMove);
     void makeCharacterSelector(imageHandler& image, characterManager &character, characterBuilder& charBuild);
     void makeBackground(imageHandler background, movementHandler move, float &gridX, float &gridY);
     void makeLogIn(login& Login, imageHandler& image, characterManager &character, characterBuilder& charBuild);
-    void makeQuestion();
 
     void makeBlur();
 
     void makeUserProfile();
+
+    void triggerQuestion(int question);
     string executeCPP(string code);
     void makeSettings(pauseMenu& Pause, imageHandler& image, characterManager& character, characterBuilder& charBuild, movementHandler& movement, login& Login, bool& done);
 

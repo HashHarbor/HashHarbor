@@ -28,6 +28,9 @@ class database
     mongocxx::client client; // MongoDB client
     mongocxx::database db; // MongoDB database
 
+    mongocxx::client client_Q; // MongoDB client
+    mongocxx::database db_Q; // MongoDB database
+
     database();
     ~database();
     database(const database&) = delete;
@@ -50,14 +53,26 @@ public:
 
     };
 
+    struct questionData
+    {
+    public:
+        int id;
+        string question = "";
+        string boiler = "";
+        vector<string> cases;
+        vector<string> results;
+    };
+
     static database& getInstance();
     void connect();
 
      bool getUserAuth(string usr, usrProfile& profile);
-    bool makeUser(usrProfile& profile);
+     bool makeUser(usrProfile& profile);
 
      bool getUserData();
      bool updatePassword(usrProfile& profile);
      bool updateUsername(string newUsr);
      bool updateCharacter();
+
+     bool getQuestion(int num, questionData& data);
 };

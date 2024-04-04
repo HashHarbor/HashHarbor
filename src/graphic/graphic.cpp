@@ -47,61 +47,13 @@ using std::ofstream;
 
 void graphic::setup(){
     TextEditor editor;
-	auto lang = TextEditor::LanguageDefinition::CPlusPlus();
+    languages.push_back(TextEditor::LanguageDefinition::CPlusPlus());
+    languages.push_back(TextEditor::LanguageDefinition::Python());
+    languages.push_back(TextEditor::LanguageDefinition::Java());
+    languages.push_back(TextEditor::LanguageDefinition::CSharp());
 
-	// set your own known preprocessor symbols...
-	static const char* ppnames[] = { "NULL", "PM_REMOVE",
-		"ZeroMemory", "DXGI_SWAP_EFFECT_DISCARD", "D3D_FEATURE_LEVEL", "D3D_DRIVER_TYPE_HARDWARE", "WINAPI","D3D11_SDK_VERSION", "assert" };
-	// ... and their corresponding values
-	static const char* ppvalues[] = { 
-		"#define NULL ((void*)0)", 
-		"#define PM_REMOVE (0x0001)",
-		"Microsoft's own memory zapper function\n(which is a macro actually)\nvoid ZeroMemory(\n\t[in] PVOID  Destination,\n\t[in] SIZE_T Length\n); ", 
-		"enum DXGI_SWAP_EFFECT::DXGI_SWAP_EFFECT_DISCARD = 0", 
-		"enum D3D_FEATURE_LEVEL", 
-		"enum D3D_DRIVER_TYPE::D3D_DRIVER_TYPE_HARDWARE  = ( D3D_DRIVER_TYPE_UNKNOWN + 1 )",
-		"#define WINAPI __stdcall",
-		"#define D3D11_SDK_VERSION (7)",
-		" #define assert(expression) (void)(                                                  \n"
-        "    (!!(expression)) ||                                                              \n"
-        "    (_wassert(_CRT_WIDE(#expression), _CRT_WIDE(__FILE__), (unsigned)(__LINE__)), 0) \n"
-        " )"
-		};
-
-	for (long unsigned int i = 0; i < sizeof(ppnames) / sizeof(ppnames[0]); ++i)
-	{
-		TextEditor::Identifier id;
-		id.mDeclaration = ppvalues[i];
-		lang.mPreprocIdentifiers.insert(std::make_pair(std::string(ppnames[i]), id));
-	}
-
-	// set your own identifiers
-	static const char* identifiers[] = {
-		"HWND", "HRESULT", "LPRESULT","D3D11_RENDER_TARGET_VIEW_DESC", "DXGI_SWAP_CHAIN_DESC","MSG","LRESULT","WPARAM", "LPARAM","UINT","LPVOID",
-		"ID3D11Device", "ID3D11DeviceContext", "ID3D11Buffer", "ID3D11Buffer", "ID3D10Blob", "ID3D11VertexShader", "ID3D11InputLayout", "ID3D11Buffer",
-		"ID3D10Blob", "ID3D11PixelShader", "ID3D11SamplerState", "ID3D11ShaderResourceView", "ID3D11RasterizerState", "ID3D11BlendState", "ID3D11DepthStencilState",
-		"IDXGISwapChain", "ID3D11RenderTargetView", "ID3D11Texture2D", "TextEditor" };
-	static const char* idecls[] = 
-	{
-		"typedef HWND_* HWND", "typedef long HRESULT", "typedef long* LPRESULT", "struct D3D11_RENDER_TARGET_VIEW_DESC", "struct DXGI_SWAP_CHAIN_DESC",
-		"typedef tagMSG MSG\n * Message structure","typedef LONG_PTR LRESULT","WPARAM", "LPARAM","UINT","LPVOID",
-		"ID3D11Device", "ID3D11DeviceContext", "ID3D11Buffer", "ID3D11Buffer", "ID3D10Blob", "ID3D11VertexShader", "ID3D11InputLayout", "ID3D11Buffer",
-		"ID3D10Blob", "ID3D11PixelShader", "ID3D11SamplerState", "ID3D11ShaderResourceView", "ID3D11RasterizerState", "ID3D11BlendState", "ID3D11DepthStencilState",
-		"IDXGISwapChain", "ID3D11RenderTargetView", "ID3D11Texture2D", "class TextEditor" };
-	for (long unsigned int i = 0; i < sizeof(identifiers) / sizeof(identifiers[0]); ++i)
-	{
-		TextEditor::Identifier id;
-		id.mDeclaration = std::string(idecls[i]);
-		lang.mIdentifiers.insert(std::make_pair(std::string(identifiers[i]), id));
-	}
-	editor.SetLanguageDefinition(lang);
-	//editor.SetPalette(TextEditor::GetLightPalette());
-
-	// error markers
-	TextEditor::ErrorMarkers markers;
-	markers.insert(std::make_pair<int, std::string>(6, "Example error here:\nInclude file not found: \"TextEditor.h\""));
-	markers.insert(std::make_pair<int, std::string>(41, "Another example error"));
-	editor.SetErrorMarkers(markers);
+    editor.SetLanguageDefinition(languages[3]);
+	// editor.SetPalette(TextEditor::GetLightPalette());
 
     vector<string> cppStart;
     cppStart.push_back("#include <iostream>");
@@ -111,7 +63,7 @@ void graphic::setup(){
     cppStart.push_back("}");
     editor.SetTextLines(cppStart);
 
-    static const char* fileToEdit = "solution.cpp";
+    static const char* fileToEdit = "solution";
 
     //texteditor setup ends here
 
@@ -149,7 +101,7 @@ void graphic::setup(){
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
     SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI);
-    SDL_Window* window = SDL_CreateWindow("test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, this->width_px, this->height_px, window_flags);
+    SDL_Window* window = SDL_CreateWindow("HashHarbor", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, this->width_px, this->height_px, window_flags);
     SDL_GLContext gl_context = SDL_GL_CreateContext(window);
     SDL_GL_MakeCurrent(window, gl_context);
     SDL_GL_SetSwapInterval(1); // Enable vsync
@@ -200,26 +152,31 @@ void graphic::setup(){
     pauseMenu Pause = pauseMenu(width_px, height_px);
 
     string pathMap;
+    string intMap;
     string obsMap;
-    string overlapMap;
+    string overlapMap;    
 #if defined(__APPLE__)
     pathMap = imgPth.currentPath.string() + "/assets/map/abc.png";
+    intMap = imgPth.currentPath.string() + + "/assets/map/int.png";
     obsMap = imgPth.currentPath.string() + "/assets/map/obs.png";
     overlapMap = imgPth.currentPath.string() + "/assets/map/overlap.png";
 #else
-    pathMap = "../src/abc.png";
-    obsMap = "../src/obs.png";
-    overlapMap = "../src/overlap.png";
+    pathMap = "../assets/map/abc.png";
+    intMap = "../assets/map/int.png";
+    obsMap = "../assets/map/obs.png";
+    overlapMap = "../assets/map/overlap.png";
 #endif
     imageHandler background = imageHandler(pathMap.c_str());
     imageHandler overlap = imageHandler(overlapMap.c_str());
+    imageHandler interactions = imageHandler(intMap.c_str());
     background.loadTexture(background.filepath, &background);
     overlap.loadTexture(overlap.filepath, &overlap);
+    interactions.loadTexture(interactions.filepath, &interactions);
 
     character.createCharacter("USER", false, true, &image);
     character.setMainPlayer("USER");
 
-    movementHandler move = movementHandler(obsMap, width_px, height_px);
+    movementHandler move = movementHandler(obsMap, intMap, width_px, height_px);
     int lastAction = 0;
     // auto gr = move.getGrid();
     // cout << gr.size() << ", " << gr[0].size() << endl;
@@ -318,14 +275,12 @@ void graphic::setup(){
         }
 
         if(show_display){
-            makeCharacter(image, overlap, mapGridX, mapGridY, move, lastAction, character, builder,  allowMovement);
+            makeCharacter(image, overlap, editor, mapGridX, mapGridY, move, lastAction, character, builder,  allowMovement);
             makeBackground(background, move.getGrid(), mapGridX, mapGridY, allowMovement);
         }
 
         if(show_codeEditor){
-            makeQuestion();
             makeCodeEditor(editor, fileToEdit);
-
         }
 
         if(show_userProfile){
@@ -381,7 +336,7 @@ void graphic::makeBlur(){
     ImGui::End();
 }
 
-void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, double &gridX, double &gridY, movementHandler move, int &lastAction, characterManager &character, characterBuilder& charBuild, bool canMove)
+void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, TextEditor& editor, double &gridX, double &gridY, movementHandler& move, int &lastAction, characterManager &character, characterBuilder& charBuild, bool canMove)
 {
     // Graphics window calculation
     ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
@@ -389,6 +344,7 @@ void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, double &
 
     const float frameLength = 1.f / 10.f; // In seconds, so  FPS
     static float frameTimer = frameLength;
+    static float arrowTimer = frameLength;
 
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | 
                             ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNav;
@@ -396,12 +352,15 @@ void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, double &
         flags |= ImGuiWindowFlags_NoInputs;
     }
 
-    // Window - Graphics
-    ImGui::Begin("Graphics", NULL, flags);
+    static int interact = false;
+
+    // Window - Character
+    ImGui::Begin("Character", NULL, flags);
     {
-        if(characterCreated && !show_settings)
+        if(characterCreated)
         {
             frameTimer -= ImGui::GetIO().DeltaTime;
+            arrowTimer = frameTimer;
 
             ImVec2 characterPos = ImVec2((ImGui::GetContentRegionAvail() - ImVec2(32, 64)) * 0.5f) + ImVec2(8, 0) - ImVec2(0, 8);
             character.drawPos = characterPos;
@@ -426,10 +385,53 @@ void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, double &
             else if(ImGui::IsKeyDown(ImGuiKey_A)) { keyDown = 4; }
         }
 
-        move.mapMovement(keyDown, overlap, gridX, gridY, move.getGrid().size(), move.getGrid()[0].size(), lastAction);
+        move.mapMovement(keyDown, overlap, gridX, gridY, move.getGrid().size(), move.getGrid()[0].size(), lastAction, interact);
+
+        // cout << gridX << ", " << gridY << " and last action " << lastAction << endl;
+
+        if(interact != 0){
+            // ImGui::SetCursorPos(ImVec2((float)width_px/ 4 , (float)height_px / 4 ));
+            ImGui::SetCursorPos(ImVec2((float)width_px/ 4 - 16, (float)height_px / 4 - 54));
+
+            move.drawArrows(arrowTimer, lastAction);
+            if (arrowTimer <= 0.f){
+                arrowTimer = frameLength;
+            }
+
+            if(ImGui::IsKeyDown(ImGuiKey_W) && show_codeEditor == false){
+                // cout << "trigger interaction here" << endl;
+                show_codeEditor = !show_codeEditor;
+                show_userProfile = !show_userProfile;
+                allowMovement = !allowMovement;
+
+                // codeStarter.clear();
+
+                // codeStarter.push_back("#include <iostream>");
+                // codeStarter.push_back("int main() {");
+                // codeStarter.push_back("\tstd::cout << \"Hello HashHarbor!\";");
+                // codeStarter.push_back("\treturn 0;");
+                // codeStarter.push_back("}");
+                // cout << selectedLanguageIndex << endl;
+                editor.SetTextLines(codeStarter);
+
+                result = "";
+                
+            }
+
+
+            // cout << "interact true and timer is: " << frameTimer << endl;
+        }
+
+        ImGui::SetCursorPos(ImVec2(0, 0));
 
     }
     ImGui::End();
+}
+
+void graphic::triggerQuestion(int question){
+
+    result = "";
+
 }
 
 void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, double gridX, double gridY, bool canMove){
@@ -451,52 +453,9 @@ void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, 
     ImGui::End();
 }
 
-void graphic::makeQuestion() {
-    int horizontalIndent = 20;
-    int verticalIndent = 20;
-    ImGui::SetNextWindowSize({(float)width_px / 2 - (2 * horizontalIndent), (float)height_px - (2 * verticalIndent)});
-    ImGui::SetNextWindowPos({(float)horizontalIndent, (float)verticalIndent});
-
-    ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar;
-    if(show_blur){
-        flags |= ImGuiWindowFlags_NoInputs;
-    }
-
-    ImGui::Begin("Question", NULL, flags);
-    {
-        ImGui::TextWrapped("Given an integer n, return a string array answer (1-indexed) where:\n"
-                           "\n"
-                           "    answer[i] == \"HashHarbor\" if i is divisible by 3 and 5.\n"
-                           "    answer[i] == \"Hash\" if i is divisible by 3.\n"
-                           "    answer[i] == \"Harbor\" if i is divisible by 5.\n"
-                           "    answer[i] == i (as a string) if none of the above conditions are true.\n"
-                           "\n"
-                           "Example 1:\n"
-                           "\n"
-                           "Input: n = 3\n"
-                           "Output: [\"1\",\"2\",\"Hash\"]\n"
-                           "\n"
-                           "Example 2:\n"
-                           "\n"
-                           "Input: n = 5\n"
-                           "Output: [\"1\",\"2\",\"Hash\",\"4\",\"Harbor\"]\n"
-                           "\n"
-                           "Example 3:\n"
-                           "\n"
-                           "Input: n = 15\n"
-                           "Output: [\"1\",\"2\",\"Hash\",\"4\",\"Harbor\",\"Hash\",\"7\",\"8\",\"Hash\",\"Harbor\",\"11\",\"Hash\",\"13\",\"14\",\"HashHarbor\"]\n"
-                           "\n"
-                           "Constraints:\n"
-                           "\n"
-                           "    1 <= n <= 104");
-        ImGui::SetWindowFontScale(1.1f); // Increase the font scale
-    }
-
-    ImGui::End();
-}
 
 void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit){
-    ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus;
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar ;
     if(show_blur){
         flags |= ImGuiWindowFlags_NoInputs;
     }
@@ -545,6 +504,59 @@ void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit){
     }
     ImGui::End();
 
+    int horizontalIndent = 20;
+    int verticalIndent = 20;
+    ImGui::SetNextWindowSize({(float)width_px / 2 - (2 * horizontalIndent), (float)height_px - (2 * verticalIndent)});
+    ImGui::SetNextWindowPos({(float)horizontalIndent, (float)verticalIndent});
+
+    flags |= ImGuiWindowFlags_NoTitleBar;
+    if(show_blur){
+        flags |= ImGuiWindowFlags_NoInputs;
+    }
+
+    
+
+    ImGui::Begin("Question", NULL, flags);
+    {
+        static const char* languages[] = { "C++", "Python", "Java", "C#" }; // Add more languages as needed
+        const char* currentLanguage = languages[selectedLanguageIndex];
+
+        if (ImGui::Button("X")) {
+            show_codeEditor = !show_codeEditor;
+            show_userProfile = !show_userProfile;
+            allowMovement = !allowMovement;
+        }
+        ImGui::SameLine(); // Place subsequent widgets on the same line
+
+        // Open combo box
+        if (ImGui::BeginCombo("Choose Language", currentLanguage))
+        {
+            for (int i = 0; i < IM_ARRAYSIZE(languages); ++i)
+            {
+                bool isSelected = (selectedLanguageIndex == i);
+                if (ImGui::Selectable(languages[i], isSelected))
+                {
+                    selectedLanguageIndex = i;
+                    currentLanguage = languages[i];
+                }
+                if (isSelected)
+                    ImGui::SetItemDefaultFocus(); // Set the initially selected item
+            }
+
+            ImGui::EndCombo();
+        }
+
+        // TODO - implement code for all questions
+        database &db = database::getInstance();
+        database::questionData qes;
+        db.getQuestion(1, qes);
+        ImGui::TextWrapped(qes.question.c_str());
+    }
+    ImGui::End();
+
+
+    editor.SetLanguageDefinition(languages[selectedLanguageIndex]);
+    
     // Code Editor
     ImGui::SetNextWindowSize({(float)width_px / 2,(float)height_px / 4 * 3});
     ImGui::SetNextWindowPos({(float)width_px / 2, 0});
@@ -554,22 +566,6 @@ void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit){
 
     ImGui::Begin("Sandbox", NULL, flags);
     {
-        // if (ImGui::BeginMenu("File")) {
-        //     if (ImGui::MenuItem("New", "Ctrl+N")) {
-        //         // Handle New action
-        //     }
-        //     if (ImGui::MenuItem("Open", "Ctrl+O")) {
-        //         // Handle Open action
-        //     }
-        //     if (ImGui::MenuItem("Save", "Ctrl+S")) {
-        //         // Handle Save action
-        //     }
-        //     ImGui::Separator();
-        //     if (ImGui::MenuItem("Exit", "Alt+F4")) {
-        //         // Handle Exit action
-        //     }
-        //     ImGui::EndMenu();
-        // }
 
         ImGui::Text("%6d/%-6d %6d lines  | %s | %s | %s | %s", cpos.mLine + 1, cpos.mColumn + 1, editor.GetTotalLines(),
 			editor.IsOverwrite() ? "Ovr" : "Ins",
@@ -582,7 +578,6 @@ void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit){
 		
     }
     ImGui::End();
-
 }
 
 void graphic::makeUserProfile(){
@@ -629,23 +624,24 @@ void graphic::makeConfig(vector<string> &codeStarter, TextEditor &editor){
     {
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
-        ImGui::Text(" ");
-        if(ImGui::Button("leetcode")){
-            show_codeEditor = !show_codeEditor;
-            show_userProfile = !show_userProfile;
-            allowMovement = !allowMovement;
 
-            codeStarter.clear();
+        // ImGui::Text(" ");
+        // if(ImGui::Button("leetcode")){
+        //     show_codeEditor = !show_codeEditor;
+        //     show_userProfile = !show_userProfile;
+        //     allowMovement = !allowMovement;
 
-            codeStarter.push_back("#include <iostream>");
-            codeStarter.push_back("int main() {");
-            codeStarter.push_back("\tstd::cout << \"Hello HashHarbor!\";");
-            codeStarter.push_back("\treturn 0;");
-            codeStarter.push_back("}");
-            editor.SetTextLines(codeStarter);
+        //     codeStarter.clear();
 
-            result = "";
-        }
+        //     codeStarter.push_back("#include <iostream>");
+        //     codeStarter.push_back("int main() {");
+        //     codeStarter.push_back("\tstd::cout << \"Hello HashHarbor!\";");
+        //     codeStarter.push_back("\treturn 0;");
+        //     codeStarter.push_back("}");
+        //     editor.SetTextLines(codeStarter);
+
+        //     result = "";
+        // }
 
     }
     ImGui::End();
@@ -654,6 +650,9 @@ void graphic::makeConfig(vector<string> &codeStarter, TextEditor &editor){
 
 void graphic::makeCharacterSelector(imageHandler& image, characterManager &character, characterBuilder& charBuild)
 {
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.FrameRounding = 7.5f;
+
     ImGui::SetNextWindowSize({850.f, 520.f});
     ImGui::SetNextWindowPos({((float)width_px - 850.f) / 2.f,((float)height_px - 520.f) / 2.f});
 
@@ -695,6 +694,7 @@ void graphic::makeCharacterSelector(imageHandler& image, characterManager &chara
         ImGui::PopID();
     }
     ImGui::End();
+    style.FrameRounding = 0.f;
 }
 
 string graphic::executeCPP(string code){

@@ -44,10 +44,14 @@ void database::connect()
     imagePath imgPth = imagePath();
 
     auto config = cpptoml::parse_file(imgPth.absolutePath + "assets/api.toml");
-
     auto apikey = config->get_table("mongodb");
 
+    auto config_Q = cpptoml::parse_file(imgPth.absolutePath + "assets/api.toml");
+    auto apikey_Q = config_Q->get_table("questions");
+
     const auto uri = mongocxx::uri{*apikey->get_as<string>("uri")};
+
+    const auto uri_Q = mongocxx::uri{*apikey_Q->get_as<string>("uri")};
     // Set the version of the Stable API on the client
     mongocxx::options::client client_options;
     const auto api = mongocxx::options::server_api{mongocxx::options::server_api::version::k_version_1};
@@ -55,6 +59,9 @@ void database::connect()
 
     client = mongocxx::client { uri, client_options };
     db = client["HashHarbor"];
+
+    client_Q = mongocxx::client { uri_Q, client_options };
+    db_Q = client_Q["question"];
     std::cout << "Connected to MongoDB" << std::endl;
 }
 
@@ -237,6 +244,52 @@ bool database::updateUsername(string newUsr)
     }catch(const std::exception& e)
     {
         cout << "Database Failure:: " << e.what() << endl;
+    }
+    return false;
+}
+
+bool database::getQuestion(int num, questionData& data)
+{
+    try {
+        auto collection = db_Q["questions"];
+
+        auto findQuestion= collection.find_one(make_document(kvp("num", num)));
+        if(findQuestion)
+        {
+            data.id = num;
+
+            bsoncxx::document::element db_question = findQuestion.value()["question"];
+            data.question = db_question.get_string().value.to_string();
+
+            bsoncxx::document::element db_boiler = findQuestion.value()["boilerCoder"];
+            data.boiler = db_boiler.get_string().value.data();
+
+            bsoncxx::document::element db_cases = findQuestion.value()["testInput"];
+            assert(db_cases.type() == bsoncxx::type::k_array);
+            bsoncxx::array::view cases = db_cases.get_array();
+            int i = 0;
+            for (auto iter: cases) {
+                assert(iter.type() == bsoncxx::type::k_string); // if string
+                data.cases.push_back(iter.get_string().value.data());
+                i++;
+            }
+
+            bsoncxx::document::element db_res = findQuestion.value()["testResult"];
+            assert(db_res.type() == bsoncxx::type::k_array);
+            bsoncxx::array::view res = db_res.get_array();
+            i = 0;
+            for (auto iter: res) {
+                assert(iter.type() == bsoncxx::type::k_string); // if string
+                data.cases.push_back(iter.get_string().value.data());
+                i++;
+            }
+
+            assert(findQuestion);
+            return true;
+        }
+    }catch(const std::exception& e)
+    {
+        cout << "Failed to get collection. :: " << e.what() << endl;
     }
     return false;
 }
