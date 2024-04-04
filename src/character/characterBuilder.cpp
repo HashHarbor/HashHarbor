@@ -583,12 +583,12 @@ void characterBuilder::drawCharacterAnimation(imageHandler *imgHandler, ImVec2 p
     ImGui::SetCursorPos(pos);
     imgHandler->DrawAnimationFrame(*outfit[characterIndex[2]][characterIndex[3]], cords, scale);
 
-    if(indexHair != (int)hair.size())
+    if(characterIndex[4] != (int)hair.size()) // allow for hair index to equal size to allow for bald character
     {
         ImGui::SetCursorPos(pos);
         imgHandler->DrawAnimationFrame(*hair[characterIndex[4]][characterIndex[5]], cords, scale);
     }
-    if(indexAccessories != (int)accessories.size())
+    if(characterIndex[6] != (int)accessories.size()) // allow for accessories to equal size to allow for no accessories
     {
         ImGui::SetCursorPos(pos);
         imgHandler->DrawAnimationFrame(*accessories[characterIndex[6]][characterIndex[7]], cords, scale);

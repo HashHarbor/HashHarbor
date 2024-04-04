@@ -59,45 +59,69 @@ class characterManager
     character* mainPlayer; // stores a pointer to the main player character to reduce map finds
 
     // ----- Hardcoded Coordinates for Character Drawing ONLY ------ //
-    vector<pair<ImVec2,ImVec2>> cordsIdle = {
-            {ImVec2(0.1f / 192.f, 0.1f/320.f),ImVec2(31.99f/192.f, 64.f/320.f)},
-            {ImVec2(32.1f / 192.f, 0.1f/320.f),ImVec2(63.99f/192.f, 64.f/320.f)},
-            {ImVec2(64.1f / 192.f, 0.1f/320.f),ImVec2(95.99f/192.f, 64.f/320.f)},
-            {ImVec2(96.1f / 192.f, 0.1f/320.f),ImVec2(127.99f/192.f, 64.f/320.f)},
-            {ImVec2(128.1f / 192.f, 0.1f/320.f),ImVec2(159.99f/192.f, 64.f/320.f)},
-             {ImVec2(160.1f / 192.f, 0.1f/320.f),ImVec2(191.99f/192.f, 64.f/320.f)}
+    vector<pair<ImVec2,ImVec2>> cordsIdleDown = {
+            {ImVec2(0.1f / 192.f, 0.1f/512.f),ImVec2(31.99f/192.f, 64.f/512.f)},
+            {ImVec2(32.1f / 192.f, 0.1f/512.f),ImVec2(63.99f/192.f, 64.f/512.f)},
+            {ImVec2(64.1f / 192.f, 0.1f/512.f),ImVec2(95.99f/192.f, 64.f/512.f)},
+            {ImVec2(96.1f / 192.f, 0.1f/512.f),ImVec2(127.99f/192.f, 64.f/512.f)},
+            {ImVec2(128.1f / 192.f, 0.1f/512.f),ImVec2(159.99f/192.f, 64.f/512.f)},
+             {ImVec2(160.1f / 192.f, 0.1f/512.f),ImVec2(191.99f/192.f, 64.f/512.f)}
     };
     vector<pair<ImVec2,ImVec2>> cordsWalkUp = {
-            {ImVec2(0.1f / 192.f, 64.1f/320.f),ImVec2(31.99f/192.f, 128.f/320.f)},
-            {ImVec2(32.1f / 192.f, 64.1f/320.f),ImVec2(63.99f/192.f, 128.f/320.f)},
-            {ImVec2(64.1f / 192.f, 64.1f/320.f),ImVec2(95.99f/192.f, 128.f/320.f)},
-            {ImVec2(96.1f / 192.f, 64.1f/320.f),ImVec2(127.99f/192.f, 128.f/320.f)},
-            {ImVec2(128.1f / 192.f, 64.1f/320.f),ImVec2(159.99f/192.f, 128.f/320.f)},
-            {ImVec2(160.1f / 192.f, 64.1f/320.f),ImVec2(191.99f/192.f, 128.f/320.f)}
+            {ImVec2(0.1f / 192.f, 64.1f/512.f),ImVec2(31.99f/192.f, 128.f/512.f)},
+            {ImVec2(32.1f / 192.f, 64.1f/512.f),ImVec2(63.99f/192.f, 128.f/512.f)},
+            {ImVec2(64.1f / 192.f, 64.1f/512.f),ImVec2(95.99f/192.f, 128.f/512.f)},
+            {ImVec2(96.1f / 192.f, 64.1f/512.f),ImVec2(127.99f/192.f, 128.f/512.f)},
+            {ImVec2(128.1f / 192.f, 64.1f/512.f),ImVec2(159.99f/192.f, 128.f/512.f)},
+            {ImVec2(160.1f / 192.f, 64.1f/512.f),ImVec2(191.99f/192.f, 128.f/512.f)}
     };
     vector<pair<ImVec2,ImVec2>> cordsWalkDown = {
-            {ImVec2(0.1f / 192.f, 128.1f/320.f),ImVec2(31.99f/192.f, 192.f/320.f)},
-            {ImVec2(32.1f / 192.f, 128.1f/320.f),ImVec2(63.99f/192.f, 192.f/320.f)},
-            {ImVec2(64.1f / 192.f, 128.1f/320.f),ImVec2(95.99f/192.f, 192.f/320.f)},
-            {ImVec2(96.1f / 192.f, 128.1f/320.f),ImVec2(127.99f/192.f, 192.f/320.f)},
-            {ImVec2(128.1f / 192.f, 128.1f/320.f),ImVec2(159.99f/192.f, 192.f/320.f)},
-            {ImVec2(160.1f / 192.f, 128.1f/320.f),ImVec2(191.99f/192.f, 192.f/320.f)}
+            {ImVec2(0.1f / 192.f, 128.1f/512.f),ImVec2(31.99f/192.f, 192.f/512.f)},
+            {ImVec2(32.1f / 192.f, 128.1f/512.f),ImVec2(63.99f/192.f, 192.f/512.f)},
+            {ImVec2(64.1f / 192.f, 128.1f/512.f),ImVec2(95.99f/192.f, 192.f/512.f)},
+            {ImVec2(96.1f / 192.f, 128.1f/512.f),ImVec2(127.99f/192.f, 192.f/512.f)},
+            {ImVec2(128.1f / 192.f, 128.1f/512.f),ImVec2(159.99f/192.f, 192.f/512.f)},
+            {ImVec2(160.1f / 192.f, 128.1f/512.f),ImVec2(191.99f/192.f, 192.f/512.f)}
     };
     vector<pair<ImVec2,ImVec2>> cordsWalkRight = {
-            {ImVec2(0.1f / 192.f, 192.1f/320.f),ImVec2(31.99f/192.f, 256.f/320.f)},
-            {ImVec2(32.1f / 192.f, 192.1f/320.f),ImVec2(63.99f/192.f, 256.f/320.f)},
-            {ImVec2(64.1f / 192.f, 192.1f/320.f),ImVec2(95.99f/192.f, 256.f/320.f)},
-            {ImVec2(96.1f / 192.f, 192.1f/320.f),ImVec2(127.99f/192.f, 256.f/320.f)},
-            {ImVec2(128.1f / 192.f, 192.1f/320.f),ImVec2(159.99f/192.f, 256.f/320.f)},
-            {ImVec2(160.1f / 192.f, 192.1f/320.f),ImVec2(191.99f/192.f, 256.f/320.f)}
+            {ImVec2(0.1f / 192.f, 192.1f/512.f),ImVec2(31.99f/192.f, 256.f/512.f)},
+            {ImVec2(32.1f / 192.f, 192.1f/512.f),ImVec2(63.99f/192.f, 256.f/512.f)},
+            {ImVec2(64.1f / 192.f, 192.1f/512.f),ImVec2(95.99f/192.f, 256.f/512.f)},
+            {ImVec2(96.1f / 192.f, 192.1f/512.f),ImVec2(127.99f/192.f, 256.f/512.f)},
+            {ImVec2(128.1f / 192.f, 192.1f/512.f),ImVec2(159.99f/192.f, 256.f/512.f)},
+            {ImVec2(160.1f / 192.f, 192.1f/512.f),ImVec2(191.99f/192.f, 256.f/512.f)}
     };
     vector<pair<ImVec2,ImVec2>> cordsWalkLeft = {
-            {ImVec2(0.1f / 192.f, 256.1f/320.f),ImVec2(31.99f/192.f, 320.f/320.f)},
-            {ImVec2(32.1f / 192.f, 256.1f/320.f),ImVec2(63.99f/192.f, 320.f/320.f)},
-            {ImVec2(64.1f / 192.f, 256.1f/320.f),ImVec2(95.99f/192.f, 320.f/320.f)},
-            {ImVec2(96.1f / 192.f, 256.1f/320.f),ImVec2(127.99f/192.f, 320.f/320.f)},
-            {ImVec2(128.1f / 192.f, 256.1f/320.f),ImVec2(159.99f/192.f, 320.f/320.f)},
-            {ImVec2(160.1f / 192.f, 256.1f/320.f),ImVec2(191.99f/192.f, 320.f/320.f)}
+            {ImVec2(0.1f / 192.f, 256.1f/512.f),ImVec2(31.99f/192.f, 320.f/512.f)},
+            {ImVec2(32.1f / 192.f, 256.1f/512.f),ImVec2(63.99f/192.f, 320.f/512.f)},
+            {ImVec2(64.1f / 192.f, 256.1f/512.f),ImVec2(95.99f/192.f, 320.f/512.f)},
+            {ImVec2(96.1f / 192.f, 256.1f/512.f),ImVec2(127.99f/192.f, 320.f/512.f)},
+            {ImVec2(128.1f / 192.f, 256.1f/512.f),ImVec2(159.99f/192.f, 320.f/512.f)},
+            {ImVec2(160.1f / 192.f, 256.1f/512.f),ImVec2(191.99f/192.f, 320.f/512.f)}
+    };
+    vector<pair<ImVec2,ImVec2>> cordsIdleUp = {
+            {ImVec2(0.1f / 192.f, 320.1f/512.f),ImVec2(31.99f/192.f, 384.f/512.f)},
+            {ImVec2(32.1f / 192.f, 320.1f/512.f),ImVec2(63.99f/192.f, 384.f/512.f)},
+            {ImVec2(64.1f / 192.f, 320.1f/512.f),ImVec2(95.99f/192.f, 384.f/512.f)},
+            {ImVec2(96.1f / 192.f, 320.1f/512.f),ImVec2(127.99f/192.f, 384.f/512.f)},
+            {ImVec2(128.1f / 192.f, 320.1f/512.f),ImVec2(159.99f/192.f, 384.f/512.f)},
+            {ImVec2(160.1f / 192.f, 320.1f/512.f),ImVec2(191.99f/192.f, 384.f/512.f)}
+    };
+    vector<pair<ImVec2,ImVec2>> cordsIdleRight = {
+            {ImVec2(0.1f / 192.f, 384.1f/512.f),ImVec2(31.99f/192.f, 448.f/512.f)},
+            {ImVec2(32.1f / 192.f, 384.1f/512.f),ImVec2(63.99f/192.f, 448.f/512.f)},
+            {ImVec2(64.1f / 192.f, 384.1f/512.f),ImVec2(95.99f/192.f, 448.f/512.f)},
+            {ImVec2(96.1f / 192.f, 384.1f/512.f),ImVec2(127.99f/192.f, 448.f/512.f)},
+            {ImVec2(128.1f / 192.f, 384.1f/512.f),ImVec2(159.99f/192.f, 448.f/512.f)},
+            {ImVec2(160.1f / 192.f, 384.1f/512.f),ImVec2(191.99f/192.f, 448.f/512.f)}
+    };
+    vector<pair<ImVec2,ImVec2>> cordsIdleLeft = {
+            {ImVec2(0.1f / 192.f, 448.1f/512.f),ImVec2(31.99f/192.f, 512.f/512.f)},
+            {ImVec2(32.1f / 192.f, 448.1f/512.f),ImVec2(63.99f/192.f, 512.f/512.f)},
+            {ImVec2(64.1f / 192.f, 448.1f/512.f),ImVec2(95.99f/192.f, 512.f/512.f)},
+            {ImVec2(96.1f / 192.f, 448.1f/512.f),ImVec2(127.99f/192.f, 512.f/512.f)},
+            {ImVec2(128.1f / 192.f, 448.1f/512.f),ImVec2(159.99f/192.f, 512.f/512.f)},
+            {ImVec2(160.1f / 192.f, 448.1f/512.f),ImVec2(191.99f/192.f, 512.f/512.f)}
     };
 
     int frameCount_4 = 0; // animation control for 4 frame

@@ -79,11 +79,18 @@ void characterManager::moveMainCharacter(imageHandler* imgHandler, characterBuil
 
 
     int keyDown = 0; // used to identify which direction the character is moving
-    if(canMove){
+    static int previousKey = 2;
+    if(canMove)
+    {
         if(ImGui::IsKeyDown(ImGuiKey_W)) { keyDown = 1; }
-            else if(ImGui::IsKeyDown(ImGuiKey_S)) { keyDown = 2; }
-            else if(ImGui::IsKeyDown(ImGuiKey_D)) { keyDown = 3; }
-            else if(ImGui::IsKeyDown(ImGuiKey_A)) { keyDown = 4; }
+        else if(ImGui::IsKeyDown(ImGuiKey_S)) { keyDown = 2; }
+        else if(ImGui::IsKeyDown(ImGuiKey_D)) { keyDown = 3; }
+        else if(ImGui::IsKeyDown(ImGuiKey_A)) { keyDown = 4; }
+    }
+
+    if(keyDown != 0)
+    {
+        previousKey = keyDown;
     }
 
     float factor = 1.f;
@@ -103,8 +110,21 @@ void characterManager::moveMainCharacter(imageHandler* imgHandler, characterBuil
             charBuild->drawCharacterAnimation(imgHandler,drawPos,cordsWalkLeft.at(frameCount_6),factor,mainPlayer->dynamicIndex);
             break;
         default:
-            charBuild->drawCharacterAnimation(imgHandler,drawPos,cordsIdle.at(frameCount_6),factor,mainPlayer->dynamicIndex);
-
+            switch(previousKey)
+            {
+                case 1:
+                    charBuild->drawCharacterAnimation(imgHandler,drawPos,cordsIdleUp.at(frameCount_6),factor,mainPlayer->dynamicIndex);
+                    break;
+                case 2:
+                    charBuild->drawCharacterAnimation(imgHandler,drawPos,cordsIdleDown.at(frameCount_6),factor,mainPlayer->dynamicIndex);
+                    break;
+                case 3:
+                    charBuild->drawCharacterAnimation(imgHandler,drawPos,cordsIdleRight.at(frameCount_6),factor,mainPlayer->dynamicIndex);
+                    break;
+                case 4:
+                    charBuild->drawCharacterAnimation(imgHandler,drawPos,cordsIdleLeft.at(frameCount_6),factor,mainPlayer->dynamicIndex);
+                    break;
+            }
             break;
     }
 

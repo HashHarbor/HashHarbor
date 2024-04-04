@@ -780,7 +780,7 @@ void pauseMenu::settingsUser(imageHandler *image, characterBuilder *charBuild, c
     draw_list->AddRectFilled(ImVec2(profileWidth + 20.f, profileHeight + 70.f), ImVec2(profileWidth + 320.f, profileHeight + 230.f), ImColor(ImVec4(0.6f, 0.6f, 0.6f, 1.0f)), 20.0f);
     draw_list->AddRectFilled(ImVec2(profileWidth + 35.f, profileHeight + 85.f), ImVec2(profileWidth + 109.f, profileHeight + 218.f), ImColor(ImVec4(0.9f, 0.9f, 0.9f, 1.0f)), 20.0f);
 
-    charBuild->drawCharacterAnimation(image, ImVec2(40.f, 85.f), {ImVec2(0.1f / 192.f, 0.1f/320.f),ImVec2(31.99f/192.f, 64.f/320.f)}, 2.f, character->getMainPlayer()->dynamicIndex);
+    charBuild->drawCharacterAnimation(image, ImVec2(40.f, 85.f), {ImVec2(0.1f / 192.f, 0.1f/512.f),ImVec2(31.99f/192.f, 64.f/512.f)}, 2.f, character->getMainPlayer()->dynamicIndex);
     // show username
     //ICON_FA_ID_CARD
     ImGui::SetCursorPos(ImVec2(270.f, 85.f));
