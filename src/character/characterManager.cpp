@@ -32,6 +32,7 @@ namespace ImGui { extern ImGuiKeyData* GetKeyData(ImGuiKey key); }
 #include "../imageHandler/imageHandler.h"
 #include "../imageHandler/imagePath.h"
 #include "characterManager.h"
+#include "characterConfig.h"
 
 characterManager::characterManager() {}
 
@@ -94,35 +95,36 @@ void characterManager::moveMainCharacter(imageHandler* imgHandler, characterBuil
     }
 
     float factor = 1.f;
+    characterConfig cords;
     //Draw Order: Body -> Eyes -> Outfit -> Hair -> Accessories
     switch(keyDown)
     {
         case 1:
-            charBuild->drawCharacterAnimation(imgHandler,drawPos,cordsWalkUp.at(frameCount_6),factor,mainPlayer->dynamicIndex);
+            charBuild->drawCharacterAnimation(imgHandler,drawPos,cords.cordsWalkUp.at(frameCount_6),factor,mainPlayer->dynamicIndex);
             break;
         case 2:
-            charBuild->drawCharacterAnimation(imgHandler,drawPos,cordsWalkDown.at(frameCount_6),factor,mainPlayer->dynamicIndex);
+            charBuild->drawCharacterAnimation(imgHandler,drawPos,cords.cordsWalkDown.at(frameCount_6),factor,mainPlayer->dynamicIndex);
             break;
         case 3:
-            charBuild->drawCharacterAnimation(imgHandler,drawPos,cordsWalkRight.at(frameCount_6),factor,mainPlayer->dynamicIndex);
+            charBuild->drawCharacterAnimation(imgHandler,drawPos,cords.cordsWalkRight.at(frameCount_6),factor,mainPlayer->dynamicIndex);
             break;
         case 4:
-            charBuild->drawCharacterAnimation(imgHandler,drawPos,cordsWalkLeft.at(frameCount_6),factor,mainPlayer->dynamicIndex);
+            charBuild->drawCharacterAnimation(imgHandler,drawPos,cords.cordsWalkLeft.at(frameCount_6),factor,mainPlayer->dynamicIndex);
             break;
         default:
             switch(previousKey)
             {
                 case 1:
-                    charBuild->drawCharacterAnimation(imgHandler,drawPos,cordsIdleUp.at(frameCount_6),factor,mainPlayer->dynamicIndex);
+                    charBuild->drawCharacterAnimation(imgHandler,drawPos,cords.cordsIdleUp.at(frameCount_6),factor,mainPlayer->dynamicIndex);
                     break;
                 case 2:
-                    charBuild->drawCharacterAnimation(imgHandler,drawPos,cordsIdleDown.at(frameCount_6),factor,mainPlayer->dynamicIndex);
+                    charBuild->drawCharacterAnimation(imgHandler,drawPos,cords.cordsIdleDown.at(frameCount_6),factor,mainPlayer->dynamicIndex);
                     break;
                 case 3:
-                    charBuild->drawCharacterAnimation(imgHandler,drawPos,cordsIdleRight.at(frameCount_6),factor,mainPlayer->dynamicIndex);
+                    charBuild->drawCharacterAnimation(imgHandler,drawPos,cords.cordsIdleRight.at(frameCount_6),factor,mainPlayer->dynamicIndex);
                     break;
                 case 4:
-                    charBuild->drawCharacterAnimation(imgHandler,drawPos,cordsIdleLeft.at(frameCount_6),factor,mainPlayer->dynamicIndex);
+                    charBuild->drawCharacterAnimation(imgHandler,drawPos,cords.cordsIdleLeft.at(frameCount_6),factor,mainPlayer->dynamicIndex);
                     break;
             }
             break;

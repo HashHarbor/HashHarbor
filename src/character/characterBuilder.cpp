@@ -28,6 +28,8 @@ using std::pair;
 #include <bits/stdc++.h>
 #endif
 
+#include "characterConfig.h"
+
 characterBuilder::characterBuilder(imageHandler* imgHandler)
 {
     imagePath imgPath = imagePath();
@@ -238,32 +240,48 @@ void characterBuilder::drawCharacter(imageHandler *imgHandler, float frameTimer)
 
     ImGui::SetCursorPos(ImVec2(drawPos.x + 20.f,drawPos.y - 20.f));
     static bool animate = true;
-    ImGui::Checkbox("Animate", &animate);
+    static int direction = 0;
+    ImGui::Checkbox("Play Animation", &animate);
 
     if(!animate)
     {
-        frameCount_4 = 0 ;
+        ImGui::SetCursorPos(ImVec2(drawPos.x - 50.f,drawPos.y + 280.f));
+        ImGui::Text("Rotate Character");
+        ImGui::SetCursorPos(ImVec2(drawPos.x - 50.f,drawPos.y + 300.f));
+        ImGui::PushItemWidth(250);
+        ImGui::SliderInt(" ", &direction, 0, 3, "");
+        ImGui::PopItemWidth();
+
+        if(direction != frameCount_4)
+        {
+            frameCount_4 = direction;
+        }
+    }
+    else
+    {
+        direction = 0;
     }
 
+    characterConfig cords;
     ImGui::SetCursorPos(drawPos);
-    imgHandler->DrawAnimationFrame(*body.at(indexBody), cordsAnim.at(frameCount_4), factor); // body
+    imgHandler->DrawAnimationFrame(*body.at(indexBody), cords.cordsAnim.at(frameCount_4), factor); // body
 
     ImGui::SetCursorPos(drawPos);
-    imgHandler->DrawAnimationFrame(*eyes.at(indexEyes), cordsAnim.at(frameCount_4), factor); // eyes
+    imgHandler->DrawAnimationFrame(*eyes.at(indexEyes), cords.cordsAnim.at(frameCount_4), factor); // eyes
 
     ImGui::SetCursorPos(drawPos);
-    imgHandler->DrawAnimationFrame(*outfit.at(indexOutfit).at(indexOutfitColor), cordsAnim.at(frameCount_4), factor); // outfit
+    imgHandler->DrawAnimationFrame(*outfit.at(indexOutfit).at(indexOutfitColor), cords.cordsAnim.at(frameCount_4), factor); // outfit
 
     if(indexHair != (int)hair.size())
     {
         ImGui::SetCursorPos(drawPos);
-        imgHandler->DrawAnimationFrame(*hair.at(indexHair).at(indexHairColor), cordsAnim.at(frameCount_4), factor); // hair
+        imgHandler->DrawAnimationFrame(*hair.at(indexHair).at(indexHairColor), cords.cordsAnim.at(frameCount_4), factor); // hair
     }
 
     if(indexAccessories != (int)accessories.size())
     {
         ImGui::SetCursorPos(drawPos);
-        imgHandler->DrawAnimationFrame(*accessories.at(indexAccessories).at(indexAccessoriesColor), cordsAnim.at(frameCount_4), factor); // accessories
+        imgHandler->DrawAnimationFrame(*accessories.at(indexAccessories).at(indexAccessoriesColor), cords.cordsAnim.at(frameCount_4), factor); // accessories
     }
 
     if (frameTimer <= 0.f)
@@ -379,6 +397,7 @@ void characterBuilder::drawHairControls()
 }
 void characterBuilder::drawBodyEyeControl()
 {
+    characterConfig c;
     ImGui::SetCursorPos(ImVec2(50.f,138.f));
     ImGui::Text("Body       ");
 
@@ -388,9 +407,9 @@ void characterBuilder::drawBodyEyeControl()
         ImGui::SetCursorPos(ImVec2(x,168.f));
         ImGui::PushID((i + 1) * 100);
         int colorIndex = i * 3;
-        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)bodyColors.at(colorIndex));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)bodyColors.at(colorIndex + 1));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)bodyColors.at(colorIndex + 2));
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)c.bodyColors.at(colorIndex));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)c.bodyColors.at(colorIndex + 1));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)c.bodyColors.at(colorIndex + 2));
         if(ImGui::Button("  "))
         {
             changeBody(i);
@@ -410,9 +429,9 @@ void characterBuilder::drawBodyEyeControl()
         ImGui::SetCursorPos(ImVec2(x,236.f));
         ImGui::PushID((i + 1) * 110);
         int colorIndex = i * 3;
-        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)eyeColors.at(colorIndex));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)eyeColors.at(colorIndex + 1));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)eyeColors.at(colorIndex + 2));
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)c.eyeColors.at(colorIndex));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)c.eyeColors.at(colorIndex + 1));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)c.eyeColors.at(colorIndex + 2));
         if(ImGui::Button("  "))
         {
             changeEyes(i);
@@ -423,6 +442,7 @@ void characterBuilder::drawBodyEyeControl()
 }
 void characterBuilder::drawOutfitControls()
 {
+    characterConfig c;
     ImGui::SetCursorPos(ImVec2(50.f,274.f));
     ImGui::Text("Outfit     ");
     ImGui::SameLine();
@@ -446,9 +466,9 @@ void characterBuilder::drawOutfitControls()
         ImGui::SetCursorPos(ImVec2(x,304.f));
         ImGui::PushID((i + 1) * 11);
         int colorIndex = i * 3;
-        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)outfitButtonColor.at(indexOutfit).at(colorIndex));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)outfitButtonColor.at(indexOutfit).at(colorIndex + 1));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)outfitButtonColor.at(indexOutfit).at(colorIndex + 2));
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)c.outfitButtonColor.at(indexOutfit).at(colorIndex));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)c.outfitButtonColor.at(indexOutfit).at(colorIndex + 1));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)c.outfitButtonColor.at(indexOutfit).at(colorIndex + 2));
         if(ImGui::Button("  "))
         {
             changeOutfitColor(i);
@@ -459,6 +479,8 @@ void characterBuilder::drawOutfitControls()
 }
 void characterBuilder::drawAccessoriesControl()
 {
+    characterConfig c;
+
     ImGui::SetCursorPos(ImVec2(50.f,70.f));
     ImGui::Text("Accessories");
     ImGui::SameLine();
@@ -484,9 +506,9 @@ void characterBuilder::drawAccessoriesControl()
             ImGui::SetCursorPos(ImVec2(x,100.f));
             ImGui::PushID((i + 1) * 13);
             int colorIndex = i * 3;
-            ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)accessoriesButtonColor.at(indexAccessories).at(colorIndex));
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)accessoriesButtonColor.at(indexAccessories).at(colorIndex + 1));
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)accessoriesButtonColor.at(indexAccessories).at(colorIndex + 2));
+            ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)c.accessoriesButtonColor.at(indexAccessories).at(colorIndex));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)c.accessoriesButtonColor.at(indexAccessories).at(colorIndex + 1));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)c.accessoriesButtonColor.at(indexAccessories).at(colorIndex + 2));
             if(ImGui::Button("  "))
             {
                 changeAccessoriesColor(i);
