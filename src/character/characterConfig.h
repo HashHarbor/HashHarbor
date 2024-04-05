@@ -168,7 +168,7 @@ public:
                     ImColor::HSV(190.f / 360.f,0.582f,0.620f), ImColor::HSV(229.f / 360.f,0.290f,0.784f), ImColor::HSV(199.f / 360.f,0.623f,0.604f), // 21.3
                     ImColor::HSV(19.f / 360.f,0.689f,0.882f), ImColor::HSV(13.f / 360.f,0.389f,0.725f), ImColor::HSV(8.f / 360.f,0.639f,0.816f)}, // 21.4
             // outfit 24
-            {ImColor::HSV(201.f / 360.f,0.1f,0.89f), ImColor::HSV(201.f / 360.f,0.375f,0.941f), ImColor::HSV(210.f / 360.f,0.958f,0.831f), // 24.1
+            {ImColor::HSV(201.f / 360.f,1.0f,0.89f), ImColor::HSV(201.f / 360.f,0.375f,0.941f), ImColor::HSV(210.f / 360.f,0.958f,0.831f), // 24.1
                     ImColor::HSV(174.f / 360.f,0.473f,0.812f), ImColor::HSV(201.f / 360.f,0.254f,0.957f), ImColor::HSV(186.f / 360.f,0.51f,0.784f), // 24.2
                     ImColor::HSV(180.f / 360.f,0.100f,0.573f), ImColor::HSV(194.f / 360.f,0.389f,0.867f), ImColor::HSV(201.f / 360.f,0.49f,0.408f), // 24.3
                     ImColor::HSV(278.f / 360.f,0.338f,0.776f), ImColor::HSV(340.f / 360.f,0.319f,0.984f), ImColor::HSV(277.f / 360.f,0.525f,0.784f)} // 24.3
@@ -201,11 +201,27 @@ public:
                     ImColor::HSV(186.f / 360.f,0.446f,0.616f), ImColor::HSV(197.f / 360.f,0.493f,0.596f), ImColor::HSV(207.f / 360.f,0.522f,0.541f), // 4
                     ImColor::HSV(8.f / 360.f,0.525f,0.627f), ImColor::HSV(0.f / 360.f,0.423f,0.557f), ImColor::HSV(349.f / 360.f,0.432f,0.49f)}, // 5
             // Beard
-            {ImColor::HSV(8.f / 360.f,0.525f,0.627f), ImColor::HSV(0.f / 360.f,0.423f,0.557f), ImColor::HSV(349.f / 360.f,0.432f,0.49f)},
+            {ImColor::HSV(17.f / 360.f,0.342f,0.435f), ImColor::HSV(20.f / 360.f,0.406f,0.541f), ImColor::HSV(47.f / 360.f,0.784f,0.525f),
+                    ImColor::HSV(16.f / 360.f,0.652f,0.541f), ImColor::HSV(24.f / 360.f,0.748f,0.592f), ImColor::HSV(21.f / 360.f,0.898f,0.694f),
+                    ImColor::HSV(28.f / 360.f,0.634f,0.631f), ImColor::HSV(41.f / 360.f,0.826f,0.675f), ImColor::HSV(45.f / 360.f,0.943f,0.82f),
+                    ImColor::HSV(28.f / 360.f,0.09f,0.65f), ImColor::HSV(39.f / 360.f,0.13f,0.70f), ImColor::HSV(39.f / 360.f,0.15f,0.89f),
+                    ImColor::HSV(227.f / 360.f,0.27f,0.55f), ImColor::HSV(219.f / 360.f,0.30f,0.64f), ImColor::HSV(240.f / 360.f,0.26f,0.37f)},
+            // Mustache
+            {ImColor::HSV(17.f / 360.f,0.342f,0.435f), ImColor::HSV(20.f / 360.f,0.406f,0.541f), ImColor::HSV(47.f / 360.f,0.784f,0.525f),
+                    ImColor::HSV(16.f / 360.f,0.652f,0.541f), ImColor::HSV(24.f / 360.f,0.748f,0.592f), ImColor::HSV(21.f / 360.f,0.898f,0.694f),
+                    ImColor::HSV(28.f / 360.f,0.634f,0.631f), ImColor::HSV(41.f / 360.f,0.826f,0.675f), ImColor::HSV(45.f / 360.f,0.943f,0.82f),
+                    ImColor::HSV(28.f / 360.f,0.09f,0.65f), ImColor::HSV(39.f / 360.f,0.13f,0.70f), ImColor::HSV(39.f / 360.f,0.15f,0.89f),
+                    ImColor::HSV(227.f / 360.f,0.27f,0.55f), ImColor::HSV(219.f / 360.f,0.30f,0.64f), ImColor::HSV(240.f / 360.f,0.26f,0.37f)},
             // Chef Hat
-            {ImColor::HSV(8.f / 360.f,0.525f,0.627f), ImColor::HSV(0.f / 360.f,0.423f,0.557f), ImColor::HSV(349.f / 360.f,0.432f,0.49f)},
+            {ImColor::HSV(270.f / 360.f,0.06f,0.95f), ImColor::HSV(248.f / 360.f,0.14f,0.80f), ImColor::HSV(0.f / 360.f,0.0f,0.97f)},
             // Dino Hat
-            {ImColor::HSV(8.f / 360.f,0.525f,0.627f), ImColor::HSV(0.f / 360.f,0.423f,0.557f), ImColor::HSV(349.f / 360.f,0.432f,0.49f)}
+            {ImColor::HSV(79.f / 360.f,0.64f,0.76f), ImColor::HSV(107.f / 360.f,0.52f,0.65f), ImColor::HSV(132.f / 360.f,0.39f,0.55f),
+                    ImColor::HSV(190.f / 360.f,0.31f,0.78f), ImColor::HSV(203.f / 360.f,0.46f,0.73f), ImColor::HSV(218.f / 360.f,0.56f,0.58f),
+                    ImColor::HSV(35.f / 360.f,0.69f,0.88f), ImColor::HSV(16.f / 360.f,0.61f,0.8f), ImColor::HSV(347.f / 360.f,0.70f,0.67f)},
+            // Monocle
+            {ImColor::HSV(39.f / 360.f,0.68f,0.78f), ImColor::HSV(34.f / 360.f,0.58f,0.60f), ImColor::HSV(10.f / 360.f,0.27f,0.35f),
+                    ImColor::HSV(20.f / 360.f,0.84f,0.84f), ImColor::HSV(26.f / 360.f,0.60f,0.93f), ImColor::HSV(4.f / 360.f,0.45f,0.59f),
+                    ImColor::HSV(201.f / 360.f,0.27f,0.73f), ImColor::HSV(186.f / 360.f,0.27f,0.89f), ImColor::HSV(228.f / 360.f,0.45f,0.59f)}
     };
 
     vector<ImColor> bodyColors = {

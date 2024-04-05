@@ -79,11 +79,27 @@ public:
                                "assets/characters/accessories/beanie_4.png",
                                "assets/characters/accessories/beanie_5.png"}},
             // beard
-            {4, {"assets/characters/accessories/beard_1.png"}},
+            {4, {"assets/characters/accessories/beard_1.png",
+                        "assets/characters/accessories/beard_2.png",
+                        "assets/characters/accessories/beard_3.png",
+                        "assets/characters/accessories/beard_4.png",
+                        "assets/characters/accessories/beard_5.png"}},
+            // mustache
+            {5, {"assets/characters/accessories/mustache_1.png",
+                        "assets/characters/accessories/mustache_2.png",
+                        "assets/characters/accessories/mustache_3.png",
+                        "assets/characters/accessories/mustache_4.png",
+                        "assets/characters/accessories/mustache_5.png"}},
             // chef
-            {5, {"assets/characters/accessories/chef_1.png"}},
+            {6, {"assets/characters/accessories/chef_1.png"}},
             // dino hat
-            {6, {"assets/characters/accessories/dinohat_3.png"}}
+            {7, {"assets/characters/accessories/dinohat_1.png",
+                        "assets/characters/accessories/dinohat_2.png",
+                        "assets/characters/accessories/dinohat_3.png"}},
+            // monocle
+            {8, {"assets/characters/accessories/monocle_1.png",
+                        "assets/characters/accessories/monocle_2.png",
+                        "assets/characters/accessories/monocle_3.png"}}
     };
     vector<string> body ={
             {"assets/characters/body/body_1.png"},
