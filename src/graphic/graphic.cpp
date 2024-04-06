@@ -361,6 +361,7 @@ void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, TextEdit
     // Window - Character
     ImGui::Begin("Character", NULL, flags);
     {
+        ImDrawList* draw_list = ImGui::GetWindowDrawList();
         if(characterCreated)
         {
             frameTimer -= ImGui::GetIO().DeltaTime;
@@ -368,6 +369,8 @@ void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, TextEdit
 
             ImVec2 characterPos = ImVec2((ImGui::GetContentRegionAvail() - ImVec2(32, 64)) * 0.5f) + ImVec2(8, 0) - ImVec2(0, 8);
             character.drawPos = characterPos;
+
+            draw_list->AddCircleFilled(ImVec2(characterPos.x + 16.f, characterPos.y + 60.f), 13.f, ImColor(ImVec4(0.0f, 0.0f, 0.0f, 0.15f))); // shadow
 
             ImGui::SetCursorPos(characterPos);
             character.moveMainCharacter(&image, &charBuild, frameTimer, canMove);
