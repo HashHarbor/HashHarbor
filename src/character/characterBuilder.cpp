@@ -28,6 +28,7 @@ using std::pair;
 #include <bits/stdc++.h>
 #endif
 
+#include <random>
 #include "characterConfig.h"
 
 characterBuilder::characterBuilder(imageHandler* imgHandler)
@@ -237,30 +238,6 @@ void characterBuilder::changeAccessoriesColor(int i)
 void characterBuilder::drawCharacter(imageHandler *imgHandler, float frameTimer)
 {
     float factor = 4.f;
-
-    ImGui::SetCursorPos(ImVec2(drawPos.x + 20.f,drawPos.y - 20.f));
-    static bool animate = true;
-    static int direction = 0;
-    ImGui::Checkbox("Play Animation", &animate);
-
-    if(!animate)
-    {
-        ImGui::SetCursorPos(ImVec2(drawPos.x - 50.f,drawPos.y + 280.f));
-        ImGui::Text("Rotate Character");
-        ImGui::SetCursorPos(ImVec2(drawPos.x - 50.f,drawPos.y + 300.f));
-        ImGui::PushItemWidth(250);
-        ImGui::SliderInt(" ", &direction, 0, 3, "");
-        ImGui::PopItemWidth();
-
-        if(direction != frameCount_4)
-        {
-            frameCount_4 = direction;
-        }
-    }
-    else
-    {
-        direction = 0;
-    }
 
     characterConfig cords;
     ImGui::SetCursorPos(drawPos);
@@ -519,6 +496,85 @@ void characterBuilder::drawAccessoriesControl()
     }
 }
 
+void characterBuilder::drawUI()
+{
+    ImGui::SetCursorPos(ImVec2(drawPos.x + 20.f,drawPos.y - 20.f));
+    static bool animate = true;
+    static int direction = 0;
+    ImGui::Checkbox("Play Animation", &animate);
+
+    if(!animate)
+    {
+        ImGui::SetCursorPos(ImVec2(drawPos.x - 50.f,drawPos.y + 280.f));
+        ImGui::Text("Rotate Character");
+        ImGui::SetCursorPos(ImVec2(drawPos.x - 50.f,drawPos.y + 300.f));
+        ImGui::PushItemWidth(250);
+        ImGui::SliderInt(" ", &direction, 0, 3, "");
+        ImGui::PopItemWidth();
+
+        if(direction != frameCount_4)
+        {
+            frameCount_4 = direction;
+        }
+    }
+    else
+    {
+        direction = 0;
+    }
+
+    ImGui::SetCursorPos(ImVec2(50.f,450.f));
+    ImGui::PushID(88);
+    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(228.f / 360.f, 0.153f, 0.384f));
+    if(ImGui::Button("Randomize", ImVec2(150.f, 40.f)))
+    {
+        std::random_device rd;
+        std::mt19937 gen(rd());
+
+        std::uniform_int_distribution<> _body(0, (int)body.size() - 1);
+        indexBody = _body(gen);
+
+        std::uniform_int_distribution<> _eyes(0, (int)eyes.size() - 1);
+        indexEyes = _eyes(gen);
+
+        std::uniform_int_distribution<> _outfit(0, (int)outfit.size() - 1);
+        indexOutfit = _outfit(gen);
+
+        std::uniform_int_distribution<> _outfitColor(0, (int)outfit.at(indexOutfit).size() - 1);
+        indexOutfitColor = _outfitColor(gen);
+
+        std::uniform_int_distribution<> _hair(0, (int)hair.size());
+        indexHair = _hair(gen);
+
+        if(indexHair != hair.size())
+        {
+            std::uniform_int_distribution<> _hairColor(0, (int)hair.at(indexHair).size() - 1);
+            indexHairColor = _hairColor(gen);
+        }
+        else
+        {
+            indexHairColor = 0;
+        }
+
+        std::uniform_int_distribution<> _accessories(0, (int)accessories.size());
+        indexAccessories = _accessories(gen);
+
+        if(indexAccessories != accessories.size())
+        {
+            std::uniform_int_distribution<> _accessoriesColor(0, (int)accessories.at(indexAccessories).size() - 1);
+            indexAccessoriesColor = _accessoriesColor(gen);
+        }
+        else
+        {
+            indexAccessoriesColor = 0;
+        }
+
+    }
+    ImGui::PopStyleColor(3);
+    ImGui::PopID();
+}
+
 void characterBuilder::drawCharacterBuilder(imageHandler* imgHandler, float frameTimer)
 {
     //cout << indexBody << " || " << indexEyes << " || " << indexOutfit << " | " << indexOutfitColor << " || " << indexHair << " | " << indexHairColor << " || " << indexAccessories << " | " << indexAccessoriesColor << " ||||" << endl;
@@ -527,6 +583,7 @@ void characterBuilder::drawCharacterBuilder(imageHandler* imgHandler, float fram
     drawBodyEyeControl();
     drawOutfitControls();
     drawHairControls();
+    drawUI();
 }
 
 void characterBuilder::setAsMainCharacter(vector<int>& index)

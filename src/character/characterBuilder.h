@@ -55,6 +55,8 @@ class characterBuilder
     void drawOutfitControls();
     void drawAccessoriesControl();
 
+    void drawUI();
+
     void changeBody(int i);
     void changeEyes(int i);
     void changeOutfit(int i);

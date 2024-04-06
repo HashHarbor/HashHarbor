@@ -674,7 +674,7 @@ void graphic::makeCharacterSelector(imageHandler& image, characterManager &chara
         }
 
         //---setchar
-        ImGui::SetCursorPos(ImVec2(characterPos.x * 3.f - 10.f, 420.f));
+        ImGui::SetCursorPos(ImVec2(characterPos.x * 3.f - 10.f, 450.f));
         ImGui::PushID(8);
         ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(219.f / 360.f, 0.289f, 0.475f));
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(211.f / 360.f, 0.346f, 0.6f));
