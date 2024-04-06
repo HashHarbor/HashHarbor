@@ -130,13 +130,17 @@ void graphic::setup(){
 #if defined(__APPLE__)
     string font_1 = imgPth.currentPath.string() + FONT_ICON_FILE_NAME_FAR;
     string font_2 = imgPth.currentPath.string() + FONT_ICON_FILE_NAME_FAS;
+    string font_3 = imgPth.currentPath.string() + "/assets/font/NotoSans-Medium.ttf";
 #else
     string font_1 = string("..") + FONT_ICON_FILE_NAME_FAR;
     string font_2 = string("..") + FONT_ICON_FILE_NAME_FAS;
+    string font_3 = "../assets/font/NotoSans-Medium.ttf";
 #endif
     io.Fonts->AddFontFromFileTTF(font_1.c_str(), iconFontSize, &icons_config, icons_ranges );
     io.Fonts->AddFontFromFileTTF( font_2.c_str(), iconFontSize, &icons_config, icons_ranges );
 
+    ImFont* notoLarge = io.Fonts->AddFontFromFileTTF(font_3.c_str(), 25.f, NULL, io.Fonts->GetGlyphRangesDefault());
+    ImFont* notoSmall = io.Fonts->AddFontFromFileTTF(font_3.c_str(), 13.f, NULL, io.Fonts->GetGlyphRangesDefault());
 
     // Setup Platform/Renderer backends
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
@@ -284,7 +288,7 @@ void graphic::setup(){
         }
 
         if(show_userProfile){
-            makeUserProfile();
+            makeUserProfile(notoLarge, notoSmall);
         }
 
         if(show_config){
@@ -304,7 +308,7 @@ void graphic::setup(){
         {
             makeCharacterSelector(image, character, builder);
         }
-        
+
         // Rendering
         ImGui::Render();
         glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
@@ -580,7 +584,8 @@ void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit){
     ImGui::End();
 }
 
-void graphic::makeUserProfile(){
+void graphic::makeUserProfile(ImFont* fontLarge, ImFont* fontSmall)
+{
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus;
     if(show_blur){
         flags |= ImGuiWindowFlags_NoInputs;
@@ -596,12 +601,80 @@ void graphic::makeUserProfile(){
     }
     ImGui::End();
 
+    float windowWidth = (float)width_px / 2;
+    float windowHeight = (float)height_px / 3 * 2;
     // Code Editor
-    ImGui::SetNextWindowSize({(float)width_px / 2,(float)height_px / 3 * 2});
+    ImGui::SetNextWindowSize({windowWidth,windowHeight});
     ImGui::SetNextWindowPos({(float)width_px / 2, 0});
+
+    float profileWidth = ((float)width_px / 2) + (windowWidth / 2.f);
+    float profileHeight = windowHeight / 2.f;
 
     ImGui::Begin("Profile", NULL, flags);
     {
+        ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+        // card gradient Blue
+        ImU32 col_card_top = ImGui::GetColorU32(IM_COL32(140, 200, 255, 255));
+        ImU32 col_card_bottom = ImGui::GetColorU32(IM_COL32(70, 150, 230, 255));
+
+        draw_list->AddRectFilled(ImVec2(profileWidth  - 150.f, profileHeight - 200.f), ImVec2(profileWidth + 150.f, profileHeight + 200.f), ImColor(ImVec4(1.0f, 0.8f, 0.2f, 1.0f)), 20.f); // outer border
+        draw_list->AddRectFilledMultiColor(ImVec2(profileWidth - 140.f, profileHeight - 190.f), ImVec2(profileWidth + 140.f, profileHeight + 190.f), col_card_bottom, col_card_top, col_card_bottom, col_card_top); // inner fill
+
+        ImU32 col_gold = ImGui::GetColorU32(IM_COL32(255, 215, 0, 255));
+        ImU32 col_pastel_gold = ImGui::GetColorU32(IM_COL32(255, 236, 139, 255));
+        draw_list->AddRectFilled(ImVec2(profileWidth - 110.f, profileHeight - 150.f), ImVec2(profileWidth + 116.f, profileHeight + 16.f), ImColor(ImVec4(0.0f, 0.0f, 0.0f, 0.2f)), 5.f); // character shade
+        draw_list->AddRectFilledMultiColor(ImVec2(profileWidth - 110.f, profileHeight - 150.f), ImVec2(profileWidth + 110.f, profileHeight + 10.f), col_pastel_gold, col_gold, col_pastel_gold, col_gold); // character Border
+
+        draw_list->AddRectFilled(ImVec2(profileWidth - 100.f, profileHeight + 18.f), ImVec2(profileWidth + 100.f, profileHeight + 32.f), ImColor(ImVec4(1.0f, 0.8f, 0.2f, 1.0f)), 10.f); // character shade
+
+        // background behind character
+        ImU32 col_sky_top = ImGui::GetColorU32(IM_COL32(190, 220, 255, 255));
+        ImU32 col_sky_bottom = ImGui::GetColorU32(IM_COL32(100, 180, 255, 255));
+        ImU32 col_grass_top = ImGui::GetColorU32(IM_COL32(120, 180, 120, 255));
+        ImU32 col_grass_bottom = ImGui::GetColorU32(IM_COL32(160, 220, 160, 255));
+        draw_list->AddRectFilledMultiColor(ImVec2(profileWidth - 105.f, profileHeight - 145.f), ImVec2(profileWidth + 105.f, profileHeight + 5.f), col_sky_top, col_sky_bottom, col_grass_top, col_grass_bottom); // background behind character
+
+        draw_list->AddCircleFilled(ImVec2(profileWidth + 116.5f, profileHeight - 167.5f), 13.5f, ImColor(ImVec4(0.0f, 0.0f, 0.0f, 0.2f))); // circle behind logo
+        draw_list->AddCircleFilled(ImVec2(profileWidth + 115.f, profileHeight - 168.f), 12.f, ImColor(ImVec4(0.1f, 0.5f, 1.0f, 1.0f))); // circle behind logo
+        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) + 107.f, (windowHeight / 2.f) - 173.f));
+        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0,0,0,255));
+        ImGui::Text(ICON_FA_BOLT_LIGHTNING);
+        ImGui::PopStyleColor();
+
+        draw_list->AddLine(ImVec2(profileWidth - 120.f, profileHeight + 95.f), ImVec2(profileWidth + 120.f, profileHeight + 95.f), IM_COL32(0, 0, 0, 255), 2.f);
+
+        ImGui::PushFont(fontLarge);
+
+        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) - 120.f, (windowHeight / 2.f) - 180.f));
+        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0,0,0,255));
+        ImGui::Text("UserName");
+        ImGui::PopStyleColor();
+
+        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) + 40.f, (windowHeight / 2.f) - 180.f));
+        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255,0,0,255));
+        ImGui::Text("123 HP");
+        ImGui::PopStyleColor();
+
+        ImGui::PopFont();
+
+        ImGui::PushFont(fontSmall);
+
+        string join = "Joined: 3/23/24";
+        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) - (ImGui::CalcTextSize(join.c_str()).x / 2.f), (windowHeight / 2.f) + 17.f));
+        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0,0,0,255));
+        ImGui::Text("%s", join.c_str());
+
+        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) - 120.f, (windowHeight / 2.f) + 35.f));
+        ImGui::PushTextWrapPos(fontSmall->FontSize * 35.f);
+        ImGui::TextWrapped("Insert User Profile Text Here Insert User Profile Text Here Insert User Profile Text Here Insert User Profile Text Here Insert User Profile Text Here ");
+
+        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) - 120.f, (windowHeight / 2.f) + 105.f));
+        ImGui::TextWrapped("Insert User Profile Text Here Insert User Profile Text Here Insert User Profile Text Here Insert User Profile Text Here Insert User Profile Text Here ");
+        ImGui::PopTextWrapPos();
+        ImGui::PopStyleColor();
+
+        ImGui::PopFont();
 
     }
     ImGui::End();
