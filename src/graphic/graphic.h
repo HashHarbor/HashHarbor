@@ -62,7 +62,7 @@ public:
 
     void makeBlur();
 
-    void makeUserProfile(ImFont* fontLarge, ImFont* fontSmall);
+    void makeUserProfile(ImFont* fontLarge, ImFont* fontSmall, imageHandler& image, characterManager& character, characterBuilder& charBuild);
 
     void triggerQuestion(int question);
     string executeCPP(string code);

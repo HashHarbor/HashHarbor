@@ -35,7 +35,7 @@ authentication::authentication()
 
 bool authentication::inputValidation(string usr, string passwd, bool mode)
 {
-    if(regex_search(usr, regex("^[A-Za-z0-9_.-]{3,48}$"))) // check if username matches requirments
+    if(regex_search(usr, regex("^[A-Za-z0-9_.-]{3,16}$"))) // check if username matches requirments
     {
         if(std::regex_search(passwd, regex("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[~`!@#$%^&*()_+={}:;<>?-])[A-Za-z0-9~`!@#$%^&*()_+={}:;<>?-]{8,48}$"))) // if password is within allowed
         {

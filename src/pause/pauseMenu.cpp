@@ -432,7 +432,7 @@ void pauseMenu::updateUserUsername(float profileWidth, float profileHeight)
 
     ImGui::SetCursorPos(ImVec2(425.f - (ImGui::CalcTextSize("New Username").x / 2.f) , 390.f));
     ImGui::Text("New Username");
-    ImGui::SameLine(); HelpMarker("A username should be between 3 and 48 character\nA Username MAY contain:\n  Lowercase letters: a-z\n  Uppercase letters: A-Z\n  Digits: 0-9\n  Special character: - _ .");
+    ImGui::SameLine(); HelpMarker("A username should be between 3 and 16 character\nA Username MAY contain:\n  Lowercase letters: a-z\n  Uppercase letters: A-Z\n  Digits: 0-9\n  Special character: - _ .");
     ImGui::PopStyleColor();
 
     ImGui::SetCursorPos(ImVec2(425.f - 150.f, 410.f));

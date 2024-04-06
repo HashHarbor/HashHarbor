@@ -54,7 +54,7 @@ class pauseMenu
     bool usr_Password_FailCmp = false;
     bool usr_Password_Fail = false;
 
-    char createUsername[64] = "";
+    char createUsername[17] = "";
 
     char currentPasswd[64] = "";
     char createPasswd[64] = "";

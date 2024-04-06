@@ -34,10 +34,10 @@ class login
     float minHeight = 0.f;
     float txtPos_x = 0.f;
 
-    char username[64] = "";
+    char username[17] = "";
     char passwd[64] = "";
 
-    char createUsername[64] = "";
+    char createUsername[17] = "";
     char createPasswd[64] = "";
     char confirmPasswd[64] = "";
 

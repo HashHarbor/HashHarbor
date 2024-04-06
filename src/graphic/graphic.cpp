@@ -288,7 +288,7 @@ void graphic::setup(){
         }
 
         if(show_userProfile){
-            makeUserProfile(notoLarge, notoSmall);
+            makeUserProfile(notoLarge, notoSmall, image, character, builder);
         }
 
         if(show_config){
@@ -584,7 +584,7 @@ void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit){
     ImGui::End();
 }
 
-void graphic::makeUserProfile(ImFont* fontLarge, ImFont* fontSmall)
+void graphic::makeUserProfile(ImFont* fontLarge, ImFont* fontSmall, imageHandler& image, characterManager& character, characterBuilder& charBuild)
 {
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus;
     if(show_blur){
@@ -613,6 +613,7 @@ void graphic::makeUserProfile(ImFont* fontLarge, ImFont* fontSmall)
     ImGui::Begin("Profile", NULL, flags);
     {
         ImDrawList* draw_list = ImGui::GetWindowDrawList();
+        userProfile& usrProfile = userProfile::getInstance();
 
         // card gradient Blue
         ImU32 col_card_top = ImGui::GetColorU32(IM_COL32(140, 200, 255, 255));
@@ -635,32 +636,36 @@ void graphic::makeUserProfile(ImFont* fontLarge, ImFont* fontSmall)
         ImU32 col_grass_bottom = ImGui::GetColorU32(IM_COL32(160, 220, 160, 255));
         draw_list->AddRectFilledMultiColor(ImVec2(profileWidth - 105.f, profileHeight - 145.f), ImVec2(profileWidth + 105.f, profileHeight + 5.f), col_sky_top, col_sky_bottom, col_grass_top, col_grass_bottom); // background behind character
 
-        draw_list->AddCircleFilled(ImVec2(profileWidth + 116.5f, profileHeight - 167.5f), 13.5f, ImColor(ImVec4(0.0f, 0.0f, 0.0f, 0.2f))); // circle behind logo
-        draw_list->AddCircleFilled(ImVec2(profileWidth + 115.f, profileHeight - 168.f), 12.f, ImColor(ImVec4(0.1f, 0.5f, 1.0f, 1.0f))); // circle behind logo
-        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) + 107.f, (windowHeight / 2.f) - 173.f));
+        draw_list->AddCircleFilled(ImVec2(profileWidth + 116.5f, profileHeight + 169.5f), 13.5f, ImColor(ImVec4(0.0f, 0.0f, 0.0f, 0.2f))); // shadow behind circle
+        draw_list->AddCircleFilled(ImVec2(profileWidth + 115.f, profileHeight + 168.f), 12.f, ImColor(ImVec4(0.1f, 0.5f, 1.0f, 1.0f))); // circle behind logo
+        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) + 108.f, (windowHeight / 2.f) + 163.f));
         ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0,0,0,255));
         ImGui::Text(ICON_FA_BOLT_LIGHTNING);
         ImGui::PopStyleColor();
 
-        draw_list->AddLine(ImVec2(profileWidth - 120.f, profileHeight + 95.f), ImVec2(profileWidth + 120.f, profileHeight + 95.f), IM_COL32(0, 0, 0, 255), 2.f);
+        draw_list->AddLine(ImVec2(profileWidth - 120.f, profileHeight + 93.f), ImVec2(profileWidth + 120.f, profileHeight + 95.f), IM_COL32(0, 0, 0, 255), 2.f);
 
+        charBuild.drawCharacterAnimation(&image, ImVec2((windowWidth / 2.f) - 32.f, (windowHeight / 2.f) - 128.f), {ImVec2(64.1f / 192.f, 0.1f/512.f),ImVec2(95.99f/192.f, 64.f/512.f)}, 2.f, character.getMainPlayer()->dynamicIndex);
+
+        // --- Write Text With Large Font --- //
         ImGui::PushFont(fontLarge);
 
-        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) - 120.f, (windowHeight / 2.f) - 180.f));
+        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) - (ImGui::CalcTextSize(usrProfile.getUsername().c_str()).x / 2.f), (windowHeight / 2.f) - 180.f));
         ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0,0,0,255));
-        ImGui::Text("UserName");
+        ImGui::Text("%s", usrProfile.getUsername().c_str());
         ImGui::PopStyleColor();
 
-        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) + 40.f, (windowHeight / 2.f) - 180.f));
+        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) + 40.f, (windowHeight / 2.f) + 157.f));
         ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255,0,0,255));
         ImGui::Text("123 HP");
         ImGui::PopStyleColor();
 
         ImGui::PopFont();
 
+        // --- Write Text With Small Font --- //
         ImGui::PushFont(fontSmall);
 
-        string join = "Joined: 3/23/24";
+        string join = "Joined: " + usrProfile.getJoinDate();
         ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) - (ImGui::CalcTextSize(join.c_str()).x / 2.f), (windowHeight / 2.f) + 17.f));
         ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0,0,0,255));
         ImGui::Text("%s", join.c_str());
