@@ -140,7 +140,7 @@ void graphic::setup(){
     io.Fonts->AddFontFromFileTTF( font_2.c_str(), iconFontSize, &icons_config, icons_ranges );
 
     ImFont* notoLarge = io.Fonts->AddFontFromFileTTF(font_3.c_str(), 25.f, NULL, io.Fonts->GetGlyphRangesDefault());
-    ImFont* notoSmall = io.Fonts->AddFontFromFileTTF(font_3.c_str(), 13.f, NULL, io.Fonts->GetGlyphRangesDefault());
+    ImFont* notoSmall = io.Fonts->AddFontFromFileTTF(font_3.c_str(), 15.f, NULL, io.Fonts->GetGlyphRangesDefault());
 
     // Setup Platform/Renderer backends
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
@@ -284,7 +284,7 @@ void graphic::setup(){
         }
 
         if(show_codeEditor){
-            makeCodeEditor(editor, fileToEdit);
+            makeCodeEditor(editor, fileToEdit, notoSmall);
         }
 
         if(show_userProfile){
@@ -461,7 +461,7 @@ void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, 
 }
 
 
-void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit){
+void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit, ImFont* fontSmall){
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar ;
     if(show_blur){
         flags |= ImGuiWindowFlags_NoInputs;
@@ -553,11 +553,13 @@ void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit){
             ImGui::EndCombo();
         }
 
+        ImGui::PushFont(fontSmall);
         // TODO - implement code for all questions
         database &db = database::getInstance();
         database::questionData qes;
         db.getQuestion(1, qes);
         ImGui::TextWrapped(qes.question.c_str());
+        ImGui::PopFont();
     }
     ImGui::End();
 
@@ -574,6 +576,7 @@ void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit){
     ImGui::Begin("Sandbox", NULL, flags);
     {
 
+        ImGui::PushFont(fontSmall);
         ImGui::Text("%6d/%-6d %6d lines  | %s | %s | %s | %s", cpos.mLine + 1, cpos.mColumn + 1, editor.GetTotalLines(),
 			editor.IsOverwrite() ? "Ovr" : "Ins",
 			editor.CanUndo() ? " " : " ",
@@ -582,6 +585,7 @@ void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit){
         if(!show_blur){
             editor.Render("TextEditor");
         }
+        ImGui::PopFont();
 		
     }
     ImGui::End();
