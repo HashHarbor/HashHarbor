@@ -58,7 +58,7 @@ public:
     public:
         int id;
         string question = "";
-        string boiler = "";
+        vector<string> boiler;
         vector<string> cases;
         vector<string> results;
     };

@@ -261,13 +261,20 @@ bool database::getQuestion(int num, questionData& data)
             bsoncxx::document::element db_question = findQuestion.value()["question"];
             data.question = db_question.get_string().value.to_string();
 
-            bsoncxx::document::element db_boiler = findQuestion.value()["boilerCoder"];
-            data.boiler = db_boiler.get_string().value.data();
+            bsoncxx::document::element db_boiler = findQuestion.value()["boilerPlate"];
+            assert(db_boiler.type() == bsoncxx::type::k_array);
+            bsoncxx::array::view boiler = db_boiler.get_array();
+            int i = 0;
+            for (auto iter: boiler) {
+                assert(iter.type() == bsoncxx::type::k_string); // if string
+                data.boiler.push_back(iter.get_string().value.data());
+                i++;
+            }
 
             bsoncxx::document::element db_cases = findQuestion.value()["testInput"];
             assert(db_cases.type() == bsoncxx::type::k_array);
             bsoncxx::array::view cases = db_cases.get_array();
-            int i = 0;
+            i = 0;
             for (auto iter: cases) {
                 assert(iter.type() == bsoncxx::type::k_string); // if string
                 data.cases.push_back(iter.get_string().value.data());
