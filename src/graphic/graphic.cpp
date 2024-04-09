@@ -169,6 +169,8 @@ void graphic::setup(){
     overlap.loadTexture(overlap.filepath, &overlap);
     interactions.loadTexture(interactions.filepath, &interactions);
 
+    
+
     character.createCharacter("USER", false, true, &image);
     character.setMainPlayer("USER");
 
@@ -419,15 +421,17 @@ void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, TextEdit
                     obsMap = "../assets/map/town1/room1/obs.png";
                     overlapMap = "../assets/map/town1/room1/overlap.png";
 
-//                    gridX = 20;
-//                    gridY = 20;
-//
-//                    background = imageHandler(pathMap.c_str());
-//                    this->overlap = imageHandler(overlapMap.c_str());
-//                    interactions = imageHandler(intMap.c_str());
-//                    background.loadTexture(background.filepath, &background);
-//                    this->overlap.loadTexture(overlap.filepath, &overlap);
-//                    interactions.loadTexture(interactions.filepath, &interactions);
+                   gridX = 20;
+                   gridY = 20;
+
+                   background = imageHandler(pathMap.c_str());
+                   this->overlap = imageHandler(overlapMap.c_str());
+                   interactions = imageHandler(intMap.c_str());
+                   background.loadTexture(background.filepath, &background);
+                   this->overlap.loadTexture(overlap.filepath, &overlap);
+                   interactions.loadTexture(interactions.filepath, &interactions);
+
+                   move = movementHandler(obsMap, intMap, width_px, height_px);
 
                 }
 
