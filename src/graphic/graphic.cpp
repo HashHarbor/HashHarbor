@@ -263,7 +263,6 @@ void graphic::setup(){
             {
                 show_blur = !show_blur;
                 show_settings = !show_settings;
-                allowMovement= !allowMovement;
 
                 resetPauseScreen = true;
             }
@@ -275,8 +274,8 @@ void graphic::setup(){
         }
 
         if(show_display){
-            makeCharacter(image, overlap, editor, mapGridX, mapGridY, move, lastAction, character, builder,  allowMovement);
-            makeBackground(background, move.getGrid(), mapGridX, mapGridY, allowMovement);
+            makeCharacter(image, overlap, editor, mapGridX, mapGridY, move, lastAction, character, builder);
+            makeBackground(background, move.getGrid(), mapGridX, mapGridY);
         }
 
         if(show_codeEditor){
@@ -289,6 +288,13 @@ void graphic::setup(){
 
         if(show_config){
             makeConfig(cppStart, editor);
+        }
+
+        if(show_codeEditor || show_blur){
+            allowMovement = false;
+        }
+        else{
+            allowMovement = true;
         }
 
         if(show_blur){
@@ -331,12 +337,13 @@ void graphic::makeBlur(){
 
     ImGui::Begin("Blur", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoInputs);
     {
+
     }
 
     ImGui::End();
 }
 
-void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, TextEditor& editor, double &gridX, double &gridY, movementHandler& move, int &lastAction, characterManager &character, characterBuilder& charBuild, bool canMove)
+void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, TextEditor& editor, double &gridX, double &gridY, movementHandler& move, int &lastAction, characterManager &character, characterBuilder& charBuild)
 {
     // Graphics window calculation
     ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
@@ -366,7 +373,7 @@ void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, TextEdit
             character.drawPos = characterPos;
 
             ImGui::SetCursorPos(characterPos);
-            character.moveMainCharacter(&image, &charBuild, frameTimer, canMove);
+            character.moveMainCharacter(&image, &charBuild, frameTimer, allowMovement);
 
             if (frameTimer <= 0.f)
             {
@@ -378,7 +385,7 @@ void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, TextEdit
 
         int keyDown = 0; // used to identify which direction the character is moving
 
-        if(canMove){
+        if(allowMovement){
             if(ImGui::IsKeyDown(ImGuiKey_W)) { keyDown = 1; }
             else if(ImGui::IsKeyDown(ImGuiKey_S)) { keyDown = 2; }
             else if(ImGui::IsKeyDown(ImGuiKey_D)) { keyDown = 3; }
@@ -398,11 +405,10 @@ void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, TextEdit
                 arrowTimer = frameLength;
             }
 
-            if(ImGui::IsKeyDown(ImGuiKey_W) && show_codeEditor == false){
+            if(ImGui::IsKeyDown(ImGuiKey_Q) && show_codeEditor == false){
                 // cout << "trigger interaction here" << endl;
                 show_codeEditor = !show_codeEditor;
                 show_userProfile = !show_userProfile;
-                allowMovement = !allowMovement;
 
                 // codeStarter.clear();
 
@@ -434,7 +440,7 @@ void graphic::triggerQuestion(int question){
 
 }
 
-void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, double gridX, double gridY, bool canMove){
+void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, double gridX, double gridY){
     ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
     ImGui::SetNextWindowPos({0, 0});
 
@@ -524,7 +530,6 @@ void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit){
         if (ImGui::Button("X")) {
             show_codeEditor = !show_codeEditor;
             show_userProfile = !show_userProfile;
-            allowMovement = !allowMovement;
         }
         ImGui::SameLine(); // Place subsequent widgets on the same line
 
@@ -803,7 +808,6 @@ void graphic::makeSettings(pauseMenu& Pause, imageHandler& image, characterManag
         db.updateCharacter();
         show_settings = !show_settings;
         show_blur = !show_blur;
-        allowMovement = !allowMovement;
 
         resetPauseScreen = true;
         updateCharacter = false;
