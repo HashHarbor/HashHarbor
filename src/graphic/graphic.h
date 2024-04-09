@@ -40,14 +40,22 @@ public:
 
     bool characterCreated = false;
 
-    std::string rom_file;
-
     string result = "";
-    vector<TextEditor::LanguageDefinition> languages;
+    database::questionData qes;
 
+    vector<TextEditor::LanguageDefinition> languages;
     vector<string> codeStarter;
     
     int selectedLanguageIndex = 0;
+
+    string pathMap;
+    string intMap;
+    string obsMap;
+    string overlapMap;
+
+    imageHandler background;
+    imageHandler overlap;
+    imageHandler interactions;
 
     //graphic functions
     void setup();

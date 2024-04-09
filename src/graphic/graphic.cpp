@@ -151,24 +151,20 @@ void graphic::setup(){
     login Login = login(width_px, height_px, &image);
     pauseMenu Pause = pauseMenu(width_px, height_px);
 
-    string pathMap;
-    string intMap;
-    string obsMap;
-    string overlapMap;    
 #if defined(__APPLE__)
     pathMap = imgPth.currentPath.string() + "/assets/map/abc.png";
     intMap = imgPth.currentPath.string() + + "/assets/map/int.png";
     obsMap = imgPth.currentPath.string() + "/assets/map/obs.png";
     overlapMap = imgPth.currentPath.string() + "/assets/map/overlap.png";
 #else
-    pathMap = "../assets/map/abc.png";
-    intMap = "../assets/map/int.png";
-    obsMap = "../assets/map/obs.png";
-    overlapMap = "../assets/map/overlap.png";
+    pathMap = "../assets/map/town1/map.png";
+    intMap = "../assets/map/town1/int.png";
+    obsMap = "../assets/map/town1/obs.png";
+    overlapMap = "../assets/map/town1/overlap.png";
 #endif
-    imageHandler background = imageHandler(pathMap.c_str());
-    imageHandler overlap = imageHandler(overlapMap.c_str());
-    imageHandler interactions = imageHandler(intMap.c_str());
+    background = imageHandler(pathMap.c_str());
+    overlap = imageHandler(overlapMap.c_str());
+    interactions = imageHandler(intMap.c_str());
     background.loadTexture(background.filepath, &background);
     overlap.loadTexture(overlap.filepath, &overlap);
     interactions.loadTexture(interactions.filepath, &interactions);
@@ -407,20 +403,34 @@ void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, TextEdit
 
             if(ImGui::IsKeyDown(ImGuiKey_Q) && show_codeEditor == false){
                 // cout << "trigger interaction here" << endl;
-                show_codeEditor = !show_codeEditor;
-                show_userProfile = !show_userProfile;
+                if(interact == 1){
+                    show_codeEditor = !show_codeEditor;
+                    show_userProfile = !show_userProfile;
 
-                // codeStarter.clear();
+                    triggerQuestion(1);
+                    editor.SetTextLines(codeStarter);
 
-                // codeStarter.push_back("#include <iostream>");
-                // codeStarter.push_back("int main() {");
-                // codeStarter.push_back("\tstd::cout << \"Hello HashHarbor!\";");
-                // codeStarter.push_back("\treturn 0;");
-                // codeStarter.push_back("}");
-                // cout << selectedLanguageIndex << endl;
-                editor.SetTextLines(codeStarter);
+                    result = "";
+                }
+                else if(interact == 2){
+                    //update the visuals and locations of character
+                    pathMap = "../assets/map/town1/room1/map.png";
+                    intMap = "../assets/map/town1/room1/int.png";
+                    obsMap = "../assets/map/town1/room1/obs.png";
+                    overlapMap = "../assets/map/town1/room1/overlap.png";
 
-                result = "";
+//                    gridX = 20;
+//                    gridY = 20;
+//
+//                    background = imageHandler(pathMap.c_str());
+//                    this->overlap = imageHandler(overlapMap.c_str());
+//                    interactions = imageHandler(intMap.c_str());
+//                    background.loadTexture(background.filepath, &background);
+//                    this->overlap.loadTexture(overlap.filepath, &overlap);
+//                    interactions.loadTexture(interactions.filepath, &interactions);
+
+                }
+
                 
             }
 
@@ -435,9 +445,8 @@ void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, TextEdit
 }
 
 void graphic::triggerQuestion(int question){
-
-    result = "";
-
+    database &db = database::getInstance();
+    db.getQuestion(question, qes);
 }
 
 void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, double gridX, double gridY){
@@ -458,7 +467,6 @@ void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, 
 
     ImGui::End();
 }
-
 
 void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit){
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar ;
@@ -552,10 +560,7 @@ void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit){
         }
 
         // TODO - implement code for all questions
-        database &db = database::getInstance();
-        database::questionData qes;
-        db.getQuestion(1, qes);
-        ImGui::TextWrapped(qes.question.c_str());
+        ImGui::TextWrapped("%s", qes.question.c_str());
     }
     ImGui::End();
 

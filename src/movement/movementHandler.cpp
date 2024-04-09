@@ -100,7 +100,9 @@ movementHandler::movementHandler(string obspath, string intpath, int width, int 
                 uchar alphaValue = alpha.at<uchar>(y*32, x*32);
 
                 if (alphaValue != 0) {
-                    intGrid[y][x] = 1;
+                    //set stuff within here for if its NPC or map interact
+                    //intGrid[y][x] = 1;
+                    intGrid[y][x] = 2;
                 }
             }
         }
