@@ -139,8 +139,10 @@ void graphic::setup(){
     io.Fonts->AddFontFromFileTTF(font_1.c_str(), iconFontSize, &icons_config, icons_ranges );
     io.Fonts->AddFontFromFileTTF( font_2.c_str(), iconFontSize, &icons_config, icons_ranges );
 
-    ImFont* notoLarge = io.Fonts->AddFontFromFileTTF(font_3.c_str(), 25.f, NULL, io.Fonts->GetGlyphRangesDefault());
-    ImFont* notoSmall = io.Fonts->AddFontFromFileTTF(font_3.c_str(), 15.f, NULL, io.Fonts->GetGlyphRangesDefault());
+    ImFont* noto_15 = io.Fonts->AddFontFromFileTTF(font_3.c_str(), 15.f, NULL, io.Fonts->GetGlyphRangesDefault());
+    ImFont* noto_18 = io.Fonts->AddFontFromFileTTF(font_3.c_str(), 18.f, NULL, io.Fonts->GetGlyphRangesDefault());
+    ImFont* noto_21 = io.Fonts->AddFontFromFileTTF(font_3.c_str(), 21.f, NULL, io.Fonts->GetGlyphRangesDefault());
+    ImFont* noto_25 = io.Fonts->AddFontFromFileTTF(font_3.c_str(), 25.f, NULL, io.Fonts->GetGlyphRangesDefault());
 
     // Setup Platform/Renderer backends
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
@@ -153,7 +155,7 @@ void graphic::setup(){
     database& db = database::getInstance();
     db.connect();
     login Login = login(width_px, height_px, &image);
-    pauseMenu Pause = pauseMenu(width_px, height_px);
+    pauseMenu Pause = pauseMenu(width_px, height_px, noto_15, noto_18, noto_21);
 
     string pathMap;
     string intMap;
@@ -284,11 +286,12 @@ void graphic::setup(){
         }
 
         if(show_codeEditor){
-            makeCodeEditor(editor, fileToEdit, notoSmall);
+            makeCodeEditor(editor, fileToEdit, noto_15, noto_18, noto_21);
+
         }
 
         if(show_userProfile){
-            makeUserProfile(notoLarge, notoSmall, image, character, builder);
+            makeUserProfile(noto_25, noto_15, image, character, builder);
         }
 
         if(show_config){
@@ -461,7 +464,7 @@ void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, 
 }
 
 
-void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit, ImFont* fontSmall){
+void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit, ImFont* font_15, ImFont* font_18, ImFont* font_21){
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar ;
     if(show_blur){
         flags |= ImGuiWindowFlags_NoInputs;
@@ -553,8 +556,23 @@ void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit, ImFont*
             ImGui::EndCombo();
         }
 
-        ImGui::PushFont(fontSmall);
         // TODO - implement code for all questions
+
+        switch(codeEditorFont)
+        {
+            case 0:
+                ImGui::PushFont(font_15);
+                break;
+            case 1:
+                ImGui::PushFont(font_18);
+                break;
+            case 2:
+                ImGui::PushFont(font_21);
+                break;
+            default:
+                ImGui::PushFont(font_15);
+        }
+
         database &db = database::getInstance();
         database::questionData qes;
         db.getQuestion(1, qes);
@@ -575,8 +593,20 @@ void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit, ImFont*
 
     ImGui::Begin("Sandbox", NULL, flags);
     {
-
-        ImGui::PushFont(fontSmall);
+        switch(codeEditorFont)
+        {
+            case 0:
+                ImGui::PushFont(font_15);
+                break;
+            case 1:
+                ImGui::PushFont(font_18);
+                break;
+            case 2:
+                ImGui::PushFont(font_21);
+                break;
+            default:
+                ImGui::PushFont(font_15);
+        }
         ImGui::Text("%6d/%-6d %6d lines  | %s | %s | %s | %s", cpos.mLine + 1, cpos.mColumn + 1, editor.GetTotalLines(),
 			editor.IsOverwrite() ? "Ovr" : "Ins",
 			editor.CanUndo() ? " " : " ",
@@ -879,7 +909,7 @@ void graphic::makeSettings(pauseMenu& Pause, imageHandler& image, characterManag
         resetPauseScreen = false;
     }
 
-    Pause.drawPauseMenu(&image, &character, &charBuild, &changeScreenRes, &res, &updateCharacter, &reset, &done);
+    Pause.drawPauseMenu(&image, &character, &charBuild, &changeScreenRes, &res, &updateCharacter, &reset, &done, &codeEditorFont);
 
     if(updateCharacter)
     {
