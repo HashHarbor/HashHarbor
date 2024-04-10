@@ -115,10 +115,20 @@ bool database::makeUser(database::usrProfile &profile)
         ));
         assert(insertUsr);
 
+        int w,h;
+#if defined(__APPLE__)
+        w = 1320;
+        h = 768;
+#else
+        w = 1760;
+        h = 1024;
+#endif
+
         auto insertProgress = collectionProgress.insert_one(make_document(
                 kvp("_id", insertUsr->inserted_id().get_oid()), // use user oid number to relate data to user
                 kvp("join", bsoncxx::types::b_date(std::chrono::system_clock::now())),
-                kvp("character", make_array(0,5,8,0,2,2,0,3))
+                kvp("character", make_array(0,5,8,0,2,2,0,3)),
+                kvp("settings", make_array(w,h))
         ));
         assert(insertProgress);
 
@@ -163,6 +173,26 @@ bool database::getUserData()
                 i++;
             }
 
+            bsoncxx::document::element db_settings = findData.value()["settings"]; // array for character
+            assert(db_settings.type() == bsoncxx::type::k_array);
+            arr = db_settings.get_array();
+            i = 0;
+            int w,h;
+            for(auto iter : arr)
+            {
+                assert(iter.type() == bsoncxx::type::k_int32);
+                switch(i)
+                {
+                    case 0:
+                        w = iter.get_int32().value;
+                        break;
+                    case 1:
+                        h = iter.get_int32().value;
+                        break;
+                }
+                i++;
+            }
+            usrProfile.setSettings(w,h);
             assert(findData);
             return true;
         }
@@ -264,31 +294,25 @@ bool database::getQuestion(int num, questionData& data)
             bsoncxx::document::element db_boiler = findQuestion.value()["boilerPlate"];
             assert(db_boiler.type() == bsoncxx::type::k_array);
             bsoncxx::array::view boiler = db_boiler.get_array();
-            int i = 0;
             for (auto iter: boiler) {
                 assert(iter.type() == bsoncxx::type::k_string); // if string
                 data.boiler.push_back(iter.get_string().value.data());
-                i++;
             }
 
             bsoncxx::document::element db_cases = findQuestion.value()["testInput"];
             assert(db_cases.type() == bsoncxx::type::k_array);
             bsoncxx::array::view cases = db_cases.get_array();
-            i = 0;
             for (auto iter: cases) {
                 assert(iter.type() == bsoncxx::type::k_string); // if string
                 data.cases.push_back(iter.get_string().value.data());
-                i++;
             }
 
             bsoncxx::document::element db_res = findQuestion.value()["testResult"];
             assert(db_res.type() == bsoncxx::type::k_array);
             bsoncxx::array::view res = db_res.get_array();
-            i = 0;
             for (auto iter: res) {
                 assert(iter.type() == bsoncxx::type::k_string); // if string
                 data.cases.push_back(iter.get_string().value.data());
-                i++;
             }
 
             assert(findQuestion);
@@ -297,6 +321,26 @@ bool database::getQuestion(int num, questionData& data)
     }catch(const std::exception& e)
     {
         cout << "Failed to get collection. :: " << e.what() << endl;
+    }
+    return false;
+}
+
+bool database::updateSettings()
+{
+    try {
+        userProfile& usrProfile = userProfile::getInstance();
+        auto collectionProgress = db["UserProgress"];
+
+        auto update_one_result = collectionProgress.update_one(
+                make_document(kvp("_id", bsoncxx::oid(usrProfile.getId()))),
+                make_document(kvp("$set", make_document(kvp("settings", make_array(usrProfile.getResolution()->first,
+                                                                                   usrProfile.getResolution()->second))))));
+
+        assert(update_one_result);  // Acknowledged writes return results.
+        return true;
+    }catch(const std::exception& e)
+    {
+        cout << "Database Failure:: " << e.what() << endl;
     }
     return false;
 }

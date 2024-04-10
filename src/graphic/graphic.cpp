@@ -229,6 +229,8 @@ void graphic::setup(){
 
             Login.updateResolution(res.first, res.second);
             move.adjustResolution(res.first, res.second);
+            usrProfile.updateSettings(res.first, res.second);
+            Pause.updateResolution(res.first, res.second);
             changeScreenRes = false;
         }
 
@@ -939,6 +941,12 @@ void graphic::makeLogIn(login& Login, imageHandler& image, characterManager &cha
         {
             charBuild.setCharacterFromDb();
             character.selectMainCharacter(&charBuild);
+
+            userProfile& usrProfile = userProfile::getInstance();
+            res.first = usrProfile.getResolution()->first;
+            res.second = usrProfile.getResolution()->second;
+            changeScreenRes = true;
+
             characterCreated = true;
             show_charSelector = false;
             allowMovement = true;

@@ -59,6 +59,22 @@ pauseMenu::pauseMenu(int width, int height, ImFont* font_15, ImFont* font_18, Im
     width_px = width;
     height_px = height;
 
+    switch(width_px)
+    {
+        case 1180:
+            e = 0;
+            break;
+        case 1320:
+            e = 1;
+            break;
+        case 1760:
+            e = 2;
+            break;
+        case 2048:
+            e = 3;
+            break;
+    }
+
     windowWidth = 320.f;
     windowHeight = 620.f; // allow for 50px padding on a 1280x720 window
     paddingHeight = ((float)height_px - windowHeight) / 2.f;
@@ -684,7 +700,6 @@ void pauseMenu::settingsMain(bool* changeScreenRes, pair<int,int>* res, int* fon
     const float profileWidth = windowWidth + paddingWidth + 10.f;
     const float profileHeight = paddingHeight;
 
-    static int e = 1;
     static int k = 0;
 
     ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
@@ -718,7 +733,6 @@ void pauseMenu::settingsMain(bool* changeScreenRes, pair<int,int>* res, int* fon
         ImGui::EndTabBar();
     }
 #else
-    static int e = 2;
     static int k = 0;
     ImGui::RadioButton("Small", &e, 0);
     ImGui::SameLine();
@@ -1019,4 +1033,29 @@ void pauseMenu::drawQuitWindow(bool* done)
         ImGui::PopID();
     }
     ImGui::End();
+}
+
+void pauseMenu::updateResolution(int w, int h)
+{
+    width_px = w;
+    height_px = h;
+
+    switch(width_px)
+    {
+        case 1180:
+            e = 0;
+            break;
+        case 1320:
+            e = 1;
+            break;
+        case 1760:
+            e = 2;
+            break;
+        case 2048:
+            e = 3;
+            break;
+    }
+
+    paddingHeight = ((float)height_px - windowHeight) / 2.f;
+    paddingWidth = ((float)width_px - (320.f + 860.f)) / 2.f;
 }

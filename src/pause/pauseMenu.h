@@ -68,6 +68,8 @@ class pauseMenu
     ImFont* noto_18 = nullptr;
     ImFont* noto_21 = nullptr;
 
+    int e; // used to control screen resolution
+
     void mainControls();
     void drawSettingsWindow(imageHandler *image, characterBuilder *charBuild, characterManager *character, bool* changeScreenRes, pair<int,int>* res, int* font);
     void drawNotebookWindow();
@@ -90,5 +92,6 @@ class pauseMenu
 public:
     pauseMenu(int width, int height, ImFont* font_15, ImFont* font_18, ImFont* font_21);
     void drawPauseMenu(imageHandler *image,characterManager *character, characterBuilder *charBuild, bool* changeScreenRes, pair<int,int>* res, bool* updateCharacter, bool* reset, bool* done, int* font);
+    void updateResolution(int w, int h);
     void reset();
 };

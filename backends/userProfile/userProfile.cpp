@@ -1,4 +1,9 @@
 #include "userProfile.h"
+#include <iostream>
+#include <utility>
+#include "database/database.h"
+
+using std::pair;
 
 userProfile::userProfile() {}
 userProfile::~userProfile() {}
@@ -13,20 +18,18 @@ string userProfile::getUsername()
 {
     return username;
 }
+void userProfile::setUsername(string username)
+{
+    this->username = username;
+}
 
 string userProfile::getId()
 {
     return db_id;
 }
-
 string userProfile::getUserId()
 {
     return profile_id;
-}
-
-void userProfile::setUsername(string username)
-{
-    this->username = username;
 }
 void userProfile::setId(std::string id)
 {
@@ -50,14 +53,37 @@ void userProfile::setJoinDate(string date)
     joinDate = date;
 }
 
+int *userProfile::getCharacter()
+{
+    return character;
+}
 void userProfile::setCharacter(int i, int val)
 {
     character[i] = val;
 }
 
-int *userProfile::getCharacter()
+void userProfile::setSettings(int w, int h)
 {
-    return character;
+    resolution = {w, h};
+}
+pair<int, int>* userProfile::getResolution()
+{
+    if(resolution.first == 0) // if unable to load the settings return default
+    {
+#if defined(__APPLE__)
+        resolution = {1320,768};
+#else
+        resolution = {1760,1024};
+#endif
+    }
+    return &resolution;
+}
+void userProfile::updateSettings(int w, int h)
+{
+    resolution = {w,h};
+    database& db = database::getInstance();
+    db.updateSettings();
+
 }
 
 void userProfile::clear()
