@@ -16,7 +16,12 @@ string userProfile::getUsername()
 
 string userProfile::getId()
 {
-    return id;
+    return db_id;
+}
+
+string userProfile::getUserId()
+{
+    return profile_id;
 }
 
 void userProfile::setUsername(string username)
@@ -25,7 +30,15 @@ void userProfile::setUsername(string username)
 }
 void userProfile::setId(std::string id)
 {
-    this->id = id;
+    this->db_id = id;
+
+    for(int i = 0; i < id.size(); i++)
+    {
+        if (isdigit(id[i]))
+        {
+            profile_id += id[i];
+        }
+    }
 }
 
 string userProfile::getJoinDate()
@@ -50,7 +63,8 @@ int *userProfile::getCharacter()
 void userProfile::clear()
 {
     username.clear();
-    id.clear();
+    db_id.clear();
+    profile_id.clear();
     joinDate.clear();
     character[0] = 0;
     character[0] = 5;

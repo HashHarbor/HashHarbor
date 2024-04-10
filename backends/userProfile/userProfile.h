@@ -20,7 +20,8 @@ using std::vector;
 // User profile is implemented as a singleton class
 class userProfile {
     string username = "";
-    string id = "";
+    string db_id = ""; // used to access the db
+    string profile_id = ""; // the user profile number for display
 
     string joinDate = "";
     int character[8];
@@ -36,6 +37,7 @@ public:
     //----- User -----//
     string getUsername();
     string getId();
+    string getUserId();
 
     void setUsername(string username);
     void setId(string id);
