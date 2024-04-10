@@ -431,6 +431,11 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
                 else if(interact == 2){
                     //update the visuals and locations of character
                     world = "town1/";
+
+                    //TODO: implement some check for the grid and its respective instructions
+                    // check to see if we go to a world or room
+                    // also check if coordinates are given, if they arent, resume from last coordinate
+
                     if(room == ""){
                         room = "room1/";
                         worldX = gridX;
@@ -440,7 +445,8 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
                         gridX = 28;
                         gridY = 27;
                     }
-                    else{
+                    else{ 
+                        //exiting room back to world
                         room = "";
                         gridX = worldX;
                         gridY = worldY;
