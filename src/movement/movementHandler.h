@@ -63,6 +63,15 @@ public:
              {ImVec2(160.1f / 192.f, 0.1f/128.f),ImVec2(191.99f/192.f, 31.99f/128.f)}
     };
 
+    std::vector<std::pair<ImVec2,ImVec2>> arrowDown = {
+            {ImVec2(0.1f / 192.f, 32.1f/128.f),ImVec2(31.99f/192.f, 63.99f/128.f)},
+            {ImVec2(32.1f / 192.f, 32.1f/128.f),ImVec2(63.99f/192.f, 63.99f/128.f)},
+            {ImVec2(64.1f / 192.f, 32.1f/128.f),ImVec2(95.99f/192.f, 63.99f/128.f)},
+            {ImVec2(96.1f / 192.f, 32.1f/128.f),ImVec2(127.99f/192.f, 63.99f/128.f)},
+            {ImVec2(128.1f / 192.f, 32.1f/128.f),ImVec2(159.99f/192.f, 63.99f/128.f)},
+             {ImVec2(160.1f / 192.f, 32.1f/128.f),ImVec2(191.99f/192.f, 63.99f/128.f)}
+    };
+
 
     movementHandler(string obspath, string intpath, int width, int height);
     std::vector<std::vector<int>> getGrid();

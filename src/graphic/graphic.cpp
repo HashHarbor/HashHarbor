@@ -2,6 +2,7 @@
 #include "../../backends/imgui_impl_sdl.h"
 #include "../../backends/imgui_impl_opengl3.h"
 #include <stdio.h>
+#include <thread>
 
 #include <SDL2/SDL.h>
 #if defined(IMGUI_IMPL_OPENGL_ES2)
@@ -272,7 +273,7 @@ void graphic::setup(){
         }
 
         if(show_display){
-            makeCharacter(image, overlap, editor, mapGridX, mapGridY, move, lastAction, character, builder);
+            makeCharacter(image, editor, mapGridX, mapGridY, move, lastAction, character, builder);
             makeBackground(background, move.getGrid(), mapGridX, mapGridY);
         }
 
@@ -341,7 +342,7 @@ void graphic::makeBlur(){
     ImGui::End();
 }
 
-void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, TextEditor& editor, double &gridX, double &gridY, movementHandler& move, int &lastAction, characterManager &character, characterBuilder& charBuild)
+void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gridX, double &gridY, movementHandler& move, int &lastAction, characterManager &character, characterBuilder& charBuild)
 {
     // Graphics window calculation
     ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
@@ -356,8 +357,6 @@ void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, TextEdit
     if(show_blur){
         flags |= ImGuiWindowFlags_NoInputs;
     }
-
-    static int interact = false;
 
     // Window - Character
     ImGui::Begin("Character", NULL, flags);
@@ -396,16 +395,31 @@ void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, TextEdit
 
         if(interact != 0){
             // ImGui::SetCursorPos(ImVec2((float)width_px/ 4 , (float)height_px / 4 ));
-            ImGui::SetCursorPos(ImVec2((float)width_px/ 4 - 16, (float)height_px / 4 - 54));
+            if(interact == 2){
+                switch (lastAction){
+                    case 1:
+                        ImGui::SetCursorPos(ImVec2((float)width_px/ 4 - 16, (float)height_px / 4 - 54));
+                        break;
+                    case 2:
+                        ImGui::SetCursorPos(ImVec2((float)width_px/ 4 - 16, (float)height_px / 4 + 16));
+                        break;
 
-            move.drawArrows(arrowTimer, lastAction);
-            if (arrowTimer <= 0.f){
-                arrowTimer = frameLength;
+                    default:
+                        break;
+                }
+                
+
+                move.drawArrows(arrowTimer, lastAction);
+                if (arrowTimer <= 0.f){
+                    arrowTimer = frameLength;
+                }
             }
+            
 
             if(ImGui::IsKeyDown(ImGuiKey_Q) && show_codeEditor == false){
                 // cout << "trigger interaction here" << endl;
                 if(interact == 1){
+                    //do NPC text or whatever first hten do the rest
                     show_codeEditor = !show_codeEditor;
                     show_userProfile = !show_userProfile;
 
@@ -416,22 +430,51 @@ void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, TextEdit
                 }
                 else if(interact == 2){
                     //update the visuals and locations of character
-                    pathMap = "../assets/map/town1/room1/map.png";
-                    intMap = "../assets/map/town1/room1/int.png";
-                    obsMap = "../assets/map/town1/room1/obs.png";
-                    overlapMap = "../assets/map/town1/room1/overlap.png";
+                    world = "town1/";
+                    if(room == ""){
+                        room = "room1/";
+                        worldX = gridX;
+                        worldY = gridY;
 
-                   gridX = 20;
-                   gridY = 20;
+                        //room grids to be determined
+                        gridX = 28;
+                        gridY = 27;
+                    }
+                    else{
+                        room = "";
+                        gridX = worldX;
+                        gridY = worldY;
+                    }
+                    
+                    pathMap = "../assets/map/" + world + room + "map.png";
+                    intMap = "../assets/map/" + world + room + "int.png";
+                    obsMap = "../assets/map/" + world + room + "obs.png";
+                    overlapMap = "../assets/map/" + world + room + "overlap.png";
 
-                   background = imageHandler(pathMap.c_str());
-                   this->overlap = imageHandler(overlapMap.c_str());
-                   interactions = imageHandler(intMap.c_str());
-                   background.loadTexture(background.filepath, &background);
-                   this->overlap.loadTexture(overlap.filepath, &overlap);
-                   interactions.loadTexture(interactions.filepath, &interactions);
+                    // auto loadMapCallable = [&move, this]() {
+                    //     std::cout << "Thread: Starting map loading process..." << std::endl;
 
-                   move = movementHandler(obsMap, intMap, width_px, height_px);
+                    //     this->loadMapUpdate(move);
+
+                    //     std::cout << "Thread: Finished map loading process..." << std::endl;
+                    // };
+
+                    // thread loadMapThread(loadMapCallable);
+
+                    // loadMapThread.join();
+
+                    background = imageHandler(pathMap.c_str());
+                    overlap = imageHandler(overlapMap.c_str());
+                    interactions = imageHandler(intMap.c_str());
+                    background.loadTexture(background.filepath, &background);
+                    overlap.loadTexture(overlap.filepath, &overlap);
+                    interactions.loadTexture(interactions.filepath, &interactions);
+
+                    move = movementHandler(obsMap, intMap, width_px, height_px);
+
+
+                    interact = 0;
+                    lastAction = 0;
 
                 }
 
@@ -451,6 +494,17 @@ void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, TextEdit
 void graphic::triggerQuestion(int question){
     database &db = database::getInstance();
     db.getQuestion(question, qes);
+}
+
+void graphic::loadMapUpdate(movementHandler &move){
+    background = imageHandler(pathMap.c_str());
+    overlap = imageHandler(overlapMap.c_str());
+    interactions = imageHandler(intMap.c_str());
+    background.loadTexture(background.filepath, &background);
+    overlap.loadTexture(overlap.filepath, &overlap);
+    interactions.loadTexture(interactions.filepath, &interactions);
+
+    move = movementHandler(obsMap, intMap, width_px, height_px);
 }
 
 void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, double gridX, double gridY){

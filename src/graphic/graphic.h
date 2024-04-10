@@ -47,11 +47,16 @@ public:
     vector<string> codeStarter;
     
     int selectedLanguageIndex = 0;
+    int interact = 0;
 
     string pathMap;
     string intMap;
     string obsMap;
     string overlapMap;
+
+    string world, room;
+    int worldX, worldY;
+    int roomX, roomY;
 
     imageHandler background;
     imageHandler overlap;
@@ -63,7 +68,7 @@ public:
     void makeBackground(imageHandler background, vector<vector<int>> grid, double gridX, double gridY);
     void makeConfig(vector<string> &codeStarter, TextEditor &editor);
     void makeCodeEditor(TextEditor &editor, const char* fileToEdit);
-    void makeCharacter(imageHandler& image, imageHandler& overlap, TextEditor& editor, double &gridX, double &gridY, movementHandler& move, int &lastAction, characterManager &character, characterBuilder& charBuild);
+    void makeCharacter(imageHandler& image, TextEditor& editor, double &gridX, double &gridY, movementHandler& move, int &lastAction, characterManager &character, characterBuilder& charBuild);
     void makeCharacterSelector(imageHandler& image, characterManager &character, characterBuilder& charBuild);
     void makeBackground(imageHandler background, movementHandler move, float &gridX, float &gridY);
     void makeLogIn(login& Login, imageHandler& image, characterManager &character, characterBuilder& charBuild);
@@ -73,6 +78,7 @@ public:
     void makeUserProfile();
 
     void triggerQuestion(int question);
+    void loadMapUpdate(movementHandler &move);
     string executeCPP(string code);
     void makeSettings(pauseMenu& Pause, imageHandler& image, characterManager& character, characterBuilder& charBuild, movementHandler& movement, login& Login, bool& done);
 

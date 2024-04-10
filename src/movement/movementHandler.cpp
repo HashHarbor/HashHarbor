@@ -264,7 +264,11 @@ void movementHandler::mapMovement(int key, imageHandler map, double &gridX, doub
                 interact = intGrid[gridY - 1][gridX];
                 break;
             }
-            
+        case 2:
+            if(intGrid[gridY + 1][gridX] != 0){
+                interact = intGrid[gridY + 1][gridX];
+                break;
+            }
         
         default:
             interact = false;
@@ -278,10 +282,21 @@ void movementHandler::mapMovement(int key, imageHandler map, double &gridX, doub
 void movementHandler::drawArrows(float frameTimer, int key)
 {
     // ImGui::SetCursorPos(pos);
-    if(key == 1){
-        // ImGui::Image((void*)(intptr_t)arrows.texture, ImVec2((32.f * 1), (32.f * 1)),arrowUp[frameTimer].first, arrowUp[frameTimer].second);
-        arrows.DrawArrowFrame(arrows, arrowUp[frameCount_6], 1.0f);        
+    switch(key){
+        case 1:
+            arrows.DrawArrowFrame(arrows, arrowUp[frameCount_6], 1.0f);
+            break;
+        
+        case 2:
+            arrows.DrawArrowFrame(arrows, arrowDown[frameCount_6], 1.0f);
+            break;
+        
+        default:
+            break;
     }
+
+    // ImGui::Image((void*)(intptr_t)arrows.texture, ImVec2((32.f * 1), (32.f * 1)),arrowUp[frameTimer].first, arrowUp[frameTimer].second);
+
     // ImGui::SetCursorPos(ImVec2(0,0));
 
     if (frameTimer <= 0.f)
