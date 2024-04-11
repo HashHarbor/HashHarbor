@@ -42,6 +42,7 @@ using std::ofstream;
 #include "userProfile/userProfile.h"
 #include "database/database.h"
 #include "authentication/authentication.h"
+#include "configReader/configReader.h"
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui_internal.h"
@@ -152,6 +153,9 @@ void graphic::setup(){
     db.connect();
     login Login = login(width_px, height_px, &image);
     pauseMenu Pause = pauseMenu(width_px, height_px);
+    configReader config = configReader();
+
+    cout << config.check("", "town", "1", "56,35") << endl;
 
 #if defined(__APPLE__)
     pathMap = imgPth.currentPath.string() + "/assets/map/abc.png";
