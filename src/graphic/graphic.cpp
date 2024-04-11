@@ -1,6 +1,7 @@
 #include "../../imgui/imgui.h"
 #include "../../backends/imgui_impl_sdl.h"
 #include "../../backends/imgui_impl_opengl3.h"
+// #include "cpptoml.h"
 #include <stdio.h>
 #include <thread>
 
@@ -391,7 +392,7 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
 
         move.mapMovement(keyDown, overlap, gridX, gridY, move.getGrid().size(), move.getGrid()[0].size(), lastAction, interact);
 
-        // cout << gridX << ", " << gridY << " and last action " << lastAction << endl;
+        cout << gridX << ", " << gridY << " and last action " << lastAction << endl;
 
         if(interact != 0){
             // ImGui::SetCursorPos(ImVec2((float)width_px/ 4 , (float)height_px / 4 ));
@@ -433,6 +434,10 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
                     world = "town1/";
 
                     //TODO: implement some check for the grid and its respective instructions
+
+                    // auto config = cpptoml::parse_file("../assets/map/" + world + room + "config.toml");
+                    // auto value = config->get_table(to_string(gridX) + ", " + to_string(gridY));
+                    // cout << value << endl;
                     // check to see if we go to a world or room
                     // also check if coordinates are given, if they arent, resume from last coordinate
 
@@ -469,15 +474,7 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
 
                     // loadMapThread.join();
 
-                    background = imageHandler(pathMap.c_str());
-                    overlap = imageHandler(overlapMap.c_str());
-                    interactions = imageHandler(intMap.c_str());
-                    background.loadTexture(background.filepath, &background);
-                    overlap.loadTexture(overlap.filepath, &overlap);
-                    interactions.loadTexture(interactions.filepath, &interactions);
-
-                    move = movementHandler(obsMap, intMap, width_px, height_px);
-
+                    loadMapUpdate(move);
 
                     interact = 0;
                     lastAction = 0;
