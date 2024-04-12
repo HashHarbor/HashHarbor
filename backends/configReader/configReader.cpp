@@ -19,14 +19,24 @@ using namespace std;
 
 configReader::configReader(){};
 
-string configReader::check(string configPath, string world, string room, string gridLocation)
-{
-    imagePath imgPth = imagePath();
+// string configReader::mapCheck(string configPath, string gridLocation)
+// {
 
-    // gridlocation must be in the "56,25" format to find grid location
-    auto config = cpptoml::parse_file(imgPth.absolutePath + "assets/map/" + world + room + "/config.toml");
+//     // gridlocation must be in the "56,25" format to find grid location
+//     auto config = cpptoml::parse_file(configPath);
+//     auto location = config->get_table(gridLocation);
+
+//     return *location->get_as<string>("next");
+// }
+
+string configReader::check(string configPath, string gridLocation)
+{
+    auto config = cpptoml::parse_file(configPath);
     auto location = config->get_table(gridLocation);
 
-    return *location->get_as<string>("room");
-}
+    gridX = stod(*location->get_as<string>("coordX"));
+    gridY = stod(*location->get_as<string>("coordY"));
+
+    return *location->get_as<string>("next");
+}   
 

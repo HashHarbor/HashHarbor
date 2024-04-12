@@ -1,20 +1,54 @@
 ["56,35"]
-room = "room1"
+next = "+room1"
+coordX = "28"
+coordY = "27"
 
 ["47,35"]
-room = "room1"
+next = "+room1"
+coordX = "28"
+coordY = "27"
 
 ["66,35"]
-room = "room1"
+next = "+room1"
+coordX = "28"
+coordY = "27"
 
 ["71,25"]
-room = "room1"
+next = "+room1"
+coordX = "28"
+coordY = "27"
 
 ["64,25"]
-room = "room1"
+next = "+room1"
+coordX = "28"
+coordY = "27"
 
 ["48,25"]
-room = "room1"
+next = "+room1"
+coordX = "28"
+coordY = "27"
 
 ["42,25"]
-room = "room1"
+next = "+room1"
+coordX = "28"
+coordY = "27"
+
+["55,15"]
+next = "+room1"
+coordX = "28"
+coordY = "27"
+
+["56,15"]
+next = "+room1"
+coordX = "28"
+coordY = "27"
+
+["57,15"]
+next = "+room1"
+coordX = "28"
+coordY = "27"
+
+["58,15"]
+next = "+room1"
+coordX = "28"
+coordY = "27"

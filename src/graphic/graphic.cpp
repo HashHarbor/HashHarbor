@@ -153,9 +153,6 @@ void graphic::setup(){
     db.connect();
     login Login = login(width_px, height_px, &image);
     pauseMenu Pause = pauseMenu(width_px, height_px);
-    configReader config = configReader();
-
-    cout << config.check("", "town", "1", "56,35") << endl;
 
 #if defined(__APPLE__)
     pathMap = imgPth.currentPath.string() + "/assets/map/abc.png";
@@ -439,44 +436,37 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
 
                     //TODO: implement some check for the grid and its respective instructions
 
-                    // auto config = cpptoml::parse_file("../assets/map/" + world + room + "config.toml");
-                    // auto value = config->get_table(to_string(gridX) + ", " + to_string(gridY));
-                    // cout << value << endl;
-                    // check to see if we go to a world or room
-                    // also check if coordinates are given, if they arent, resume from last coordinate
+                    configReader config = configReader();
+                    string newLocation = config.check("../assets/map/" + world + room + "config.toml", to_string((int)gridX) + "," + to_string((int)gridY));
 
-                    if(room == ""){
-                        room = "room1/";
-                        worldX = gridX;
-                        worldY = gridY;
+                    // for(int i = 0; i < info.size() - 2; i++){
+                    //     if(info[i].substr(0,1) == "+"){
+                    //         room = info[i].substr(1) + "/";
+                    //     }
 
-                        //room grids to be determined
-                        gridX = 28;
-                        gridY = 27;
+                    //     if(info[i].substr(0,1) == "-"){
+                            
+                    //     }
+                    // }
+
+
+                    if(newLocation.substr(0,1) == "+"){ //enter room
+                        room = newLocation.substr(1) + "/";
                     }
-                    else{ 
-                        //exiting room back to world
+
+                    if(newLocation.substr(0,1) == "-"){  //enter world
+                        world = newLocation.substr(1) + "/";
                         room = "";
-                        gridX = worldX;
-                        gridY = worldY;
                     }
+
+                    gridX = config.gridX;
+                    gridY = config.gridY;
+
                     
                     pathMap = "../assets/map/" + world + room + "map.png";
                     intMap = "../assets/map/" + world + room + "int.png";
                     obsMap = "../assets/map/" + world + room + "obs.png";
                     overlapMap = "../assets/map/" + world + room + "overlap.png";
-
-                    // auto loadMapCallable = [&move, this]() {
-                    //     std::cout << "Thread: Starting map loading process..." << std::endl;
-
-                    //     this->loadMapUpdate(move);
-
-                    //     std::cout << "Thread: Finished map loading process..." << std::endl;
-                    // };
-
-                    // thread loadMapThread(loadMapCallable);
-
-                    // loadMapThread.join();
 
                     loadMapUpdate(move);
 

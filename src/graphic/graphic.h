@@ -54,7 +54,7 @@ public:
     string obsMap;
     string overlapMap;
 
-    string world, room;
+    string world = "", room = "";
     int worldX, worldY;
     int roomX, roomY;
 

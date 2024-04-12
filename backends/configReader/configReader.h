@@ -16,7 +16,10 @@ using namespace std;
 
 class configReader{
 public:
+    string location = "";
+    double gridX, gridY;
+
     configReader();
-    string check(string configPath, string world, string room, string gridLocation);
+    string check(string configPath, string gridLocation);
 
 };
