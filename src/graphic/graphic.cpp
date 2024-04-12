@@ -229,7 +229,6 @@ void graphic::setup(){
 
             Login.updateResolution(res.first, res.second);
             move.adjustResolution(res.first, res.second);
-            usrProfile.updateSettings(res.first, res.second);
             Pause.updateResolution(res.first, res.second);
             changeScreenRes = false;
         }
@@ -599,20 +598,6 @@ void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit, ImFont*
 
     ImGui::Begin("Sandbox", NULL, flags);
     {
-        switch(codeEditorFont)
-        {
-            case 0:
-                ImGui::PushFont(font_15);
-                break;
-            case 1:
-                ImGui::PushFont(font_18);
-                break;
-            case 2:
-                ImGui::PushFont(font_21);
-                break;
-            default:
-                ImGui::PushFont(font_15);
-        }
         ImGui::Text("%6d/%-6d %6d lines  | %s | %s | %s | %s", cpos.mLine + 1, cpos.mColumn + 1, editor.GetTotalLines(),
 			editor.IsOverwrite() ? "Ovr" : "Ins",
 			editor.CanUndo() ? " " : " ",
@@ -621,7 +606,6 @@ void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit, ImFont*
         if(!show_blur){
             editor.Render("TextEditor");
         }
-        ImGui::PopFont();
 		
     }
     ImGui::End();
@@ -941,11 +925,6 @@ void graphic::makeLogIn(login& Login, imageHandler& image, characterManager &cha
         {
             charBuild.setCharacterFromDb();
             character.selectMainCharacter(&charBuild);
-
-            userProfile& usrProfile = userProfile::getInstance();
-            res.first = usrProfile.getResolution()->first;
-            res.second = usrProfile.getResolution()->second;
-            changeScreenRes = true;
 
             characterCreated = true;
             show_charSelector = false;

@@ -73,7 +73,6 @@ public:
      bool updatePassword(usrProfile& profile);
      bool updateUsername(string newUsr);
      bool updateCharacter();
-     bool updateSettings();
 
      bool getQuestion(int num, questionData& data);
 };

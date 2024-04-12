@@ -35,8 +35,6 @@ class userProfile {
     map<int, bool> problems;
     int totalComplete = 0;
 
-    pair<int,int> resolution = {0,0};
-
     userProfile();
     ~userProfile();
     userProfile(const userProfile&) = delete;
@@ -58,17 +56,13 @@ public:
     int* getCharacter();
     string getLastActive();
     int getStreak();
-    pair<int,int>* getResolution();
     int getTotalProbComp();
 
     void setJoinDate(string date);
     void setLastActive(string date);
     void setStreak(int s);
     void setCharacter(int i, int val);
-    void setSettings(int w, int h);
     void setTotalProbComp(int i);
-
-    void updateSettings(int w, int h);
 
     void clear();
 };

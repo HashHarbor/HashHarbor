@@ -62,30 +62,6 @@ void userProfile::setCharacter(int i, int val)
     character[i] = val;
 }
 
-void userProfile::setSettings(int w, int h)
-{
-    resolution = {w, h};
-}
-pair<int, int>* userProfile::getResolution()
-{
-    if(resolution.first == 0) // if unable to load the settings return default
-    {
-#if defined(__APPLE__)
-        resolution = {1320,768};
-#else
-        resolution = {1760,1024};
-#endif
-    }
-    return &resolution;
-}
-void userProfile::updateSettings(int w, int h)
-{
-    resolution = {w,h};
-    database& db = database::getInstance();
-    db.updateSettings();
-
-}
-
 void userProfile::clear()
 {
     username.clear();
