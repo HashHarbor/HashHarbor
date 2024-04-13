@@ -24,4 +24,5 @@
 /src/authentication.o
 /assets/api.toml
 /src/assets/
-/src/pause.o
+/src/pauseMenu.o
+/src/userProfile.o

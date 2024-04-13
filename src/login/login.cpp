@@ -244,7 +244,7 @@ void login::drawCreateUser()
     ImGui::SetCursorPos(ImVec2(txtPos_x, minHeight + 70.f));
     ImGui::Text("Username");
     ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255,255,255,255));
-    ImGui::SameLine(); HelpMarker("A username should be between 3 and 48 character\nA Username may contain:\n  Lowercase letters: a-z\n  Uppercase letters: A-Z\n  Digits: 0-9\n  Special character: - _ .");
+    ImGui::SameLine(); HelpMarker("A username should be between 3 and 16 character\nA Username may contain:\n  Lowercase letters: a-z\n  Uppercase letters: A-Z\n  Digits: 0-9\n  Special character: - _ .");
     ImGui::PopStyleColor();
 
     ImGui::SetCursorPos(ImVec2(minWidth + 50.f, minHeight + 90.f));

@@ -54,7 +54,7 @@ class pauseMenu
     bool usr_Password_FailCmp = false;
     bool usr_Password_Fail = false;
 
-    char createUsername[64] = "";
+    char createUsername[17] = "";
 
     char currentPasswd[64] = "";
     char createPasswd[64] = "";
@@ -64,8 +64,14 @@ class pauseMenu
 
     vector<string> notebook;
 
+    ImFont* noto_15 = nullptr;
+    ImFont* noto_18 = nullptr;
+    ImFont* noto_21 = nullptr;
+
+    int e; // used to control screen resolution
+
     void mainControls();
-    void drawSettingsWindow(imageHandler *image, characterBuilder *charBuild, characterManager *character, bool* changeScreenRes, pair<int,int>* res);
+    void drawSettingsWindow(imageHandler *image, characterBuilder *charBuild, characterManager *character, bool* changeScreenRes, pair<int,int>* res, int* font);
     void drawNotebookWindow();
     void drawCharacterCreatorWindow(imageHandler *image, characterBuilder *charBuild, bool *updateCharacter);
     void drawLogOutWindow(bool* reset);
@@ -80,11 +86,12 @@ class pauseMenu
     void updatePasswordError_Cmp(float profileWidth, float profileHeight); // error message for password comparison failing
     void updatePasswordError(float profileWidth, float profileHeight); // general error: either database or passwords dont match
 
-    void settingsMain(bool* changeScreenRes, pair<int,int>* res);
+    void settingsMain(bool* changeScreenRes, pair<int,int>* res, int* font);
     void settingsUser(imageHandler *image, characterBuilder *charBuild, characterManager *character);
 
 public:
-    pauseMenu(int width, int height);
-    void drawPauseMenu(imageHandler *image,characterManager *character, characterBuilder *charBuild, bool* changeScreenRes, pair<int,int>* res, bool* updateCharacter, bool* reset, bool* done);
+    pauseMenu(int width, int height, ImFont* font_15, ImFont* font_18, ImFont* font_21);
+    void drawPauseMenu(imageHandler *image,characterManager *character, characterBuilder *charBuild, bool* changeScreenRes, pair<int,int>* res, bool* updateCharacter, bool* reset, bool* done, int* font);
+    void updateResolution(int w, int h);
     void reset();
 };

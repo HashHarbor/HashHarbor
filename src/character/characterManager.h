@@ -58,48 +58,6 @@ class characterManager
 
     character* mainPlayer; // stores a pointer to the main player character to reduce map finds
 
-    // ----- Hardcoded Coordinates for Character Drawing ONLY ------ //
-    vector<pair<ImVec2,ImVec2>> cordsIdle = {
-            {ImVec2(0.1f / 192.f, 0.1f/320.f),ImVec2(31.99f/192.f, 64.f/320.f)},
-            {ImVec2(32.1f / 192.f, 0.1f/320.f),ImVec2(63.99f/192.f, 64.f/320.f)},
-            {ImVec2(64.1f / 192.f, 0.1f/320.f),ImVec2(95.99f/192.f, 64.f/320.f)},
-            {ImVec2(96.1f / 192.f, 0.1f/320.f),ImVec2(127.99f/192.f, 64.f/320.f)},
-            {ImVec2(128.1f / 192.f, 0.1f/320.f),ImVec2(159.99f/192.f, 64.f/320.f)},
-             {ImVec2(160.1f / 192.f, 0.1f/320.f),ImVec2(191.99f/192.f, 64.f/320.f)}
-    };
-    vector<pair<ImVec2,ImVec2>> cordsWalkUp = {
-            {ImVec2(0.1f / 192.f, 64.1f/320.f),ImVec2(31.99f/192.f, 128.f/320.f)},
-            {ImVec2(32.1f / 192.f, 64.1f/320.f),ImVec2(63.99f/192.f, 128.f/320.f)},
-            {ImVec2(64.1f / 192.f, 64.1f/320.f),ImVec2(95.99f/192.f, 128.f/320.f)},
-            {ImVec2(96.1f / 192.f, 64.1f/320.f),ImVec2(127.99f/192.f, 128.f/320.f)},
-            {ImVec2(128.1f / 192.f, 64.1f/320.f),ImVec2(159.99f/192.f, 128.f/320.f)},
-            {ImVec2(160.1f / 192.f, 64.1f/320.f),ImVec2(191.99f/192.f, 128.f/320.f)}
-    };
-    vector<pair<ImVec2,ImVec2>> cordsWalkDown = {
-            {ImVec2(0.1f / 192.f, 128.1f/320.f),ImVec2(31.99f/192.f, 192.f/320.f)},
-            {ImVec2(32.1f / 192.f, 128.1f/320.f),ImVec2(63.99f/192.f, 192.f/320.f)},
-            {ImVec2(64.1f / 192.f, 128.1f/320.f),ImVec2(95.99f/192.f, 192.f/320.f)},
-            {ImVec2(96.1f / 192.f, 128.1f/320.f),ImVec2(127.99f/192.f, 192.f/320.f)},
-            {ImVec2(128.1f / 192.f, 128.1f/320.f),ImVec2(159.99f/192.f, 192.f/320.f)},
-            {ImVec2(160.1f / 192.f, 128.1f/320.f),ImVec2(191.99f/192.f, 192.f/320.f)}
-    };
-    vector<pair<ImVec2,ImVec2>> cordsWalkRight = {
-            {ImVec2(0.1f / 192.f, 192.1f/320.f),ImVec2(31.99f/192.f, 256.f/320.f)},
-            {ImVec2(32.1f / 192.f, 192.1f/320.f),ImVec2(63.99f/192.f, 256.f/320.f)},
-            {ImVec2(64.1f / 192.f, 192.1f/320.f),ImVec2(95.99f/192.f, 256.f/320.f)},
-            {ImVec2(96.1f / 192.f, 192.1f/320.f),ImVec2(127.99f/192.f, 256.f/320.f)},
-            {ImVec2(128.1f / 192.f, 192.1f/320.f),ImVec2(159.99f/192.f, 256.f/320.f)},
-            {ImVec2(160.1f / 192.f, 192.1f/320.f),ImVec2(191.99f/192.f, 256.f/320.f)}
-    };
-    vector<pair<ImVec2,ImVec2>> cordsWalkLeft = {
-            {ImVec2(0.1f / 192.f, 256.1f/320.f),ImVec2(31.99f/192.f, 320.f/320.f)},
-            {ImVec2(32.1f / 192.f, 256.1f/320.f),ImVec2(63.99f/192.f, 320.f/320.f)},
-            {ImVec2(64.1f / 192.f, 256.1f/320.f),ImVec2(95.99f/192.f, 320.f/320.f)},
-            {ImVec2(96.1f / 192.f, 256.1f/320.f),ImVec2(127.99f/192.f, 320.f/320.f)},
-            {ImVec2(128.1f / 192.f, 256.1f/320.f),ImVec2(159.99f/192.f, 320.f/320.f)},
-            {ImVec2(160.1f / 192.f, 256.1f/320.f),ImVec2(191.99f/192.f, 320.f/320.f)}
-    };
-
     int frameCount_4 = 0; // animation control for 4 frame
     int frameCount_6 = 0; // animation control for 6 frame
 public:
@@ -119,7 +77,7 @@ public:
     void setMainPlayer(string name);
     // set the main character to animate
     // can be used to change the players character after game started
-    void moveMainCharacter(imageHandler* imgHandler, characterBuilder* charBuild,float frameTimer, bool canMove);
+    void moveMainCharacter(imageHandler* imgHandler, characterBuilder* charBuild,float frameTimer, bool canMove, ImDrawList* draw_list);
     // used to move the main character based on keyboard input
     void selectMainCharacter(characterBuilder* charBuild);
     // used to save character item indexes

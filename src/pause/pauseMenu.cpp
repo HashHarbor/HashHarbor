@@ -54,18 +54,38 @@ static void HelpMarker(const char* desc)
     }
 }
 
-pauseMenu::pauseMenu(int width, int height)
+pauseMenu::pauseMenu(int width, int height, ImFont* font_15, ImFont* font_18, ImFont* font_21)
 {
     width_px = width;
     height_px = height;
+
+    switch(width_px)
+    {
+        case 1180:
+            e = 0;
+            break;
+        case 1320:
+            e = 1;
+            break;
+        case 1760:
+            e = 2;
+            break;
+        case 2048:
+            e = 3;
+            break;
+    }
 
     windowWidth = 320.f;
     windowHeight = 620.f; // allow for 50px padding on a 1280x720 window
     paddingHeight = ((float)height_px - windowHeight) / 2.f;
     paddingWidth = ((float)width_px - (320.f + 860.f)) / 2.f;
+
+    noto_15 = font_15;
+    noto_18 = font_18;
+    noto_21 = font_21;
 }
 
-void pauseMenu::drawPauseMenu(imageHandler *image, characterManager *character, characterBuilder *charBuild, bool *changeScreenRes, pair<int,int>* res, bool *updateCharacter, bool *reset, bool *done)
+void pauseMenu::drawPauseMenu(imageHandler *image, characterManager *character, characterBuilder *charBuild, bool *changeScreenRes, pair<int,int>* res, bool *updateCharacter, bool *reset, bool *done, int* font)
 {
     // userProfile& usrProfile = userProfile::getInstance();
 
@@ -73,7 +93,7 @@ void pauseMenu::drawPauseMenu(imageHandler *image, characterManager *character, 
 
     if(settingsWindow)
     {
-        drawSettingsWindow(image, charBuild, character, changeScreenRes, res);
+        drawSettingsWindow(image, charBuild, character, changeScreenRes, res, font);
     }
     else if(notebookWindow)
     {
@@ -222,7 +242,7 @@ void pauseMenu::mainControls()
     }
     ImGui::End();
 }
-void pauseMenu::drawSettingsWindow(imageHandler *image, characterBuilder *charBuild, characterManager *character, bool* changeScreenRes, pair<int,int>* res)
+void pauseMenu::drawSettingsWindow(imageHandler *image, characterBuilder *charBuild, characterManager *character, bool* changeScreenRes, pair<int,int>* res, int* font)
 {
     // todo - change to real audio controls from audio class
 
@@ -236,7 +256,7 @@ void pauseMenu::drawSettingsWindow(imageHandler *image, characterBuilder *charBu
         {
             if (ImGui::BeginTabItem("Main Game"))
             {
-                settingsMain(changeScreenRes, res);
+                settingsMain(changeScreenRes, res, font);
                 ImGui::EndTabItem();
             }
             if (ImGui::BeginTabItem("User Account"))
@@ -432,7 +452,7 @@ void pauseMenu::updateUserUsername(float profileWidth, float profileHeight)
 
     ImGui::SetCursorPos(ImVec2(425.f - (ImGui::CalcTextSize("New Username").x / 2.f) , 390.f));
     ImGui::Text("New Username");
-    ImGui::SameLine(); HelpMarker("A username should be between 3 and 48 character\nA Username MAY contain:\n  Lowercase letters: a-z\n  Uppercase letters: A-Z\n  Digits: 0-9\n  Special character: - _ .");
+    ImGui::SameLine(); HelpMarker("A username should be between 3 and 16 character\nA Username MAY contain:\n  Lowercase letters: a-z\n  Uppercase letters: A-Z\n  Digits: 0-9\n  Special character: - _ .");
     ImGui::PopStyleColor();
 
     ImGui::SetCursorPos(ImVec2(425.f - 150.f, 410.f));
@@ -664,7 +684,7 @@ void pauseMenu::updatePasswordSuccess(float profileWidth, float profileHeight)
     ImGui::PopStyleColor();
 }
 
-void pauseMenu::settingsMain(bool* changeScreenRes, pair<int,int>* res)
+void pauseMenu::settingsMain(bool* changeScreenRes, pair<int,int>* res, int* font)
 {
     draw_list = ImGui::GetWindowDrawList();
 
@@ -680,7 +700,6 @@ void pauseMenu::settingsMain(bool* changeScreenRes, pair<int,int>* res)
     const float profileWidth = windowWidth + paddingWidth + 10.f;
     const float profileHeight = paddingHeight;
 
-    static int e = 1;
     static int k = 0;
 
     ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
@@ -714,7 +733,6 @@ void pauseMenu::settingsMain(bool* changeScreenRes, pair<int,int>* res)
         ImGui::EndTabBar();
     }
 #else
-    static int e = 2;
     static int k = 0;
     ImGui::RadioButton("Small", &e, 0);
     ImGui::SameLine();
@@ -724,39 +742,41 @@ void pauseMenu::settingsMain(bool* changeScreenRes, pair<int,int>* res)
     ImGui::SameLine();
     ImGui::RadioButton("Large", &e, 3);
 #endif
-            if(k != e)
-            {
-                switch(e)
-                {
-                    case 0:
-                        width_px = 1180;
-                        height_px = 686;
-                        *changeScreenRes = true;
-                        *res = {1180, 686};
-                        break;
-                    case 1:
-                        width_px = 1320;
-                        height_px = 768;
-                        *changeScreenRes = true;
-                        *res = {1320, 768};
-                        break;
-                    case 2:
-                        width_px = 1760;
-                        height_px = 1024;
-                        *changeScreenRes = true;
-                        *res = {1760, 1024};
-                        break;
-                    case 3:
-                        width_px = 2048;
-                        height_px = 1191;
-                        *changeScreenRes = true;
-                        *res = {2048, 1191};
-                        break;
-                }
-                k = e;
-                paddingHeight = ((float)height_px - windowHeight) / 2.f;
-                paddingWidth = ((float)width_px - (320.f + 860.f)) / 2.f;
-            }
+    if(k != e)
+    {
+        switch(e)
+        {
+            case 0:
+                width_px = 1180;
+                height_px = 686;
+                *changeScreenRes = true;
+                *res = {1180, 686};
+                break;
+            case 1:
+                width_px = 1320;
+                height_px = 768;
+                *changeScreenRes = true;
+                *res = {1320, 768};
+                break;
+            case 2:
+                width_px = 1760;
+                height_px = 1024;
+                *changeScreenRes = true;
+                *res = {1760, 1024};
+                break;
+            case 3:
+                width_px = 2048;
+                height_px = 1191;
+                *changeScreenRes = true;
+                *res = {2048, 1191};
+                break;
+        }
+        k = e;
+        paddingHeight = ((float)height_px - windowHeight) / 2.f;
+        paddingWidth = ((float)width_px - (320.f + 860.f)) / 2.f;
+    }
+
+    ImGui::Separator();
 
     ImGui::SetCursorPos(ImVec2(20.f, 150.f));
     ImGui::Text("Volume Controls: ");
@@ -767,8 +787,44 @@ void pauseMenu::settingsMain(bool* changeScreenRes, pair<int,int>* res)
     ImGui::SliderInt("Music", &tempMusic, 0, 20);
     ImGui::SetCursorPos(ImVec2(30.f, 220.f));
     ImGui::SliderInt("Sound Effects", &tempSoundEffect, 0, 20);
-    // Change resolution
-    // give warning on mac that resolution exceeds display size on anything over 1440x900 or just double the number displayed
+
+    ImGui::Separator();
+
+    ImGui::SetCursorPos(ImVec2(30.f, 250.f));
+    ImGui::Text("Code Editor: ");
+    ImGui::SetCursorPos(ImVec2(40.f, 270.f));
+    ImGui::Text("Font Size: ");
+
+    ImGui::SetCursorPos(ImVec2(50.f, 290.f));
+    ImGui::RadioButton("Default", font, 0);
+    ImGui::SameLine();
+    ImGui::RadioButton("Medium", font, 1);
+    ImGui::SameLine();
+    ImGui::RadioButton("Large", font, 2);
+
+    ImGui::SetCursorPos(ImVec2(50.f, 310.f));
+    switch(*font)
+    {
+        case 0:
+            ImGui::PushTextWrapPos(noto_15->FontSize * 35.f);
+            ImGui::PushFont(noto_15);
+            break;
+        case 1:
+            ImGui::PushTextWrapPos(noto_18->FontSize * 30.f);
+            ImGui::PushFont(noto_18);
+            break;
+        case 2:
+            ImGui::PushTextWrapPos(noto_21->FontSize * 25.f);
+            ImGui::PushFont(noto_21);
+            break;
+        default:
+            ImGui::PushTextWrapPos(noto_15->FontSize * 35.f);
+            ImGui::PushFont(noto_15);
+    }
+    ImGui::Text("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", 30.f);
+    draw_list->AddRect(ImVec2(windowWidth + paddingWidth + 45.f, paddingHeight + 310.f), ImVec2(windowWidth + paddingWidth + 540.f, paddingHeight + 360.f),IM_COL32(190, 190, 190, 255));
+    ImGui::PopTextWrapPos();
+    ImGui::PopFont();
 }
 void pauseMenu::settingsUser(imageHandler *image, characterBuilder *charBuild, characterManager *character)
 {
@@ -780,7 +836,7 @@ void pauseMenu::settingsUser(imageHandler *image, characterBuilder *charBuild, c
     draw_list->AddRectFilled(ImVec2(profileWidth + 20.f, profileHeight + 70.f), ImVec2(profileWidth + 320.f, profileHeight + 230.f), ImColor(ImVec4(0.6f, 0.6f, 0.6f, 1.0f)), 20.0f);
     draw_list->AddRectFilled(ImVec2(profileWidth + 35.f, profileHeight + 85.f), ImVec2(profileWidth + 109.f, profileHeight + 218.f), ImColor(ImVec4(0.9f, 0.9f, 0.9f, 1.0f)), 20.0f);
 
-    charBuild->drawCharacterAnimation(image, ImVec2(40.f, 85.f), {ImVec2(0.1f / 192.f, 0.1f/320.f),ImVec2(31.99f/192.f, 64.f/320.f)}, 2.f, character->getMainPlayer()->dynamicIndex);
+    charBuild->drawCharacterAnimation(image, ImVec2(40.f, 85.f), {ImVec2(0.1f / 192.f, 0.1f/512.f),ImVec2(31.99f/192.f, 64.f/512.f)}, 2.f, character->getMainPlayer()->dynamicIndex);
     // show username
     //ICON_FA_ID_CARD
     ImGui::SetCursorPos(ImVec2(270.f, 85.f));
@@ -977,4 +1033,29 @@ void pauseMenu::drawQuitWindow(bool* done)
         ImGui::PopID();
     }
     ImGui::End();
+}
+
+void pauseMenu::updateResolution(int w, int h)
+{
+    width_px = w;
+    height_px = h;
+
+    switch(width_px)
+    {
+        case 1180:
+            e = 0;
+            break;
+        case 1320:
+            e = 1;
+            break;
+        case 1760:
+            e = 2;
+            break;
+        case 2048:
+            e = 3;
+            break;
+    }
+
+    paddingHeight = ((float)height_px - windowHeight) / 2.f;
+    paddingWidth = ((float)width_px - (320.f + 860.f)) / 2.f;
 }

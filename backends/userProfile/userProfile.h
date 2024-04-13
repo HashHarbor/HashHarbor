@@ -14,16 +14,26 @@ using std::pair;
 using std::pair;
 #endif
 
+#include <map>
+
 using std::string;
 using std::vector;
+using std::map;
 
 // User profile is implemented as a singleton class
 class userProfile {
     string username = "";
-    string id = "";
+    string db_id = ""; // used to access the db
+    string profile_id = ""; // the user profile number for display
 
     string joinDate = "";
+    string lastActive = "";
+    int streak = 0;
+
     int character[8];
+
+    map<int, bool> problems;
+    int totalComplete = 0;
 
     userProfile();
     ~userProfile();
@@ -36,6 +46,7 @@ public:
     //----- User -----//
     string getUsername();
     string getId();
+    string getUserId();
 
     void setUsername(string username);
     void setId(string id);
@@ -43,9 +54,15 @@ public:
     //----- User Data -----//
     string getJoinDate();
     int* getCharacter();
+    string getLastActive();
+    int getStreak();
+    int getTotalProbComp();
 
     void setJoinDate(string date);
+    void setLastActive(string date);
+    void setStreak(int s);
     void setCharacter(int i, int val);
+    void setTotalProbComp(int i);
 
     void clear();
 };

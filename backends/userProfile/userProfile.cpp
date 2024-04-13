@@ -1,4 +1,9 @@
 #include "userProfile.h"
+#include <iostream>
+#include <utility>
+#include "database/database.h"
+
+using std::pair;
 
 userProfile::userProfile() {}
 userProfile::~userProfile() {}
@@ -13,19 +18,30 @@ string userProfile::getUsername()
 {
     return username;
 }
-
-string userProfile::getId()
-{
-    return id;
-}
-
 void userProfile::setUsername(string username)
 {
     this->username = username;
 }
+
+string userProfile::getId()
+{
+    return db_id;
+}
+string userProfile::getUserId()
+{
+    return profile_id;
+}
 void userProfile::setId(std::string id)
 {
-    this->id = id;
+    this->db_id = id;
+
+    for(int i = 0; i < id.size(); i++)
+    {
+        if (isdigit(id[i]))
+        {
+            profile_id += id[i];
+        }
+    }
 }
 
 string userProfile::getJoinDate()
@@ -37,20 +53,20 @@ void userProfile::setJoinDate(string date)
     joinDate = date;
 }
 
+int *userProfile::getCharacter()
+{
+    return character;
+}
 void userProfile::setCharacter(int i, int val)
 {
     character[i] = val;
 }
 
-int *userProfile::getCharacter()
-{
-    return character;
-}
-
 void userProfile::clear()
 {
     username.clear();
-    id.clear();
+    db_id.clear();
+    profile_id.clear();
     joinDate.clear();
     character[0] = 0;
     character[0] = 5;

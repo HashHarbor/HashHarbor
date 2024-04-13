@@ -37,6 +37,8 @@ public:
     // bool show_blur = true;
     // bool show_userProfile = true;
 
+    int codeEditorFont = 0;
+
 
     bool characterCreated = false;
 
@@ -67,7 +69,7 @@ public:
 
     void makeBackground(imageHandler background, vector<vector<int>> grid, double gridX, double gridY);
     void makeConfig(vector<string> &codeStarter, TextEditor &editor);
-    void makeCodeEditor(TextEditor &editor, const char* fileToEdit);
+    void makeCodeEditor(TextEditor &editor, const char* fileToEdit, ImFont* font_15, ImFont* font_18, ImFont* font_21);
     void makeCharacter(imageHandler& image, TextEditor& editor, double &gridX, double &gridY, movementHandler& move, int &lastAction, characterManager &character, characterBuilder& charBuild);
     void makeCharacterSelector(imageHandler& image, characterManager &character, characterBuilder& charBuild);
     void makeBackground(imageHandler background, movementHandler move, float &gridX, float &gridY);
@@ -75,7 +77,7 @@ public:
 
     void makeBlur();
 
-    void makeUserProfile();
+    void makeUserProfile(ImFont* fontLarge, ImFont* fontSmall, ImFont* fontLogo, imageHandler& image, characterManager& character, characterBuilder& charBuild);
 
     void triggerQuestion(int question);
     void loadMapUpdate(movementHandler &move);

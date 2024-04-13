@@ -32,6 +32,7 @@ namespace ImGui { extern ImGuiKeyData* GetKeyData(ImGuiKey key); }
 #include "../imageHandler/imageHandler.h"
 #include "../imageHandler/imagePath.h"
 #include "characterManager.h"
+#include "characterConfig.h"
 
 characterManager::characterManager() {}
 
@@ -74,37 +75,66 @@ void characterManager::setMainPlayer(std::string name)
 }
 
 
-void characterManager::moveMainCharacter(imageHandler* imgHandler, characterBuilder* charBuild,float frameTimer, bool canMove)
+void characterManager::moveMainCharacter(imageHandler* imgHandler, characterBuilder* charBuild,float frameTimer, bool canMove, ImDrawList* draw_list)
 {
 
 
     int keyDown = 0; // used to identify which direction the character is moving
-    if(canMove){
+    static int previousKey = 2;
+    if(canMove)
+    {
         if(ImGui::IsKeyDown(ImGuiKey_W)) { keyDown = 1; }
-            else if(ImGui::IsKeyDown(ImGuiKey_S)) { keyDown = 2; }
-            else if(ImGui::IsKeyDown(ImGuiKey_D)) { keyDown = 3; }
-            else if(ImGui::IsKeyDown(ImGuiKey_A)) { keyDown = 4; }
+        else if(ImGui::IsKeyDown(ImGuiKey_S)) { keyDown = 2; }
+        else if(ImGui::IsKeyDown(ImGuiKey_D)) { keyDown = 3; }
+        else if(ImGui::IsKeyDown(ImGuiKey_A)) { keyDown = 4; }
+    }
+
+    if(keyDown != 0)
+    {
+        previousKey = keyDown;
     }
 
     float factor = 1.f;
+    characterConfig cords;
     //Draw Order: Body -> Eyes -> Outfit -> Hair -> Accessories
     switch(keyDown)
     {
-        case 1:
-            charBuild->drawCharacterAnimation(imgHandler,drawPos,cordsWalkUp.at(frameCount_6),factor,mainPlayer->dynamicIndex);
+        case 1: // UP
+            draw_list->AddRectFilled(ImVec2(drawPos.x + 0.f, drawPos.y + 55.f), ImVec2(drawPos.x + 32.f, drawPos.y + 69.f), ImColor(ImVec4(0.0f, 0.0f, 0.0f, 0.15f)), 20.f);
+            charBuild->drawCharacterAnimation(imgHandler,drawPos,cords.cordsWalkUp.at(frameCount_6),factor,mainPlayer->dynamicIndex);
             break;
-        case 2:
-            charBuild->drawCharacterAnimation(imgHandler,drawPos,cordsWalkDown.at(frameCount_6),factor,mainPlayer->dynamicIndex);
+        case 2: // DOWN
+            draw_list->AddRectFilled(ImVec2(drawPos.x + 0.f, drawPos.y + 53.f), ImVec2(drawPos.x + 32.f, drawPos.y + 67.f), ImColor(ImVec4(0.0f, 0.0f, 0.0f, 0.15f)), 20.f);
+            charBuild->drawCharacterAnimation(imgHandler,drawPos,cords.cordsWalkDown.at(frameCount_6),factor,mainPlayer->dynamicIndex);
             break;
-        case 3:
-            charBuild->drawCharacterAnimation(imgHandler,drawPos,cordsWalkRight.at(frameCount_6),factor,mainPlayer->dynamicIndex);
+        case 3: // RIGHT
+            draw_list->AddRectFilled(ImVec2(drawPos.x + 2.f, drawPos.y + 55.f), ImVec2(drawPos.x + 32.f, drawPos.y + 67.f), ImColor(ImVec4(0.0f, 0.0f, 0.0f, 0.15f)), 20.f);
+            charBuild->drawCharacterAnimation(imgHandler,drawPos,cords.cordsWalkRight.at(frameCount_6),factor,mainPlayer->dynamicIndex);
             break;
-        case 4:
-            charBuild->drawCharacterAnimation(imgHandler,drawPos,cordsWalkLeft.at(frameCount_6),factor,mainPlayer->dynamicIndex);
+        case 4: // LEFT
+            draw_list->AddRectFilled(ImVec2(drawPos.x + 0.f, drawPos.y + 55.f), ImVec2(drawPos.x + 30.f, drawPos.y + 67.f), ImColor(ImVec4(0.0f, 0.0f, 0.0f, 0.15f)), 20.f);
+            charBuild->drawCharacterAnimation(imgHandler,drawPos,cords.cordsWalkLeft.at(frameCount_6),factor,mainPlayer->dynamicIndex);
             break;
         default:
-            charBuild->drawCharacterAnimation(imgHandler,drawPos,cordsIdle.at(frameCount_6),factor,mainPlayer->dynamicIndex);
-
+            switch(previousKey)
+            {
+                case 1:
+                    draw_list->AddRectFilled(ImVec2(drawPos.x + 0.f, drawPos.y + 55.f), ImVec2(drawPos.x + 32.f, drawPos.y + 67.f), ImColor(ImVec4(0.0f, 0.0f, 0.0f, 0.15f)), 20.f);
+                    charBuild->drawCharacterAnimation(imgHandler,drawPos,cords.cordsIdleUp.at(frameCount_6),factor,mainPlayer->dynamicIndex);
+                    break;
+                case 2:
+                    draw_list->AddRectFilled(ImVec2(drawPos.x + 0.f, drawPos.y + 55.f), ImVec2(drawPos.x + 32.f, drawPos.y + 67.f), ImColor(ImVec4(0.0f, 0.0f, 0.0f, 0.15f)), 20.f);
+                    charBuild->drawCharacterAnimation(imgHandler,drawPos,cords.cordsIdleDown.at(frameCount_6),factor,mainPlayer->dynamicIndex);
+                    break;
+                case 3:
+                    draw_list->AddRectFilled(ImVec2(drawPos.x + 5.f, drawPos.y + 55.f), ImVec2(drawPos.x + 27.f, drawPos.y + 67.f), ImColor(ImVec4(0.0f, 0.0f, 0.0f, 0.15f)), 20.f);
+                    charBuild->drawCharacterAnimation(imgHandler,drawPos,cords.cordsIdleRight.at(frameCount_6),factor,mainPlayer->dynamicIndex);
+                    break;
+                case 4:
+                    draw_list->AddRectFilled(ImVec2(drawPos.x + 5.f, drawPos.y + 55.f), ImVec2(drawPos.x + 27.f, drawPos.y + 67.f), ImColor(ImVec4(0.0f, 0.0f, 0.0f, 0.15f)), 20.f);
+                    charBuild->drawCharacterAnimation(imgHandler,drawPos,cords.cordsIdleLeft.at(frameCount_6),factor,mainPlayer->dynamicIndex);
+                    break;
+            }
             break;
     }
 
