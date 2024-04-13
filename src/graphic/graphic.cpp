@@ -170,10 +170,10 @@ void graphic::setup(){
     obsMap = imgPth.currentPath.string() + "/assets/map/obs.png";
     overlapMap = imgPth.currentPath.string() + "/assets/map/overlap.png";
 #else
-    pathMap = "../assets/map/town1/map.png";
-    intMap = "../assets/map/town1/int.png";
-    obsMap = "../assets/map/town1/obs.png";
-    overlapMap = "../assets/map/town1/overlap.png";
+    pathMap = "../assets/map/town1/house6/map.png";
+    intMap = "../assets/map/town1/house6/int.png";
+    obsMap = "../assets/map/town1/house6/obs.png";
+    overlapMap = "../assets/map/town1/house6/overlap.png";
 #endif
     background = imageHandler(pathMap.c_str());
     overlap = imageHandler(overlapMap.c_str());
@@ -182,7 +182,8 @@ void graphic::setup(){
     overlap.loadTexture(overlap.filepath, &overlap);
     interactions.loadTexture(interactions.filepath, &interactions);
 
-    
+    world = "town1/";
+    room = "house6/";
 
     character.createCharacter("USER", false, true, &image);
     character.setMainPlayer("USER");
@@ -198,8 +199,8 @@ void graphic::setup(){
     //     cout << endl;
     // }
 
-    double mapGridX = 44.0f;
-    double mapGridY = 42.0f;
+    double mapGridX = 28.0f;
+    double mapGridY = 19.0f;
     
     // Main loop
     bool done = false;
@@ -407,7 +408,7 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
 
         move.mapMovement(keyDown, overlap, gridX, gridY, move.getGrid().size(), move.getGrid()[0].size(), lastAction, interact);
 
-         //cout << gridX << ", " << gridY << " and last action " << lastAction << endl;
+        // cout << gridX << ", " << gridY << " and last action " << lastAction << endl;
 
         if(interact != 0){
             // ImGui::SetCursorPos(ImVec2((float)width_px/ 4 , (float)height_px / 4 ));
@@ -446,22 +447,9 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
                 }
                 else if(interact == 2){
                     //update the visuals and locations of character
-                    world = "town1/";
-
-                    //TODO: implement some check for the grid and its respective instructions
 
                     configReader config = configReader();
                     string newLocation = config.check("../assets/map/" + world + room + "config.toml", to_string((int)gridX) + "," + to_string((int)gridY));
-
-                    // for(int i = 0; i < info.size() - 2; i++){
-                    //     if(info[i].substr(0,1) == "+"){
-                    //         room = info[i].substr(1) + "/";
-                    //     }
-
-                    //     if(info[i].substr(0,1) == "-"){
-                            
-                    //     }
-                    // }
 
 
                     if(newLocation.substr(0,1) == "+"){ //enter room
@@ -475,7 +463,6 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
 
                     gridX = config.gridX;
                     gridY = config.gridY;
-
                     
                     pathMap = "../assets/map/" + world + room + "map.png";
                     intMap = "../assets/map/" + world + room + "int.png";
@@ -487,13 +474,9 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
                     interact = 0;
                     lastAction = 0;
 
-                }
-
-                
+                }                
             }
 
-
-            // cout << "interact true and timer is: " << frameTimer << endl;
         }
 
         ImGui::SetCursorPos(ImVec2(0, 0));

@@ -39,7 +39,6 @@ public:
 
     int codeEditorFont = 0;
 
-
     bool characterCreated = false;
 
     string result = "";
@@ -57,8 +56,6 @@ public:
     string overlapMap;
 
     string world = "", room = "";
-    int worldX, worldY;
-    int roomX, roomY;
 
     imageHandler background;
     imageHandler overlap;
