@@ -378,10 +378,9 @@ void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, TextEdit
             ImVec2 characterPos = ImVec2((ImGui::GetContentRegionAvail() - ImVec2(32, 64)) * 0.5f) + ImVec2(8, 0) - ImVec2(0, 8);
             character.drawPos = characterPos;
 
-            draw_list->AddCircleFilled(ImVec2(characterPos.x + 16.f, characterPos.y + 60.f), 13.f, ImColor(ImVec4(0.0f, 0.0f, 0.0f, 0.15f))); // shadow
 
             ImGui::SetCursorPos(characterPos);
-            character.moveMainCharacter(&image, &charBuild, frameTimer, canMove);
+            character.moveMainCharacter(&image, &charBuild, frameTimer, canMove, draw_list);
 
             if (frameTimer <= 0.f)
             {
@@ -402,7 +401,7 @@ void graphic::makeCharacter(imageHandler& image, imageHandler& overlap, TextEdit
 
         move.mapMovement(keyDown, overlap, gridX, gridY, move.getGrid().size(), move.getGrid()[0].size(), lastAction, interact);
 
-        // cout << gridX << ", " << gridY << " and last action " << lastAction << endl;
+         //cout << gridX << ", " << gridY << " and last action " << lastAction << endl;
 
         if(interact != 0){
             // ImGui::SetCursorPos(ImVec2((float)width_px/ 4 , (float)height_px / 4 ));

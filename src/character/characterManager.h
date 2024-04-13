@@ -77,7 +77,7 @@ public:
     void setMainPlayer(string name);
     // set the main character to animate
     // can be used to change the players character after game started
-    void moveMainCharacter(imageHandler* imgHandler, characterBuilder* charBuild,float frameTimer, bool canMove);
+    void moveMainCharacter(imageHandler* imgHandler, characterBuilder* charBuild,float frameTimer, bool canMove, ImDrawList* draw_list);
     // used to move the main character based on keyboard input
     void selectMainCharacter(characterBuilder* charBuild);
     // used to save character item indexes
