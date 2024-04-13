@@ -472,8 +472,8 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
 
                     triggerQuestion(1);
                     
-                    editor.SetTextLines({});
                     editor.SetTextLines(qes.boiler);
+                    cout << qes.boiler.size() << endl;
 
                     result = "";
                 }                
@@ -908,6 +908,11 @@ void graphic::makeCharacterSelector(imageHandler& image, characterManager &chara
 
 string graphic::executeCPP(string code){
     // Step 1: Write code to a temporary file
+    string setup = "#include <bits/stdc++.h> \n";
+    setup += "using namespace std; \n";
+
+    code = setup + code + qes.exeCode;
+
     std::ofstream file("temp.cpp");
     file << code;
     file.close();

@@ -61,6 +61,7 @@ public:
         vector<string> boiler;
         vector<string> cases;
         vector<string> results;
+        string exeCode = "";
     };
 
     static database& getInstance();
