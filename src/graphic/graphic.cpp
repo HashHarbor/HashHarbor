@@ -412,7 +412,7 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
 
         if(interact != 0){
             // ImGui::SetCursorPos(ImVec2((float)width_px/ 4 , (float)height_px / 4 ));
-            if(interact == 2){
+            if(interact == 1){
                 switch (lastAction){
                     case 1:
                         ImGui::SetCursorPos(ImVec2((float)width_px/ 4 - 16, (float)height_px / 4 - 54));
@@ -436,16 +436,6 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
             if(ImGui::IsKeyDown(ImGuiKey_Q) && show_codeEditor == false){
                 // cout << "trigger interaction here" << endl;
                 if(interact == 1){
-                    //do NPC text or whatever first hten do the rest
-                    show_codeEditor = !show_codeEditor;
-                    show_userProfile = !show_userProfile;
-
-                    triggerQuestion(1);
-                    editor.SetTextLines(codeStarter);
-
-                    result = "";
-                }
-                else if(interact == 2){
                     //update the visuals and locations of character
 
                     configReader config = configReader();
@@ -474,6 +464,18 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
                     interact = 0;
                     lastAction = 0;
 
+                }
+                else if(interact == 2){
+                    //do NPC text or whatever first hten do the rest
+                    show_codeEditor = !show_codeEditor;
+                    show_userProfile = !show_userProfile;
+
+                    triggerQuestion(1);
+                    
+                    editor.SetTextLines({});
+                    editor.SetTextLines(qes.boiler);
+
+                    result = "";
                 }                
             }
 
