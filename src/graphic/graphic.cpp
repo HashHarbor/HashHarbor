@@ -296,7 +296,7 @@ void graphic::setup(){
         }
 
         if(show_userProfile){
-            makeUserProfile(noto_25, noto_15, noto_Flat,  image, character, builder);
+            makeUserProfile(noto_25, noto_21, noto_Flat,  image, character, builder);
         }
 
         if(show_config){
@@ -635,59 +635,68 @@ void graphic::makeUserProfile(ImFont* fontLarge, ImFont* fontSmall, ImFont* font
     ImGui::SetNextWindowPos({(float)width_px / 2, 0});
 
     float profileWidth = ((float)width_px / 2) + (windowWidth / 2.f);
-    float profileHeight = windowHeight / 2.f;
+    float profileHeight = 0.f;
 
     ImGui::Begin("Profile", NULL, flags);
     {
         ImDrawList* draw_list = ImGui::GetWindowDrawList();
         userProfile& usrProfile = userProfile::getInstance();
 
-        // card gradient Blue
-        ImU32 col_card_top = ImGui::GetColorU32(IM_COL32(140, 200, 255, 255));
-        ImU32 col_card_bottom = ImGui::GetColorU32(IM_COL32(70, 150, 230, 255));
-        ImU32 col_dark_blue = ImGui::GetColorU32(IM_COL32(30, 90, 160, 255));
-        ImU32 col_darker_blue = ImGui::GetColorU32(IM_COL32(10, 30, 80, 255));
-
-        draw_list->AddRectFilled(ImVec2(profileWidth  - 250.f, profileHeight - 175.f), ImVec2(profileWidth + 250.f, profileHeight + 175.f), ImColor(ImVec4(0.85f, 0.85f, 0.85f, 1.0f)), 20.f); // outer border
-        draw_list->AddRectFilledMultiColor(ImVec2(profileWidth - 240.f, profileHeight - 165.f), ImVec2(profileWidth + 240.f, profileHeight + 165.f), col_card_bottom, col_card_top, col_card_bottom, col_card_top); // inner fill
-        draw_list->AddRectFilledMultiColor(ImVec2(profileWidth - 240.f, profileHeight - 165.f), ImVec2(profileWidth + 240.f, profileHeight - 125.f), col_dark_blue, col_dark_blue, col_darker_blue, col_darker_blue); // inner fill
-
-        ImU32 col_silver = ImGui::GetColorU32(IM_COL32(192, 192, 192, 255)); // Silver
-        ImU32 col_pastel_silver = ImGui::GetColorU32(IM_COL32(230, 230, 230, 255)); // Pastel Silver
-        draw_list->AddRectFilled(ImVec2(profileWidth + 90.f, profileHeight - 80.f), ImVec2(profileWidth + 235.f, profileHeight + 85.f), ImColor(ImVec4(0.0f, 0.0f, 0.0f, 0.2f)), 5.f); // character shade
-        draw_list->AddRectFilledMultiColor(ImVec2(profileWidth + 90.f, profileHeight - 80.f), ImVec2(profileWidth + 230.f, profileHeight + 80.f), col_silver, col_pastel_silver, col_silver, col_pastel_silver); // character Border
-
+        // ----- Colors ----- //
+        // -- Card -- //
+        ImU32 col_card_top_left = ImGui::GetColorU32(IM_COL32(140, 200, 255, 255));
+        ImU32 col_card_top_right = ImGui::GetColorU32(IM_COL32(20, 100, 180, 255));
+        ImU32 col_card_bottom_left = ImGui::GetColorU32(IM_COL32(120, 180, 255, 255));
+        ImU32 col_card_bottom_right = ImGui::GetColorU32(IM_COL32(0, 128, 128, 255));
+        // -- Banner -- //
+        ImU32 col_banner_top = ImGui::GetColorU32(IM_COL32(30, 90, 160, 255));
+        ImU32 col_banner_bottom = ImGui::GetColorU32(IM_COL32(10, 30, 80, 255));
+        // -- Image Border -- //
+        ImU32 col_silver = ImGui::GetColorU32(IM_COL32(192, 192, 192, 255));
+        ImU32 col_pastel_silver = ImGui::GetColorU32(IM_COL32(230, 230, 230, 255));
+        // -- Character Background --//
         // background behind character
         ImU32 col_sky_top = ImGui::GetColorU32(IM_COL32(190, 220, 255, 255));
         ImU32 col_sky_bottom = ImGui::GetColorU32(IM_COL32(100, 180, 255, 255));
         ImU32 col_grass_top = ImGui::GetColorU32(IM_COL32(120, 180, 120, 255));
         ImU32 col_grass_bottom = ImGui::GetColorU32(IM_COL32(160, 220, 160, 255));
-        draw_list->AddRectFilledMultiColor(ImVec2(profileWidth + 95.f, profileHeight - 75.f), ImVec2(profileWidth + 225.f, profileHeight + 75.f), col_sky_top, col_sky_bottom, col_grass_top, col_grass_bottom); // background behind character
-        charBuild.drawCharacterAnimation(&image, ImVec2((windowWidth / 2.f) + 128.f, (windowHeight / 2.f) - 53.f), {ImVec2(64.1f / 192.f, 0.1f/512.f),ImVec2(95.99f/192.f, 64.f/512.f)}, 2.f, character.getMainPlayer()->dynamicIndex);
 
-        //draw_list->AddLine(ImVec2(profileWidth - 120.f, profileHeight + 93.f), ImVec2(profileWidth + 120.f, profileHeight + 95.f), IM_COL32(0, 0, 0, 255), 2.f);
+        // outer border
+        draw_list->AddRectFilled(ImVec2(profileWidth - 210.f, profileHeight + 30.f), ImVec2(profileWidth + 210.f, profileHeight + 300.f), ImColor(ImVec4(0.85f, 0.85f, 0.85f, 1.0f)), 20.f);
+        // color gradient fill
+        draw_list->AddRectFilledMultiColorRound(ImVec2(profileWidth - 205.f, profileHeight + 35.f), ImVec2(profileWidth + 205.f, profileHeight + 295.f), col_card_top_left, col_card_top_right, col_card_bottom_right, col_card_bottom_left, 20.f, ImDrawFlags_None);
+        // banner gradient fill
+        draw_list->AddRectFilledMultiColorRound(ImVec2(profileWidth - 200.f, profileHeight + 40.f), ImVec2(profileWidth + 200.f, profileHeight + 65.f), col_banner_top, col_banner_top, col_banner_bottom, col_banner_bottom, 15.f, ImDrawFlags_None);
 
-        draw_list->AddRectFilled(ImVec2(profileWidth - 230.f, profileHeight - 115.f), ImVec2(profileWidth + 230.f, profileHeight - 90.f), IM_COL32(255, 255, 255, 100), 10.f); // name window
+        // shadow below character box
+        draw_list->AddRectFilled(ImVec2(profileWidth + 85.f, profileHeight + 140.f), ImVec2(profileWidth + 197.f, profileHeight + 290.f), ImColor(ImVec4(0.0f, 0.0f, 0.0f, 0.2f)), 10.f);
+        // character box border
+        draw_list->AddRectFilledMultiColorRound(ImVec2(profileWidth + 85.f, profileHeight + 140.f), ImVec2(profileWidth + 190.f, profileHeight + 285.f), col_silver, col_pastel_silver, col_silver, col_pastel_silver, 5.f, ImDrawFlags_None);
+        // character background
+        draw_list->AddRectFilledMultiColor(ImVec2(profileWidth + 90.f, profileHeight + 145.f), ImVec2(profileWidth + 185.f, profileHeight + 280.f), col_sky_top, col_sky_bottom, col_grass_top, col_grass_bottom); // background behind character
+        charBuild.drawCharacterAnimation(&image, ImVec2((windowWidth / 2.f) + 108.7f, 154.9f), {ImVec2(64.1f / 192.f, 0.1f/512.f),ImVec2(95.99f/192.f, 64.f/512.f)}, 1.8f, character.getMainPlayer()->dynamicIndex);
 
-        draw_list->AddRectFilled(ImVec2(profileWidth - 230.f, profileHeight - 62.5f), ImVec2(profileWidth + 75.f, profileHeight - 37.5f), IM_COL32(255, 255, 255, 100), 10.f); // name window
-        draw_list->AddRectFilled(ImVec2(profileWidth - 230.f, profileHeight - 10.f), ImVec2(profileWidth + 75.f, profileHeight + 15.f), IM_COL32(255, 255, 255, 100), 10.f); // name window
-        draw_list->AddRectFilled(ImVec2(profileWidth - 230.f, profileHeight + 42.5f), ImVec2(profileWidth + 75.f, profileHeight + 67.5f), IM_COL32(255, 255, 255, 100), 10.f); // name window
+        draw_list->AddRectFilled(ImVec2(profileWidth - 195.f, profileHeight + 75.f), ImVec2(profileWidth + 195.f, profileHeight + 100.f), IM_COL32(255, 255, 255, 100), 10.f); // name background
 
-        draw_list->AddRectFilled(ImVec2(profileWidth - 230.f, profileHeight + 95.f), ImVec2(profileWidth + 230.f, profileHeight + 120.f), IM_COL32(255, 255, 255, 100), 10.f); // name window
-        draw_list->AddRectFilled(ImVec2(profileWidth - 230.f, profileHeight + 130.f), ImVec2(profileWidth + 230.f, profileHeight + 155.f), IM_COL32(255, 255, 255, 100), 10.f); // name window
+        draw_list->AddRectFilled(ImVec2(profileWidth - 195.f, profileHeight + 112.f), ImVec2(profileWidth + 195.f, profileHeight + 137.f), IM_COL32(255, 255, 255, 100), 10.f); // ID background
+        draw_list->AddRectFilled(ImVec2(profileWidth - 195.f, profileHeight + 149.f), ImVec2(profileWidth + 75.f, profileHeight + 174.f), IM_COL32(255, 255, 255, 100), 10.f); // name background
+        draw_list->AddRectFilled(ImVec2(profileWidth - 195.f, profileHeight + 186.f), ImVec2(profileWidth + 75.f, profileHeight + 211.f), IM_COL32(255, 255, 255, 100), 10.f); // name background
 
-        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) - 230.f, (windowHeight / 2.f) - 151.f));
-        ImGui::Text(ICON_FA_CODE);
+        draw_list->AddRectFilled(ImVec2(profileWidth - 195.f, profileHeight + 223.f), ImVec2(profileWidth + 75.f, profileHeight + 248.f), IM_COL32(255, 255, 255, 100), 10.f); // name background
+        draw_list->AddRectFilled(ImVec2(profileWidth - 195.f, profileHeight + 260.f), ImVec2(profileWidth + 75.f, profileHeight + 285.f), IM_COL32(255, 255, 255, 100), 10.f); // name background
 
-        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) - 35.f, (windowHeight / 2.f) - 151.f));
-        ImGui::Text(ICON_FA_CODE);
+        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) - 190.f, 48.f));
+        ImGui::Text(ICON_FA_ANCHOR);
+
+        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) - 40.f, 48.f));
+        ImGui::Text(ICON_FA_ANCHOR);
 
         // --- Wrote Test with Stylized Logo Font --- //
         ImGui::PushFont(fontLogo);
 
-        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) - 204.f, (windowHeight / 2.f) - 160.f));
+        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) - 165.f, 40.f));
         ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255,255,255,255));
-        ImGui::Text("%s", "HashHarbor Card");
+        ImGui::Text("%s", "Harbor Card");
         ImGui::PopStyleColor();
 
         ImGui::PopFont();
@@ -695,74 +704,80 @@ void graphic::makeUserProfile(ImFont* fontLarge, ImFont* fontSmall, ImFont* font
         // --- Write Text With Large Font --- //
         ImGui::PushFont(fontLarge);
 
-        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) - 225.f, (windowHeight / 2.f) - 117.f));
+        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) - 190.f, 73.f));
         ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0,0,0,255));
         ImGui::Text("%s", "Name: ");
         ImGui::PopStyleColor();
 
-        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) + 225.f - ImGui::CalcTextSize(usrProfile.getUsername().c_str()).x, (windowHeight / 2.f) - 117.f));
-        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(50,60,70,255));
-        ImGui::Text("%s", usrProfile.getUsername().c_str());
-        ImGui::PopStyleColor();
-
-        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) - 225.f, (windowHeight / 2.f) - 62.5f));
+        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) - 190.f, 110.f));
         ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0,0,0,255));
         ImGui::Text("%s", "ID #: ");
         ImGui::PopStyleColor();
 
-        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) + 70.f - ImGui::CalcTextSize(usrProfile.getUserId().c_str()).x, (windowHeight / 2.f) - 62.5f));
-        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(50,60,70,255));
-        ImGui::Text("%s", usrProfile.getUserId().c_str());
-        ImGui::PopStyleColor();
-
-        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) - 225.f, (windowHeight / 2.f) - 10.f));
+        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) - 190.f, 147.f));
         ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0,0,0,255));
         ImGui::Text("%s", "Problems Solved:");
         ImGui::PopStyleColor();
 
-        // TODO - connect to number of problems solved
-        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) + 70.f - ImGui::CalcTextSize("0").x, (windowHeight / 2.f) - 10.f));
-        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(50,60,70,255));
-        ImGui::Text("%s", "0");
-        ImGui::PopStyleColor();
-
-        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) - 225.f, (windowHeight / 2.f) + 42.5f));
+        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) - 190.f, 184.f));
         ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0,0,0,255));
-        ImGui::Text("%s", "Rank:");
+        ImGui::Text("%s", "Money:");
         ImGui::PopStyleColor();
 
-        // TODO - need to add rank
-        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) + 70.f - ImGui::CalcTextSize("0").x, (windowHeight / 2.f) + 42.5f));
-        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(50,60,70,255));
-        ImGui::Text("%s", "1");
-        ImGui::PopStyleColor();
-
-        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) - 225.f, (windowHeight / 2.f) + 94.f));
+        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) - 190.f, 221.f));
         ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0,0,0,255));
         ImGui::Text("%s", "Member Since: ");
         ImGui::PopStyleColor();
 
-        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) + 225.f - ImGui::CalcTextSize(usrProfile.getJoinDate().c_str()).x, (windowHeight / 2.f) + 94.f));
-        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(50,60,70,255));
-        ImGui::Text("%s", usrProfile.getJoinDate().c_str());
-        ImGui::PopStyleColor();
-
-        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) - 225.f, (windowHeight / 2.f) + 129.f));
+        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) - 190.f, 258.f));
         ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0,0,0,255));
         ImGui::Text("%s", "Current Streak: ");
         ImGui::PopStyleColor();
 
+        ImGui::PopFont();
+
+        // --- Write Text With Small Font --- //
+        ImGui::PushFont(fontSmall);
+
+        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) + 190.f - ImGui::CalcTextSize(usrProfile.getUsername().c_str()).x, 76.f));
+        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(50,60,70,255));
+        ImGui::Text("%s", usrProfile.getUsername().c_str());
+        ImGui::PopStyleColor();
+
+        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) + 190.f - ImGui::CalcTextSize(usrProfile.getUserId().c_str()).x, 113.f));
+        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(50,60,70,255));
+        ImGui::Text("%s", usrProfile.getUserId().c_str());
+        ImGui::PopStyleColor();
+
+        // TODO - connect to number of problems solved
+        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) + 70.f - ImGui::CalcTextSize("0").x, 150.f));
+        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(50,60,70,255));
+        ImGui::Text("%s", "0");
+        ImGui::PopStyleColor();
+
+        // TODO - need to add money
+        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) + 70.f - ImGui::CalcTextSize("5543").x, 187.f));
+        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(50,60,70,255));
+        ImGui::Text("%s", "5543");
+        ImGui::PopStyleColor();
+
+        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) + 70.f - ImGui::CalcTextSize(usrProfile.getJoinDate().c_str()).x, 224.f));
+        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(50,60,70,255));
+        ImGui::Text("%s", usrProfile.getJoinDate().c_str());
+        ImGui::PopStyleColor();
+
         //TODO - need to implement streak counter
-        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) + 225.f - ImGui::CalcTextSize("0").x, (windowHeight / 2.f) + 129.f));
+        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) + 70.f - ImGui::CalcTextSize("0").x, 261.f));
         ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(50,60,70,255));
         ImGui::Text("%s", "0");
         ImGui::PopStyleColor();
 
         ImGui::PopFont();
 
-        // --- Write Text With Small Font --- //
-        //ImGui::PushFont(fontSmall);
-        //ImGui::PopFont();
+        ImGui::SetCursorPos(ImVec2((windowWidth / 2.f) + 70.f - ImGui::CalcTextSize("5543").x - 30.f, 194.f));
+        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(50,60,70,255));
+        ImGui::Text(ICON_FA_SAILBOAT);
+        ImGui::PopStyleColor();
 
     }
     ImGui::End();

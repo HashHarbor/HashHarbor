@@ -115,15 +115,6 @@ bool database::makeUser(database::usrProfile &profile)
         ));
         assert(insertUsr);
 
-        int w,h;
-#if defined(__APPLE__)
-        w = 1320;
-        h = 768;
-#else
-        w = 1760;
-        h = 1024;
-#endif
-
         auto insertProgress = collectionProgress.insert_one(make_document(
                 kvp("_id", insertUsr->inserted_id().get_oid()), // use user oid number to relate data to user
                 kvp("join", bsoncxx::types::b_date(std::chrono::system_clock::now())),
