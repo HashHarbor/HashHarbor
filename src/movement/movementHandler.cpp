@@ -92,6 +92,12 @@ movementHandler::movementHandler(string obspath, string intpath, int width, int 
 
         intGrid.resize(rows, std::vector<int>(cols));
 
+        cv::Mat hsv;
+        cv::cvtColor(interactions, hsv, cv::COLOR_BGR2HSV);
+
+        cv::Scalar interactionBlue(103, 167, 232);
+        cv::Scalar npcGreen(54, 126, 197);
+
         // Process pixels
         for (int y = 0; y < interactions.rows/32; ++y) {
             for (int x = 0; x < interactions.cols/32; ++x) {
@@ -99,10 +105,28 @@ movementHandler::movementHandler(string obspath, string intpath, int width, int 
                 // Access alpha value of the pixel
                 uchar alphaValue = alpha.at<uchar>(y*32, x*32);
 
-                if (alphaValue != 0) {
+                if (alphaValue != 0)
+                {
+
+                    cv::Vec3b pixel = hsv.at<cv::Vec3b>(y * 32, x * 32);
+
+                    //cout << (int)pixel[0]  << " | " << (int)pixel[1] << " | " << (int)pixel[2] << endl;
+
+                    if (pixel[0] == interactionBlue[0]  && pixel[1] == interactionBlue[1] && pixel[2] == interactionBlue[2])
+                    {
+                        // Set to Interaction == 1
+                        intGrid[y][x] = 1;
+                        //cout <<"Interaction: " << x << ", " << y << endl;
+                    }
+                    else if(pixel[0] == npcGreen[0]  && pixel[1] == npcGreen[1] && pixel[2] == npcGreen[2])
+                    {
+                        intGrid[y][x] = 2;
+                        cout <<"NPC: " << x << ", " << y << endl;
+                    }
+
                     //set stuff within here for if its NPC or map interact
                     //intGrid[y][x] = 1;
-                    intGrid[y][x] = 1;
+
                 }
             }
         }
@@ -267,6 +291,19 @@ void movementHandler::mapMovement(int key, imageHandler map, double &gridX, doub
         case 2:
             if(intGrid[gridY + 1][gridX] != 0){
                 interact = intGrid[gridY + 1][gridX];
+                break;
+            }
+            // TODO - needs testing
+        case 3:
+            if(intGrid[gridY][gridX + 1] != 0)
+            {
+                interact = intGrid[gridY][gridX + 1];
+                break;
+            }
+        case 4:
+            if(intGrid[gridY][gridX - 1] != 0)
+            {
+                interact = intGrid[gridY][gridX - 1];
                 break;
             }
         

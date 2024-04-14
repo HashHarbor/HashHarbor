@@ -165,10 +165,10 @@ void graphic::setup(){
     pauseMenu Pause = pauseMenu(width_px, height_px, noto_15, noto_18, noto_21);
 
 #if defined(__APPLE__)
-    pathMap = imgPth.currentPath.string() + "/assets/map/abc.png";
-    intMap = imgPth.currentPath.string() + + "/assets/map/int.png";
-    obsMap = imgPth.currentPath.string() + "/assets/map/obs.png";
-    overlapMap = imgPth.currentPath.string() + "/assets/map/overlap.png";
+    pathMap = imgPth.currentPath.string() + "/assets/map/town1/house6/map.png";
+    intMap = imgPth.currentPath.string() + + "/assets/map/town1/house6/int.png";
+    obsMap = imgPth.currentPath.string() + "/assets/map/town1/house6/obs.png";
+    overlapMap = imgPth.currentPath.string() + "/assets/map/town1/house6/overlap.png";
 #else
     pathMap = "../assets/map/town1/house6/map.png";
     intMap = "../assets/map/town1/house6/int.png";
@@ -288,7 +288,7 @@ void graphic::setup(){
 
         if(show_display){
             makeCharacter(image, editor, mapGridX, mapGridY, move, lastAction, character, builder);
-            makeBackground(background, move.getGrid(), mapGridX, mapGridY);
+            makeBackground(background, move.getGrid(), mapGridX, mapGridY, image, character, builder);
         }
 
         if(show_codeEditor){
@@ -424,7 +424,6 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
                     default:
                         break;
                 }
-                
 
                 move.drawArrows(arrowTimer, lastAction);
                 if (arrowTimer <= 0.f){
@@ -503,7 +502,8 @@ void graphic::loadMapUpdate(movementHandler &move){
     move = movementHandler(obsMap, intMap, width_px, height_px);
 }
 
-void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, double gridX, double gridY){
+void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, double gridX, double gridY, imageHandler& image, characterManager &character, characterBuilder& charBuild)
+{
     ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
     ImGui::SetNextWindowPos({0, 0});
 
@@ -514,8 +514,35 @@ void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, 
 
     ImGui::Begin("Background", NULL, flags);
     {
+        int mapCols = grid[0].size();
+        int mapRows = grid.size();
+
         ImGui::SetCursorPos(ImVec2(0,0));
-        background.DrawMap(background, gridX, gridY, (width_px / 2), (height_px / 2), grid.size(), grid[0].size());
+        background.DrawMap(background, gridX, gridY, (width_px / 2), (height_px / 2), mapRows, mapCols);
+
+        // calcluate what grids are on the edge of the screen
+        float topX = gridX - (((float)width_px / 2.f) / 32.f) / 2.f;
+        float topY = gridY - (((float)height_px / 2.f) / 32.f) / 2.f;
+
+        int botX = (int)(gridX + (((float)width_px / 2.f) / 32.f)/ 2.f);
+        int botY = (int)(gridY + (((float)height_px / 2.f) / 32.f)/ 2.f);
+
+        //cout << topX << ":" << topY << " | " << botX << ":" << botY<< " |G " << gridX << "," <<gridY << " M|" << mapRows << "," <<mapCols << " |RemX:" << (gridX - (int)gridX)<< " RemY" << (gridY - (int)gridY)<<endl;
+
+        int charX = 58; // get character position
+        int charY = 38 - 1;
+        if(charX >= (int)topX && charX <= botX && charY + 1 >= (int)topY && charY <= botY) // check if the npc should be on screen
+        {
+            //ty + 1
+            float posX = (float)charX - topX; // calculate how many grids the npc needs to be from the top left
+            float posY = (float)charY - topY;
+            ImVec2 topNpc = ImVec2((float)posX * 32.f - 16.f,(float)posY * 32.f - 16.f); // multiply by 32 for grid size, subtract 16 to adjust the npc to the exact grid location
+
+            static vector<int> npc = {0,5,8,0,2,2,5,0}; // set the npc
+            charBuild.drawCharacterAnimation(&image, topNpc, {ImVec2(64.1f / 192.f, 0.1f/512.f),ImVec2(95.99f/192.f, 64.f/512.f)}, 1.f, npc); // draw the npc
+        }
+
+        //cout << "Map: " << grid[gridY][gridX] << " | Interact: " << interact <<  " | X:" << gridX << " TOPX:" << topX <<" BOTX:" << botX <<" Y:" << gridY<< " TOPY:" << topY <<" BOTY:" << botY<< endl;
 
     }
 
