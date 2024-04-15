@@ -51,6 +51,32 @@ public:
     }
 };
 
+struct npc
+{
+public:
+    int cordX;
+    int cordY;
+    bool hasQuestion;
+    int question;
+    vector<int> character = {0,0,0,0,0,0,0,0};
+    // add something for dialog
+    npc(int x, int y, bool hasQ, int q, int arr[8])
+    {
+        this->cordX = x;
+        this->cordY = y;
+        this->hasQuestion = hasQ;
+        this->question = q;
+        this->character[0] = arr[0];
+        this->character[1] = arr[1];
+        this->character[2] = arr[2];
+        this->character[3] = arr[3];
+        this->character[4] = arr[4];
+        this->character[5] = arr[5];
+        this->character[6] = arr[6];
+        this->character[7] = arr[7];
+    }
+};
+
 class characterManager
 {
     map<string, character*> playerCharacters; // stores all the player characters
@@ -60,6 +86,8 @@ class characterManager
 
     int frameCount_4 = 0; // animation control for 4 frame
     int frameCount_6 = 0; // animation control for 6 frame
+
+    map<pair<int,int>, npc> mapNpc;
 public:
     ImVec2 drawPos;
     characterManager();
@@ -69,8 +97,8 @@ public:
     // npc designates character type
     // full movement designates if all movement animations are requires or not
 
-    character* getPlayerCharacter(string name);
-    character* getNpcCharacter(string name);
+    map<pair<int,int>, npc>* getNpc();
+    void setNpc(string configPath);
 
     character* getMainPlayer();
     // quickly get the main character to reduce map find calls

@@ -35,6 +35,7 @@ using std::ofstream;
 #include "../imageHandler/imagePath.h"
 #include "../character/characterManager.h"
 #include "../character/characterBuilder.h"
+#include "../character/characterConfig.h"
 #include "../movement/movementHandler.h"
 #include "../assets/font/IconsFontAwesome6.h"
 #include "../login/login.h"
@@ -189,6 +190,7 @@ void graphic::setup(){
     character.setMainPlayer("USER");
 
     movementHandler move = movementHandler(obsMap, intMap, width_px, height_px);
+    character.setNpc("../assets/map/" + world + room + "config.toml");
     int lastAction = 0;
     // auto gr = move.getGrid();
     // cout << gr.size() << ", " << gr[0].size() << endl;
@@ -288,7 +290,7 @@ void graphic::setup(){
 
         if(show_display){
             makeCharacter(image, editor, mapGridX, mapGridY, move, lastAction, character, builder);
-            makeBackground(background, move.getGrid(), mapGridX, mapGridY, image, character, builder);
+            makeBackground(background, move.getGrid(), mapGridX, mapGridY, image, character, builder, lastAction);
         }
 
         if(show_codeEditor){
@@ -459,6 +461,7 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
                     overlapMap = "../assets/map/" + world + room + "overlap.png";
 
                     loadMapUpdate(move);
+                    character.setNpc("../assets/map/" + world + room + "config.toml");
 
                     interact = 0;
                     lastAction = 0;
@@ -502,10 +505,18 @@ void graphic::loadMapUpdate(movementHandler &move){
     move = movementHandler(obsMap, intMap, width_px, height_px);
 }
 
-void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, double gridX, double gridY, imageHandler& image, characterManager &character, characterBuilder& charBuild)
+void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, double gridX, double gridY, imageHandler& image, characterManager &character, characterBuilder& charBuild, int &lastAction)
 {
     ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
     ImGui::SetNextWindowPos({0, 0});
+
+    const float frameLength = 1.f / 10.f; // In seconds, so  FPS
+    static float frameTimer = frameLength;
+    static int frameCount_6 = 3;
+
+    characterConfig charConfig;
+
+    //cout << world << room << " | " << character.getNpc()->size() << endl;
 
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus;
     if(show_blur){
@@ -520,26 +531,68 @@ void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, 
         ImGui::SetCursorPos(ImVec2(0,0));
         background.DrawMap(background, gridX, gridY, (width_px / 2), (height_px / 2), mapRows, mapCols);
 
-        // calcluate what grids are on the edge of the screen
-        float topX = gridX - (((float)width_px / 2.f) / 32.f) / 2.f;
-        float topY = gridY - (((float)height_px / 2.f) / 32.f) / 2.f;
+        frameTimer -= ImGui::GetIO().DeltaTime;
 
-        int botX = (int)(gridX + (((float)width_px / 2.f) / 32.f)/ 2.f);
-        int botY = (int)(gridY + (((float)height_px / 2.f) / 32.f)/ 2.f);
-
-        //cout << topX << ":" << topY << " | " << botX << ":" << botY<< " |G " << gridX << "," <<gridY << " M|" << mapRows << "," <<mapCols << " |RemX:" << (gridX - (int)gridX)<< " RemY" << (gridY - (int)gridY)<<endl;
-
-        int charX = 58; // get character position
-        int charY = 38 - 1;
-        if(charX >= (int)topX && charX <= botX && charY + 1 >= (int)topY && charY <= botY) // check if the npc should be on screen
+        for(auto iter : *character.getNpc())
         {
-            //ty + 1
-            float posX = (float)charX - topX; // calculate how many grids the npc needs to be from the top left
-            float posY = (float)charY - topY;
-            ImVec2 topNpc = ImVec2((float)posX * 32.f - 16.f,(float)posY * 32.f - 16.f); // multiply by 32 for grid size, subtract 16 to adjust the npc to the exact grid location
+            //cout << iter.second.cordX << endl;
 
-            static vector<int> npc = {0,5,8,0,2,2,5,0}; // set the npc
-            charBuild.drawCharacterAnimation(&image, topNpc, {ImVec2(64.1f / 192.f, 0.1f/512.f),ImVec2(95.99f/192.f, 64.f/512.f)}, 1.f, npc); // draw the npc
+            // calcluate what grids are on the edge of the screen
+            float topX = gridX - (((float)width_px / 2.f) / 32.f) / 2.f;
+            float topY = gridY - (((float)height_px / 2.f) / 32.f) / 2.f;
+
+            int botX = (int)(gridX + (((float)width_px / 2.f) / 32.f)/ 2.f);
+            int botY = (int)(gridY + (((float)height_px / 2.f) / 32.f)/ 2.f);
+
+            //cout << topX << ":" << topY << " | " << botX << ":" << botY<< " |G " << gridX << "," <<gridY << " M|" << mapRows << "," <<mapCols << " |RemX:" << (gridX - (int)gridX)<< " RemY" << (gridY - (int)gridY)<<endl;
+
+            int charX = iter.second.cordX; // get character position
+            int charY = iter.second.cordY - 1;
+            if(charX >= (int)topX && charX <= botX && charY + 1 >= (int)topY && charY <= botY) // check if the npc should be on screen
+            {
+                //ty + 1
+                float posX = (float)charX - topX; // calculate how many grids the npc needs to be from the top left
+                float posY = (float)charY - topY;
+                ImVec2 npcPos = ImVec2((float)posX * 32.f - 16.f,(float)posY * 32.f - 16.f); // multiply by 32 for grid size, subtract 16 to adjust the npc to the exact grid location
+
+                if(interact == 2)
+                {
+                    if((int)gridY == charY - 1) // if character above npc
+                    {
+                        charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleUp.at(frameCount_6), 1.f, iter.second.character);
+                    }
+                    else if((int)gridY == charY + 2) // if character is below npc
+                    {
+                        charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleDown.at(frameCount_6), 1.f, iter.second.character);
+                    }
+                    else if((int)gridX == charX + 1) // if character is right of npc
+                    {
+                        charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleRight.at(frameCount_6), 1.f, iter.second.character);
+                    }
+                    else if((int)gridX == charX - 1) //if character is left of npc
+                    {
+                        charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleLeft.at(frameCount_6), 1.f, iter.second.character);
+                    }
+                    else
+                    {
+                        charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleDown.at(frameCount_6), 1.f, iter.second.character);
+                    }
+                }
+                else
+                {
+                    charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleDown.at(frameCount_6), 1.f, iter.second.character); // draw the npc
+                }
+            }
+        }
+
+        if (frameTimer <= 0.f)
+        {
+            frameTimer = frameLength;
+            frameCount_6 ++;
+            if(frameCount_6 % 6 == 0)
+            {
+                frameCount_6 = 0;
+            }
         }
 
         //cout << "Map: " << grid[gridY][gridX] << " | Interact: " << interact <<  " | X:" << gridX << " TOPX:" << topX <<" BOTX:" << botX <<" Y:" << gridY<< " TOPY:" << topY <<" BOTY:" << botY<< endl;

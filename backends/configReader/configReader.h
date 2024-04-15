@@ -12,6 +12,8 @@ using std::pair;
 using std::pair;
 #endif
 
+#include "../src/character/characterManager.h"
+
 using namespace std;
 
 class configReader{
@@ -21,5 +23,6 @@ public:
 
     configReader();
     string check(string configPath, string gridLocation);
+    void getNpc(std::string configPath, characterManager *character);
 
 };

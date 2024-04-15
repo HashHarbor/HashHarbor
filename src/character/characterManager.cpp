@@ -25,6 +25,7 @@ using std::pair;
 
 #include "../imageHandler/imageHandler.h"
 #include "characterBuilder.h"
+#include "configReader/configReader.h"
 
 namespace ImGui { extern ImGuiKeyData* GetKeyData(ImGuiKey key); }
 
@@ -35,7 +36,6 @@ namespace ImGui { extern ImGuiKeyData* GetKeyData(ImGuiKey key); }
 #include "characterConfig.h"
 
 characterManager::characterManager() {}
-
 
 void characterManager::createCharacter(string name, bool npc, bool fullMovement, imageHandler* imgHandler)
 {
@@ -48,22 +48,6 @@ void characterManager::createCharacter(string name, bool npc, bool fullMovement,
         npcCharacters.emplace(name, newChar);
 }
 
-character* characterManager::getPlayerCharacter(string name)
-{
-    character* find = playerCharacters.find(name)->second;
-    if(find == nullptr)
-    { //todo - delete print statement
-        std::cout << "FAIL TO FIND BOB" << std::endl;
-    }
-    return find;
-}
-
-character* characterManager::getNpcCharacter(string name)
-{
-    character* find = npcCharacters.find(name)->second;
-    return find;
-}
-
 character *characterManager::getMainPlayer()
 {
     return mainPlayer;
@@ -73,7 +57,6 @@ void characterManager::setMainPlayer(std::string name)
 {
     mainPlayer = playerCharacters.find(name)->second;
 }
-
 
 void characterManager::moveMainCharacter(imageHandler* imgHandler, characterBuilder* charBuild,float frameTimer, bool canMove, ImDrawList* draw_list)
 {
@@ -152,4 +135,17 @@ void characterManager::selectMainCharacter(characterBuilder* charBuild)
 {
     charBuild->setAsMainCharacter(mainPlayer->dynamicIndex);
 
+}
+
+map<pair<int,int>, npc>* characterManager::getNpc()
+{
+    return &mapNpc;
+}
+
+void characterManager::setNpc(string configPath)
+{
+    mapNpc.clear();
+
+    configReader config = configReader();
+    config.getNpc(configPath, this);
 }

@@ -52,3 +52,10 @@ coordY = "27"
 next = "+house6"
 coordX = "28"
 coordY = "27"
+
+[[npc]]
+cordsX = 58
+cordsY = 38
+character = [0,5,8,0,2,2,5,0]
+hasQuestion = true
+questionNum = "1"
