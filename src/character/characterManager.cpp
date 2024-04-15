@@ -26,6 +26,7 @@ using std::pair;
 #include "../imageHandler/imageHandler.h"
 #include "characterBuilder.h"
 #include "configReader/configReader.h"
+#include "characterConfig.h"
 
 namespace ImGui { extern ImGuiKeyData* GetKeyData(ImGuiKey key); }
 
@@ -35,7 +36,10 @@ namespace ImGui { extern ImGuiKeyData* GetKeyData(ImGuiKey key); }
 #include "characterManager.h"
 #include "characterConfig.h"
 
-characterManager::characterManager() {}
+characterManager::characterManager()
+{
+    talk.loadTexture(talk.filepath, &talk);
+}
 
 void characterManager::createCharacter(string name, bool npc, bool fullMovement, imageHandler* imgHandler)
 {
@@ -148,4 +152,10 @@ void characterManager::setNpc(string configPath)
 
     configReader config = configReader();
     config.getNpc(configPath, this);
+}
+
+void characterManager::drawTalkBubble(int frame)
+{
+    characterConfig config = characterConfig();
+    talk.DrawArrowFrame(talk, config.talkBubble[frame], 1.0f);
 }

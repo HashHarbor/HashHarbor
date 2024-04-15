@@ -432,7 +432,7 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
                     arrowTimer = frameLength;
                 }
             }
-            
+
 
             if(ImGui::IsKeyDown(ImGuiKey_Q) && show_codeEditor == false){
                 // cout << "trigger interaction here" << endl;
@@ -467,17 +467,50 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
                     lastAction = 0;
 
                 }
-                else if(interact == 2){
-                    //do NPC text or whatever first hten do the rest
-                    show_codeEditor = !show_codeEditor;
-                    show_userProfile = !show_userProfile;
+                else if(interact == 2)
+                {
+                    bool hasQuestion = false;
+                    int question = 0;
 
-                    triggerQuestion(1);
-                    
-                    editor.SetTextLines({});
-                    editor.SetTextLines(qes.boiler);
+                    auto npcRight = character.getNpc()->find(make_pair((int)gridX - 1, (int)gridY));
+                    auto npcLeft = character.getNpc()->find(make_pair((int)gridX + 1, (int)gridY));
+                    auto npcUp = character.getNpc()->find(make_pair((int)gridX, (int)gridY - 1));
+                    auto npcDown = character.getNpc()->find(make_pair((int)gridX, (int)gridY + 1));
 
-                    result = "";
+                    if(npcRight != character.getNpc()->end())
+                    {
+                        hasQuestion = npcRight->second.hasQuestion;
+                        question = npcRight->second.question;
+                    }
+                    else if(npcLeft != character.getNpc()->end())
+                    {
+                        hasQuestion = npcLeft->second.hasQuestion;
+                        question = npcLeft->second.question;
+                    }
+                    else if(npcUp != character.getNpc()->end())
+                    {
+                        hasQuestion = npcUp->second.hasQuestion;
+                        question = npcUp->second.question;
+                    }
+                    else if(npcDown != character.getNpc()->end())
+                    {
+                        hasQuestion = npcDown->second.hasQuestion;
+                        question = npcDown->second.question;
+                    }
+
+                    if(hasQuestion)
+                    {
+                        //do NPC text or whatever first hten do the rest
+                        show_codeEditor = !show_codeEditor;
+                        show_userProfile = !show_userProfile;
+
+                        triggerQuestion(question);
+
+                        editor.SetTextLines({});
+                        editor.SetTextLines(qes.boiler);
+
+                        result = "";
+                    }
                 }                
             }
 
@@ -513,6 +546,7 @@ void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, 
     const float frameLength = 1.f / 10.f; // In seconds, so  FPS
     static float frameTimer = frameLength;
     static int frameCount_6 = 3;
+    static int frameCount_8 = 0;
 
     characterConfig charConfig;
 
@@ -555,32 +589,32 @@ void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, 
                 float posY = (float)charY - topY;
                 ImVec2 npcPos = ImVec2((float)posX * 32.f - 16.f,(float)posY * 32.f - 16.f); // multiply by 32 for grid size, subtract 16 to adjust the npc to the exact grid location
 
-                if(interact == 2)
+                cout << gridX << "==" << charX << " | " << gridY << "==" << charY << endl;
+                if((int)gridY == charY - 1 && (int)gridX == charX) // if character above npc
                 {
-                    if((int)gridY == charY - 1) // if character above npc
-                    {
-                        charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleUp.at(frameCount_6), 1.f, iter.second.character);
-                    }
-                    else if((int)gridY == charY + 2) // if character is below npc
-                    {
-                        charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleDown.at(frameCount_6), 1.f, iter.second.character);
-                    }
-                    else if((int)gridX == charX + 1) // if character is right of npc
-                    {
-                        charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleRight.at(frameCount_6), 1.f, iter.second.character);
-                    }
-                    else if((int)gridX == charX - 1) //if character is left of npc
-                    {
-                        charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleLeft.at(frameCount_6), 1.f, iter.second.character);
-                    }
-                    else
-                    {
-                        charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleDown.at(frameCount_6), 1.f, iter.second.character);
-                    }
+                    charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleUp.at(frameCount_6), 1.f, iter.second.character);
+                }
+                else if((int)gridY == charY + 2 && (int)gridX == charX) // if character is below npc
+                {
+                    charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleDown.at(frameCount_6), 1.f, iter.second.character);
+                }
+                else if((int)gridX == charX + 1 && (int)gridY == charY + 1) // if character is right of npc
+                {
+                    charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleRight.at(frameCount_6), 1.f, iter.second.character);
+                }
+                else if((int)gridX == charX - 1 && (int)gridY == charY + 1) //if character is left of npc
+                {
+                    charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleLeft.at(frameCount_6), 1.f, iter.second.character);
                 }
                 else
                 {
-                    charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleDown.at(frameCount_6), 1.f, iter.second.character); // draw the npc
+                    charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleDown.at(frameCount_6), 1.f, iter.second.character);
+                }
+
+                if(interact == 2)
+                {
+                    ImGui::SetCursorPos(ImVec2(npcPos.x + 18.f, npcPos.y - 24.f));
+                    character.drawTalkBubble(frameCount_8);
                 }
             }
         }
@@ -589,9 +623,14 @@ void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, 
         {
             frameTimer = frameLength;
             frameCount_6 ++;
+            frameCount_8 ++;
             if(frameCount_6 % 6 == 0)
             {
                 frameCount_6 = 0;
+            }
+            if(frameCount_8 % 8 == 0)
+            {
+                frameCount_8 = 0;
             }
         }
 

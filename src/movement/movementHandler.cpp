@@ -286,26 +286,37 @@ void movementHandler::mapMovement(int key, imageHandler map, double &gridX, doub
         case 1:
             if(intGrid[gridY - 1][gridX] != 0){
                 interact = intGrid[gridY - 1][gridX];
-                break;
             }
+            else{
+                interact = false;
+            }
+            break;
         case 2:
             if(intGrid[gridY + 1][gridX] != 0){
                 interact = intGrid[gridY + 1][gridX];
-                break;
             }
-            // TODO - needs testing
+            else{
+                interact = false;
+            }
+            break;
         case 3:
             if(intGrid[gridY][gridX + 1] != 0)
             {
                 interact = intGrid[gridY][gridX + 1];
-                break;
             }
+            else{
+                interact = false;
+            }
+            break;
         case 4:
             if(intGrid[gridY][gridX - 1] != 0)
             {
                 interact = intGrid[gridY][gridX - 1];
-                break;
             }
+            else{
+                interact = false;
+            }
+            break;
         
         default:
             interact = false;

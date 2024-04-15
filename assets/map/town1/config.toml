@@ -58,4 +58,4 @@ cordsX = 58
 cordsY = 38
 character = [0,5,8,0,2,2,5,0]
 hasQuestion = true
-questionNum = "1"
+questionNum = 2

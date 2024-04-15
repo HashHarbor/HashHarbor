@@ -244,4 +244,15 @@ public:
             ImColor::HSV(203.f / 360.f,0.64f,0.64f), ImColor::HSV(203.f / 360.f,0.64f,0.84f), ImColor::HSV(203.f / 360.f,0.64f,0.44f),
             ImColor::HSV(181.f / 360.f,0.61f,0.95f), ImColor::HSV(181.f / 360.f,0.25f,0.95f), ImColor::HSV(181.f / 360.f,0.61f,0.64f)
     };
+
+    vector<std::pair<ImVec2,ImVec2>> talkBubble = {
+            {ImVec2(0.1f / 256.f, 0.1f/32.f),ImVec2(31.99f/256.f, 31.99f/32.f)},
+            {ImVec2(32.1f / 256.f, 0.1f/32.f),ImVec2(63.99f/256.f, 31.99f/32.f)},
+            {ImVec2(64.1f / 256.f, 0.1f/32.f),ImVec2(95.99f/256.f, 31.99f/32.f)},
+            {ImVec2(96.1f / 256.f, 0.1f/32.f),ImVec2(127.99f/256.f, 31.99f/32.f)},
+            {ImVec2(128.1f / 256.f, 0.1f/32.f),ImVec2(159.99f/256.f, 31.99f/32.f)},
+            {ImVec2(160.1f / 256.f, 0.1f/32.f),ImVec2(191.99f/256.f, 31.99f/32.f)},
+            {ImVec2(192.1f / 256.f, 0.1f/32.f),ImVec2(223.99f/256.f, 31.99f/32.f)},
+            {ImVec2(224.1f / 256.f, 0.1f/32.f),ImVec2(255.99f/256.f, 31.99f/32.f)}
+    };
 };

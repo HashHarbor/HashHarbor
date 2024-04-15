@@ -88,6 +88,14 @@ class characterManager
     int frameCount_6 = 0; // animation control for 6 frame
 
     map<pair<int,int>, npc> mapNpc;
+
+#if defined(__APPLE__)
+    string talkPath = std::filesystem::current_path().string() + "/assets/other/talk.png";
+#else
+    string talkPath = "../assets/other/talk.png";
+#endif
+    imageHandler talk = imageHandler(talkPath.c_str());
+
 public:
     ImVec2 drawPos;
     characterManager();
@@ -109,4 +117,6 @@ public:
     // used to move the main character based on keyboard input
     void selectMainCharacter(characterBuilder* charBuild);
     // used to save character item indexes
+
+    void drawTalkBubble(int frame);
 };
