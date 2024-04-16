@@ -154,8 +154,8 @@ void characterManager::setNpc(string configPath)
     config.getNpc(configPath, this);
 }
 
-void characterManager::drawTalkBubble(int frame)
+void characterManager::drawTalkBubble(int frame, float scale)
 {
     characterConfig config = characterConfig();
-    talk.DrawArrowFrame(talk, config.talkBubble[frame], 1.0f);
+    talk.DrawBubbleFrame(talk, config.talkBubble[frame], scale);
 }

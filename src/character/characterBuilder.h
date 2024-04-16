@@ -77,7 +77,8 @@ public:
 
     void drawCharacterAnimation(imageHandler* imgHandler, ImVec2 pos, pair<ImVec2,ImVec2> cords, float scale, vector<int>& characterIndex);
         // Character Index 0=Body, 1=Eyes, 2=Outfit, 3=OutfitColor, 4=Hair, 5=HairColor, 6=Accessories, 7=AccessoriesColor
-
+    void drawCharacterAnimation(imageHandler* imgHandler, ImVec2 pos, pair<ImVec2,ImVec2> cords, float scale, vector<int>& characterIndex, float translucent);
+        // used for npc to make them translucent
     void cleanUp(); // destructor to delete all image textures
 
     void setCharacterFromDb();

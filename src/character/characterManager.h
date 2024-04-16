@@ -118,5 +118,5 @@ public:
     void selectMainCharacter(characterBuilder* charBuild);
     // used to save character item indexes
 
-    void drawTalkBubble(int frame);
+    void drawTalkBubble(int frame, float scale);
 };

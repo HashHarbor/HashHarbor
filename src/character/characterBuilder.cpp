@@ -674,6 +674,29 @@ void characterBuilder::drawCharacterAnimation(imageHandler *imgHandler, ImVec2 p
     }
 }
 
+void characterBuilder::drawCharacterAnimation(imageHandler *imgHandler, ImVec2 pos, pair<ImVec2, ImVec2> cords, float scale,vector<int>& characterIndex, float translucent)
+{
+    ImGui::SetCursorPos(pos);
+    imgHandler->DrawAnimationFrame(*body[characterIndex[0]], cords, scale, translucent);
+
+    ImGui::SetCursorPos(pos);
+    imgHandler->DrawAnimationFrame(*eyes[characterIndex[1]], cords, scale, translucent);
+
+    ImGui::SetCursorPos(pos);
+    imgHandler->DrawAnimationFrame(*outfit[characterIndex[2]][characterIndex[3]], cords, scale, translucent);
+
+    if(characterIndex[4] != (int)hair.size()) // allow for hair index to equal size to allow for bald character
+    {
+        ImGui::SetCursorPos(pos);
+        imgHandler->DrawAnimationFrame(*hair[characterIndex[4]][characterIndex[5]], cords, scale, translucent);
+    }
+    if(characterIndex[6] != (int)accessories.size()) // allow for accessories to equal size to allow for no accessories
+    {
+        ImGui::SetCursorPos(pos);
+        imgHandler->DrawAnimationFrame(*accessories[characterIndex[6]][characterIndex[7]], cords, scale, translucent);
+    }
+}
+
 void characterBuilder::setCharacterFromDb()
 {
     userProfile& usrProfile = userProfile::getInstance();

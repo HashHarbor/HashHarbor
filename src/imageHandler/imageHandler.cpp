@@ -93,6 +93,13 @@ void imageHandler::DrawAnimationFrame(imageHandler _image, pair<ImVec2,ImVec2> c
     ImGui::Image((void*)(intptr_t)_image.texture, ImVec2((32.f * scaleFactor), (64.f * scaleFactor)),cords.first, cords.second);
 }
 
+void imageHandler::DrawAnimationFrame(imageHandler _image, pair<ImVec2,ImVec2> cords, float scaleFactor, float translucent)
+{
+    static ImVec4 color_multipler(1, 1, 1, translucent);
+
+    ImGui::Image((void*)(intptr_t)_image.texture, ImVec2((32.f * scaleFactor), (64.f * scaleFactor)),cords.first, cords.second, color_multipler);
+}
+
 pair<ImVec2, ImVec2> imageHandler::generateCords(int animation, int frame, float spriteWidth, float spriteHeight, float imageWidth, float imageHeight)
 {
     float minX = ((float)frame * spriteWidth);
@@ -136,4 +143,9 @@ void imageHandler::DrawMap(imageHandler _image, double tileX, double tileY, floa
 void imageHandler::DrawArrowFrame(imageHandler _image, pair<ImVec2,ImVec2> cords, float scaleFactor)
 {
     ImGui::Image((void*)(intptr_t)_image.texture, ImVec2(32.0f * scaleFactor, 32.0f * scaleFactor), cords.first, cords.second);
+}
+
+void imageHandler::DrawBubbleFrame(imageHandler _image, pair<ImVec2,ImVec2> cords, float scaleFactor)
+{
+    ImGui::Image((void*)(intptr_t)_image.texture, ImVec2(32.0f * scaleFactor, 32.0f), cords.first, cords.second);
 }

@@ -48,7 +48,9 @@ public:
     void DrawImage(imageHandler& _image, float scaleFactor);
         // draw image as stored but alter the scale drawn on the screen
     void DrawAnimationFrame(imageHandler _image, pair<ImVec2,ImVec2> cords, float scaleFactor);
+    void DrawAnimationFrame(imageHandler _image, pair<ImVec2,ImVec2> cords, float scaleFactor, float translucent);
     void DrawArrowFrame(imageHandler _image, pair<ImVec2,ImVec2> cords, float scaleFactor);
+    void DrawBubbleFrame(imageHandler _image, pair<ImVec2,ImVec2> cords, float scaleFactor);
         // used for drawing animations from sprite sheet by drawing only a portion of the loaded image
     pair<ImVec2,ImVec2> generateCords(int animation, int frame, float spriteWidth, float spriteHeight, float imageWidth, float imageHeight);
         // generate coordinates to make animations
