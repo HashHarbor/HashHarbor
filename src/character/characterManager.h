@@ -90,7 +90,9 @@ class characterManager
     map<pair<int,int>, npc> mapNpc;
 
 #if defined(__APPLE__)
-    string talkPath = std::filesystem::current_path().string() + "/assets/other/talk.png";
+    //string talkPath = std::filesystem::current_path().string() + "/assets/other/talk.png";
+    string talkPath = "../assets/other/talk.png";
+
 #else
     string talkPath = "../assets/other/talk.png";
 #endif

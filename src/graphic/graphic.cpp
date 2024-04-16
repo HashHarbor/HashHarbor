@@ -134,8 +134,10 @@ void graphic::setup(){
 #if defined(__APPLE__)
     string font_1 = imgPth.currentPath.string() + FONT_ICON_FILE_NAME_FAR;
     string font_2 = imgPth.currentPath.string() + FONT_ICON_FILE_NAME_FAS;
-    string font_3 = imgPth.currentPath.string() + "/assets/font/NotoSans-Medium.ttf";
-    string font_4 = imgPth.currentPath.string() + "/assets/font/NovaFlat-Regular.ttf";
+    //string font_3 = imgPth.currentPath.string() + "/assets/font/NotoSans-Medium.ttf";
+    //string font_4 = imgPth.currentPath.string() + "/assets/font/NovaFlat-Regular.ttf";
+    string font_3 = "../assets/font/NotoSans-Medium.ttf";
+    string font_4 = "../assets/font/NovaFlat-Regular.ttf";
 #else
     string font_1 = string("..") + FONT_ICON_FILE_NAME_FAR;
     string font_2 = string("..") + FONT_ICON_FILE_NAME_FAS;
@@ -166,10 +168,15 @@ void graphic::setup(){
     pauseMenu Pause = pauseMenu(width_px, height_px, noto_15, noto_18, noto_21);
 
 #if defined(__APPLE__)
-    pathMap = imgPth.currentPath.string() + "/assets/map/abc.png";
-    intMap = imgPth.currentPath.string() + + "/assets/map/int.png";
-    obsMap = imgPth.currentPath.string() + "/assets/map/obs.png";
-    overlapMap = imgPth.currentPath.string() + "/assets/map/overlap.png";
+    //pathMap = imgPth.currentPath.string() + "/assets/map/town1/house6/map.png";
+    //intMap = imgPth.currentPath.string() + + "/assets/map//town1/house6/int.png";
+    //obsMap = imgPth.currentPath.string() + "/assets/map//town1/house6/obs.png";
+    //overlapMap = imgPth.currentPath.string() + "/assets/map//town1/house6/overlap.png";
+
+    pathMap = "../assets/map/town1/house6/map.png";
+    intMap = "../assets/map/town1/house6/int.png";
+    obsMap = "../assets/map/town1/house6/obs.png";
+    overlapMap = "../assets/map/town1/house6/overlap.png";
 #else
     pathMap = "../assets/map/town1/house6/map.png";
     intMap = "../assets/map/town1/house6/int.png";
@@ -524,7 +531,7 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
 
                     gridX = config.gridX;
                     gridY = config.gridY;
-                    
+
                     pathMap = "../assets/map/" + world + room + "map.png";
                     intMap = "../assets/map/" + world + room + "int.png";
                     obsMap = "../assets/map/" + world + room + "obs.png";

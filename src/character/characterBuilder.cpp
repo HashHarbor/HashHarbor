@@ -40,7 +40,9 @@ characterBuilder::characterBuilder(imageHandler* imgHandler)
         imageHandler* img = new imageHandler();
 
 #if defined(__APPLE__)
-        string path = imgPath.currentPath.string() +"/"+ iter;
+        //string path = imgPath.currentPath.string() +"/"+ iter;
+        //string path = imgPath.absolutePath + iter;
+        string path = imgPath.absolutePath + iter;
 #else
         string path = imgPath.absolutePath + iter;
 #endif
@@ -54,7 +56,8 @@ characterBuilder::characterBuilder(imageHandler* imgHandler)
     {
         imageHandler* img = new imageHandler();
 #if defined(__APPLE__)
-        string path = imgPath.currentPath.string() +"/"+ iter;
+        //string path = imgPath.currentPath.string() +"/"+ iter;
+        string path = imgPath.absolutePath + iter;
 #else
         string path = imgPath.absolutePath + iter;
 #endif
@@ -71,7 +74,8 @@ characterBuilder::characterBuilder(imageHandler* imgHandler)
         {
             imageHandler* img = new imageHandler();
 #if defined(__APPLE__)
-            string path = imgPath.currentPath.string() +"/"+ jter;
+            //string path = imgPath.currentPath.string() +"/"+ jter;
+            string path = imgPath.absolutePath + jter;
 #else
             string path = imgPath.absolutePath + jter;
 #endif
@@ -95,7 +99,8 @@ characterBuilder::characterBuilder(imageHandler* imgHandler)
         {
             imageHandler* img = new imageHandler();
 #if defined(__APPLE__)
-            string path = imgPath.currentPath.string() +"/"+ jter;
+            //string path = imgPath.currentPath.string() +"/"+ jter;
+            string path = imgPath.absolutePath + jter;
 #else
             string path = imgPath.absolutePath + jter;
 #endif
@@ -120,7 +125,8 @@ characterBuilder::characterBuilder(imageHandler* imgHandler)
         {
             imageHandler* img = new imageHandler();
 #if defined(__APPLE__)
-            string path = imgPath.currentPath.string() +"/"+ jter;
+            //string path = imgPath.currentPath.string() +"/"+ jter;
+            string path = imgPath.absolutePath + jter;
 #else
             string path = imgPath.absolutePath + jter;
 #endif

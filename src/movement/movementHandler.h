@@ -45,7 +45,8 @@ public:
     int height_px = 0;
 
 #if defined(__APPLE__)
-    string arrowsPath = std::filesystem::current_path().string() + "/assets/map/arrows.png";
+    //string arrowsPath = std::filesystem::current_path().string() + "/assets/map/arrows.png";
+    string arrowsPath = "../assets/map/arrows.png";
 #else
     string arrowsPath = "../assets/map/arrows.png";
 #endif
