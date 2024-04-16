@@ -583,7 +583,7 @@ void characterBuilder::drawUI()
 
 void characterBuilder::drawCharacterBuilder(imageHandler* imgHandler, float frameTimer)
 {
-    //cout << indexBody << " || " << indexEyes << " || " << indexOutfit << " | " << indexOutfitColor << " || " << indexHair << " | " << indexHairColor << " || " << indexAccessories << " | " << indexAccessoriesColor << " ||||" << endl;
+    cout << indexBody << " || " << indexEyes << " || " << indexOutfit << " | " << indexOutfitColor << " || " << indexHair << " | " << indexHairColor << " || " << indexAccessories << " | " << indexAccessoriesColor << " ||||" << endl;
     drawCharacter(imgHandler,frameTimer);
     drawAccessoriesControl();
     drawBodyEyeControl();
