@@ -264,9 +264,16 @@ bool database::getQuestion(int num, questionData& data)
             bsoncxx::document::element db_boiler = findQuestion.value()["boilerPlate"];
             assert(db_boiler.type() == bsoncxx::type::k_array);
             bsoncxx::array::view boiler = db_boiler.get_array();
-            for (auto iter: boiler) {
+            data.boiler.clear();
+            for (auto iter: boiler) {                
                 assert(iter.type() == bsoncxx::type::k_string); // if string
-                data.boiler.push_back(iter.get_string().value.data());
+                if( (string)(iter.get_string().value.data()) == "/t"){
+                    data.boiler.push_back("\t");
+                }
+                else{
+                    data.boiler.push_back(iter.get_string().value.data());
+                }
+                
             }
 
             bsoncxx::document::element db_cases = findQuestion.value()["testInput"];
@@ -284,6 +291,9 @@ bool database::getQuestion(int num, questionData& data)
                 assert(iter.type() == bsoncxx::type::k_string); // if string
                 data.cases.push_back(iter.get_string().value.data());
             }
+
+            bsoncxx::document::element db_exeCode = findQuestion.value()["executeCode"];
+            data.exeCode = db_exeCode.get_string().value.to_string();
 
             assert(findQuestion);
             return true;

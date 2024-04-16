@@ -166,10 +166,10 @@ void graphic::setup(){
     pauseMenu Pause = pauseMenu(width_px, height_px, noto_15, noto_18, noto_21);
 
 #if defined(__APPLE__)
-    pathMap = imgPth.currentPath.string() + "/assets/map/town1/house6/map.png";
-    intMap = imgPth.currentPath.string() + + "/assets/map/town1/house6/int.png";
-    obsMap = imgPth.currentPath.string() + "/assets/map/town1/house6/obs.png";
-    overlapMap = imgPth.currentPath.string() + "/assets/map/town1/house6/overlap.png";
+    pathMap = imgPth.currentPath.string() + "/assets/map/abc.png";
+    intMap = imgPth.currentPath.string() + + "/assets/map/int.png";
+    obsMap = imgPth.currentPath.string() + "/assets/map/obs.png";
+    overlapMap = imgPth.currentPath.string() + "/assets/map/overlap.png";
 #else
     pathMap = "../assets/map/town1/house6/map.png";
     intMap = "../assets/map/town1/house6/int.png";
@@ -190,7 +190,6 @@ void graphic::setup(){
     character.setMainPlayer("USER");
 
     movementHandler move = movementHandler(obsMap, intMap, width_px, height_px);
-    character.setNpc("../assets/map/" + world + room + "config.toml");
     int lastAction = 0;
     // auto gr = move.getGrid();
     // cout << gr.size() << ", " << gr[0].size() << endl;
@@ -575,10 +574,10 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
                         show_codeEditor = !show_codeEditor;
                         show_userProfile = !show_userProfile;
 
-                        triggerQuestion(question);
+                    triggerQuestion(question);
 
-                        editor.SetTextLines({});
-                        editor.SetTextLines(qes.boiler);
+                    editor.SetTextLines(qes.boiler);
+                    cout << qes.boiler.size() << endl;
 
                         result = "";
                     }
@@ -1108,6 +1107,11 @@ void graphic::makeCharacterSelector(imageHandler& image, characterManager &chara
 
 string graphic::executeCPP(string code){
     // Step 1: Write code to a temporary file
+    string setup = "#include <bits/stdc++.h> \n";
+    setup += "using namespace std; \n";
+
+    code = setup + code + qes.exeCode;
+
     std::ofstream file("temp.cpp");
     file << code;
     file.close();
