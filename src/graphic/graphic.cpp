@@ -487,7 +487,7 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
 
         move.mapMovement(keyDown, overlap, gridX, gridY, move.getGrid().size(), move.getGrid()[0].size(), lastAction, interact);
 
-        // cout << gridX << ", " << gridY << " and last action " << lastAction << endl;
+        cout << gridX << ", " << gridY << " and last action " << lastAction << endl;
 
         if(interact != 0){
             // ImGui::SetCursorPos(ImVec2((float)width_px/ 4 , (float)height_px / 4 ));
@@ -519,7 +519,6 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
                     configReader config = configReader();
                     string newLocation = config.check("../assets/map/" + world + room + "config.toml", to_string((int)gridX) + "," + to_string((int)gridY));
 
-
                     if(newLocation.substr(0,1) == "+"){ //enter room
                         room = newLocation.substr(1) + "/";
                     }
@@ -529,6 +528,7 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
                         room = "";
                     }
 
+
                     gridX = config.gridX;
                     gridY = config.gridY;
 
@@ -536,6 +536,8 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
                     intMap = "../assets/map/" + world + room + "int.png";
                     obsMap = "../assets/map/" + world + room + "obs.png";
                     overlapMap = "../assets/map/" + world + room + "overlap.png";
+
+
 
                     loadMapUpdate(move);
                     character.setNpc("../assets/map/" + world + room + "config.toml");
