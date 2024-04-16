@@ -32,23 +32,3 @@ coordY = "17"
 next = "-town1"
 coordX = "57"
 coordY = "17"
-
-["100,16"]
-next = "-town2"
-coordX = "40"
-coordY = "50"
-
-["101,16"]
-next = "-town2"
-coordX = "40"
-coordY = "50"
-
-["102,16"]
-next = "-town2"
-coordX = "40"
-coordY = "50"
-
-["103,16"]
-next = "-town2"
-coordX = "40"
-coordY = "50"
