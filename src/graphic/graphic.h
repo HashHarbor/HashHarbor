@@ -65,7 +65,7 @@ public:
     void setup();
 
     void makeBackground(imageHandler background, vector<vector<int>> grid, double gridX, double gridY, imageHandler& image, characterManager &character, characterBuilder& charBuild, int &lastAction);
-    void makeConfig(vector<string> &codeStarter, TextEditor &editor);
+    void makeConfig(ImFont* font);
     void makeCodeEditor(TextEditor &editor, const char* fileToEdit, ImFont* font_15, ImFont* font_18, ImFont* font_21);
     void makeCharacter(imageHandler& image, TextEditor& editor, double &gridX, double &gridY, movementHandler& move, int &lastAction, characterManager &character, characterBuilder& charBuild);
     void makeCharacterSelector(imageHandler& image, characterManager &character, characterBuilder& charBuild);

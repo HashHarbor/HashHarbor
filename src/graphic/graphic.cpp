@@ -303,7 +303,7 @@ void graphic::setup(){
         }
 
         if(show_config){
-            makeConfig(cppStart, editor);
+            makeConfig(noto_18);
         }
 
         if(show_codeEditor || show_blur){
@@ -374,7 +374,7 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
     characterConfig charConfig;
 
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | 
-                            ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNav;
+                            ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMouseInputs;
     if(show_blur){
         flags |= ImGuiWindowFlags_NoInputs;
     }
@@ -436,7 +436,7 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
                     charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleDown.at(frameCount_6), 1.f, iter.second.character);
                 }
 
-                if(interact == 2) // draw buble
+                if(interact == 2 && iter.second.hasQuestion) // draw buble
                 {
                     switch(lastAction)
                     {
@@ -631,7 +631,7 @@ void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, 
 
     //cout << world << room << " | " << character.getNpc()->size() << endl;
 
-    ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus;
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoMouseInputs;
     if(show_blur){
         flags |= ImGuiWindowFlags_NoInputs;
     }
@@ -947,7 +947,7 @@ void graphic::makeUserProfile(ImFont* fontLarge, ImFont* fontSmall, ImFont* font
 
 }
 
-void graphic::makeConfig(vector<string> &codeStarter, TextEditor &editor){
+void graphic::makeConfig(ImFont* font){
     // Config window calculation
     ImGui::SetNextWindowSize({(float)width_px / 2, (float)height_px / 2});
 
@@ -961,26 +961,96 @@ void graphic::makeConfig(vector<string> &codeStarter, TextEditor &editor){
     // Window - Config
     ImGui::Begin("Interactions", NULL, flags);
     {
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        ImDrawList* draw_list = ImGui::GetWindowDrawList();
+        //ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        static int index = 0;
+        static bool disabled = false;
+        int worldChange = 4;
 
+        vector<string> tutorial = {"Welcome to Hash Harbor!",
+                                   "To navigate your house, use the following keys: \nW (up), A (left), S (down), D (right)",
+                                   "Access the pause menu anytime by pressing 'ESC'.\n Use it to jot down notes, customize your character, and adjust settings",
+                                   "When you're ready to venture outside, head to the bottom of the house an arrow will appear when you're at the exit of the house",
+                                   "Press 'Q' to exit the house and embark on your adventure",
+                                   "Interact with characters and buildings in the world by pressing 'Q' when facing them",
+                                   "As you explore the world, keep an eye out for characters wearing chefs hats. They often have coding problems for you to solve",
+                                   "Best of luck on your journey!"};
 
-        // ImGui::Text(" ");
-        // if(ImGui::Button("leetcode")){
-        //     show_codeEditor = !show_codeEditor;
-        //     show_userProfile = !show_userProfile;
-        //     allowMovement = !allowMovement;
+        if(index < tutorial.size())
+        {
+            draw_list->AddRectFilled(ImVec2(((float)width_px / 4.f) - 250.f, ((float)height_px / 2.f) + 50.f), ImVec2(((float)width_px / 4.f) + 250.f, ((float)height_px / 2.f) + 200.f), ImColor(ImVec4(0.65f, 0.65f, 0.65f, 1.0f)), 20.f);
+            draw_list->AddRectFilled(ImVec2(((float)width_px / 4.f) - 247.f, ((float)height_px / 2.f) + 53.f), ImVec2(((float)width_px / 4.f) + 247.f, ((float)height_px / 2.f) + 197.f), ImColor(ImVec4(0.1f, 0.1f, 0.1f, 1.0f)), 20.f);
 
-        //     codeStarter.clear();
+            if (disabled)
+            {
+                ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+                ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+            }
 
-        //     codeStarter.push_back("#include <iostream>");
-        //     codeStarter.push_back("int main() {");
-        //     codeStarter.push_back("\tstd::cout << \"Hello HashHarbor!\";");
-        //     codeStarter.push_back("\treturn 0;");
-        //     codeStarter.push_back("}");
-        //     editor.SetTextLines(codeStarter);
+            ImGui::PushFont(font);
+            ImGui::SetCursorPos(ImVec2((ImGui::GetContentRegionAvail() / 2.f).x + 140.f, 160.f));
+            ImGui::PushID(919191);
+            if(disabled && index == (worldChange - 1))
+            {
+                ImGui::Button("Exit House", ImVec2(100.f, 30.f));
+            }
+            else if(disabled && index == worldChange)
+            {
+                ImGui::Button("Press \'Q\'", ImVec2(100.f, 30.f));
+            }
+            else
+            {
+                if(ImGui::Button("Continue ->", ImVec2(100.f, 30.f)))
+                {
+                    if(index < worldChange - 1)
+                    {
+                        index ++;
+                    }
+                    else if(index >= worldChange - 1 && world == "town1/" && room.empty())
+                    {
+                        index ++;
+                    }
+                }
+            }
+            ImGui::PopID();
+            if (disabled)
+            {
+                ImGui::PopItemFlag();
+                ImGui::PopStyleVar();
+            }
+            //cout << index << " | " << interact<< endl;
 
-        //     result = "";
-        // }
+            if(interact == 1 && index == (worldChange - 1))
+            {
+                index = 4;
+            }
+
+            if(index == (worldChange - 1) && world == "town1/" && !room.empty())
+            {
+                disabled = true;
+            }
+            else if(world == "town1/" && room.empty() && disabled)
+            {
+                index = 5;
+                disabled = false;
+            }
+
+            if(index < tutorial.size())
+            {
+                ImGui::SetCursorPos(ImVec2((ImGui::GetContentRegionAvail() / 2.f).x - 220.f, 85.f));
+                ImGui::PushTextWrapPos(580.f);
+                if(index >= worldChange && world == "town1/" && room == "")
+                {
+                    ImGui::TextWrapped("%s", tutorial.at(index).c_str());
+                }
+                else
+                {
+                    ImGui::TextWrapped("%s", tutorial.at(index).c_str());
+                }
+                ImGui::PopTextWrapPos();
+            }
+            ImGui::PopFont();
+        }
 
     }
     ImGui::End();
