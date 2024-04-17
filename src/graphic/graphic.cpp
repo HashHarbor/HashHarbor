@@ -367,37 +367,6 @@ void graphic::makeBlur(){
 
 void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gridX, double &gridY, movementHandler& move, int &lastAction, characterManager &character, characterBuilder& charBuild)
 {
-
-    static float topGridX = 0.f;
-    static float topGridY = 0.f;
-    static float botGridX = 0.f;
-    static float botGridY = 0.f;
-    static float npcGridX = 0.0f;
-    static float npcGridY = 0.0f;
-    static float pixelX = 0.0f;
-    static float pixelY = 0.0f;
-    static int key = 0;
-    ImGui::SetNextWindowSize({500.f,500.f});
-    ImGui::Begin("DEBUG NPC / CHARACTER", NULL, ImGuiWindowFlags_None);
-    {
-        ImGui::InputFloat("%f", &adjustment);
-        ImGui::Text("Key Down: %d", key);
-        ImGui::Text("Last Key Down: %d", lastAction);
-        ImGui::Text(" ");
-        ImGui::Text("Player Grid: %f , %f", gridX, gridY);
-        ImGui::Text(" ");
-        ImGui::Text("Top Left Grid: %f , %f", topGridX, topGridY);
-        ImGui::Text("Bottom Right Grid: %f , %f", botGridX, botGridY);
-        ImGui::Text(" ");
-        ImGui::Text("Grids to NPC X-Y: %f , %f", npcGridX, npcGridY);
-        ImGui::Text("Pixels to NPC: %f , %f", pixelX, pixelY);
-        ImGui::Text(" ");
-        for(auto iter : *character.getNpc())
-        {
-            ImGui::Text("NPC Position: %d , %d", iter.second.cordX, iter.second.cordY);
-        }
-    }
-    ImGui::End();
     // Graphics window calculation
     ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
     ImGui::SetNextWindowPos({0, 0});
@@ -405,10 +374,6 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
     const float frameLength = 1.f / 10.f; // In seconds, so  FPS
     static float frameTimer = frameLength;
     static float arrowTimer = frameLength;
-    static int frameCount_6 = 3;
-    static int frameCount_8 = 0;
-
-    characterConfig charConfig;
 
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | 
                             ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMouseInputs;
@@ -423,130 +388,8 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
         frameTimer -= ImGui::GetIO().DeltaTime;
         arrowTimer = frameTimer;
 
-        ImVec2 characterPos = ImVec2((ImGui::GetContentRegionAvail() - ImVec2(32, 64)) * 0.5f) + ImVec2(8, 0) - ImVec2(0, 8);
+        characterPos = ImVec2((ImGui::GetContentRegionAvail() - ImVec2(32, 64)) * 0.5f) + ImVec2(8, 0) - ImVec2(0, 8);
         character.drawPos = characterPos;
-
-        int keyDown = 0; // used to identify which direction the character is moving
-        bool moving = true;
-
-        if(allowMovement){
-            if(ImGui::IsKeyDown(ImGuiKey_W)) { keyDown = 1; }
-            else if(ImGui::IsKeyDown(ImGuiKey_S)) { keyDown = 2; }
-            else if(ImGui::IsKeyDown(ImGuiKey_D)) { keyDown = 3; }
-            else if(ImGui::IsKeyDown(ImGuiKey_A)) { keyDown = 4; }
-        }
-
-        bool overlapCharacter = false;
-
-        for(auto iter : *character.getNpc())
-        {
-            bool npcContact = false;
-
-            // calcluate what grids are on the edge of the screen
-            float topX = gridX - (((float)width_px / 2.f) / 32.f) / 2.f;
-            float topY = gridY - (((float)height_px / 2.f) / 32.f) / 2.f;
-
-            int botX = (int)(gridX + (((float)width_px / 2.f) / 32.f)/ 2.f);
-            int botY = (int)(gridY + (((float)height_px / 2.f) / 32.f)/ 2.f);
-
-            int charX = iter.second.cordX; // get character position
-            int charY = iter.second.cordY - 1;
-            if(charX >= (int)topX && charX <= botX && charY + 1 >= (int)topY && charY <= botY) // check if the npc should be on screen
-            {
-                float posX = (float)charX - topX; // calculate how many grids the npc needs to be from the top left
-                float posY = (float)charY - topY;
-
-                //float adjustment = 8.f;
-                float adjustmentX = 0.0f;
-                float adjustmentY = 0.0f;
-
-                if(keyDown != 0)
-                {
-                    switch(keyDown)
-                    {
-                        case 1:
-                            adjustmentY = adjustment;
-                            break;
-                        case 2:
-                            adjustmentY = -adjustment;
-                            break;
-                        case 3:
-                            adjustmentX = -adjustment;
-                            break;
-                        case 4:
-                            adjustmentX = adjustment;
-                            break;
-                    }
-                }
-
-                ImVec2 npcPos = ImVec2((float)posX * 32.f - 16.f + adjustmentX,(float)posY * 32.f - 16.f + adjustmentY); // multiply by 32 for grid size, subtract 16 to adjust the npc to the exact grid location
-
-                 topGridX = topX;
-                 topGridY = topY;
-                 botGridX = botX;
-                 botGridY = botY;
-                 npcGridX = posX;
-                 npcGridY = posY;
-                 pixelX = npcPos.x;
-                 pixelY = npcPos.y;
-                 key = keyDown;
-
-                cout << gridX << "==" << charX << " "<< posX <<" | " << gridY << "==" << charY <<" "<< posY << endl;
-                if((int)gridY == charY && (int)gridX == charX) // if character above npc
-                {
-                    if(characterCreated)
-                    {
-                        ImGui::SetCursorPos(characterPos);
-                        character.moveMainCharacter(&image, &charBuild, frameTimer, allowMovement, draw_list);
-                        overlapCharacter = true;
-                    }
-                    charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleUp.at(frameCount_6), 1.f, iter.second.character, 0.4f);
-                    npcContact = true;
-                }
-                else if((int)gridY == charY - 2 && (int)gridX == charX) // if character is below npc
-                {
-                    charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleDown.at(frameCount_6), 1.f, iter.second.character);
-                    npcContact = true;
-                }
-                else if((int)gridX == charX + 1 && (int)gridY == charY + 1) // if character is right of npc
-                {
-                    charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleRight.at(frameCount_6), 1.f, iter.second.character);
-                    npcContact = true;
-                }
-                else if((int)gridX == charX - 1 && (int)gridY == charY + 1) //if character is left of npc
-                {
-                    charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleLeft.at(frameCount_6), 1.f, iter.second.character);
-                    npcContact = true;
-                }
-                else
-                {
-                    charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleDown.at(0), 1.f, iter.second.character);
-                }
-
-                if(interact == 2 && iter.second.hasQuestion && npcContact) // draw buble
-                {
-                    switch(lastAction)
-                    {
-                        case 1:
-                            ImGui::SetCursorPos(ImVec2(npcPos.x + 24.f, npcPos.y + 5.f));
-                            character.drawTalkBubble(frameCount_8, 1.f);
-                            break;
-                        case 2:
-                            ImGui::SetCursorPos(ImVec2(npcPos.x + 24.f, npcPos.y + 5.f));
-                            character.drawTalkBubble(frameCount_8, 1.f);
-                            break;
-                        case 3:
-                            ImGui::SetCursorPos(ImVec2(npcPos.x + 15.f, npcPos.y - 24.f));
-                            character.drawTalkBubble(frameCount_8, -1.f);
-                            break;
-                        case 4:
-                            ImGui::SetCursorPos(ImVec2(npcPos.x + 17.f, npcPos.y - 23.f));
-                            character.drawTalkBubble(frameCount_8, 1.f);
-                            break;
-                    }
-                }
-            }
-        }
 
         if(characterCreated && !overlapCharacter)
         {
@@ -556,8 +399,15 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
 
         ImGui::SetCursorPos(ImVec2(0, 0));
 
-        move.mapMovement(keyDown, overlap, gridX, gridY, move.getGrid().size(), move.getGrid()[0].size(), lastAction, interact);
+        int keyDown = 0; // used to identify which direction the character is movin
+        if(allowMovement){
+            if(ImGui::IsKeyDown(ImGuiKey_W)) { keyDown = 1; }
+            else if(ImGui::IsKeyDown(ImGuiKey_S)) { keyDown = 2; }
+            else if(ImGui::IsKeyDown(ImGuiKey_D)) { keyDown = 3; }
+            else if(ImGui::IsKeyDown(ImGuiKey_A)) { keyDown = 4; }
+        }
 
+        move.mapMovement(keyDown, overlap, gridX, gridY, move.getGrid().size(), move.getGrid()[0].size(), lastAction, interact);
         //cout << gridX << ", " << gridY << " and last action " << lastAction << endl;
 
         if(interact != 0){
@@ -581,7 +431,6 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
                 }
             }
 
-
             if(ImGui::IsKeyDown(ImGuiKey_Q) && show_blur == false){
                 // cout << "trigger interaction here" << endl;
                 if(interact == 1){
@@ -599,7 +448,6 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
                         room = "";
                     }
 
-
                     gridX = config.gridX;
                     gridY = config.gridY;
 
@@ -607,8 +455,6 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
                     intMap = "../assets/map/" + world + room + "int.png";
                     obsMap = "../assets/map/" + world + room + "obs.png";
                     overlapMap = "../assets/map/" + world + room + "overlap.png";
-
-
 
                     loadMapUpdate(move);
                     character.setNpc("../assets/map/" + world + room + "config.toml");
@@ -669,16 +515,6 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
         if (frameTimer <= 0.f)
         {
             frameTimer = frameLength;
-            frameCount_6 ++;
-            frameCount_8 ++;
-            if(frameCount_6 % 6 == 0)
-            {
-                frameCount_6 = 0;
-            }
-            if(frameCount_8 % 8 == 0)
-            {
-                frameCount_8 = 0;
-            }
         }
 
         ImGui::SetCursorPos(ImVec2(0, 0));
@@ -708,6 +544,13 @@ void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, 
     ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
     ImGui::SetNextWindowPos({0, 0});
 
+    const float frameLength = 1.f / 10.f; // In seconds, so  FPS
+    static float frameTimer = frameLength;
+    static int frameCount_6 = 3;
+    static int frameCount_8 = 0;
+
+    characterConfig charConfig;
+
     //cout << world << room << " | " << character.getNpc()->size() << endl;
 
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoMouseInputs;
@@ -717,15 +560,111 @@ void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, 
 
     ImGui::Begin("Background", NULL, flags);
     {
+        ImDrawList* draw_list = ImGui::GetWindowDrawList();
+        frameTimer -= ImGui::GetIO().DeltaTime;
+
         int mapCols = grid[0].size();
         int mapRows = grid.size();
 
         ImGui::SetCursorPos(ImVec2(0,0));
         background.DrawMap(background, gridX, gridY, (width_px / 2), (height_px / 2), mapRows, mapCols);
 
+        // calcluate what grids are on the edge of the screen
+        float topX = gridX - (((float)width_px / 2.f) / 32.f) / 2.f;
+        float topY = gridY - (((float)height_px / 2.f) / 32.f) / 2.f;
 
+        int botX = (int)(gridX + (((float)width_px / 2.f) / 32.f)/ 2.f);
+        int botY = (int)(gridY + (((float)height_px / 2.f) / 32.f)/ 2.f);
+
+        for(auto iter : *character.getNpc())
+        {
+            bool npcContact = false;
+
+            int charX = iter.second.cordX; // get character position
+            int charY = iter.second.cordY - 1;
+            if(charX >= (int)topX && charX <= botX && charY + 1 >= (int)topY && charY <= botY) // check if the npc should be on screen
+            {
+                float posX = (float)charX - topX; // calculate how many grids the npc needs to be from the top left
+                float posY = (float)charY - topY;
+
+                ImVec2 npcPos = ImVec2((float)posX * 32.f - 16.f,(float)posY * 32.f - 16.f); // multiply by 32 for grid size, subtract 16 to adjust the npc to the exact grid location
+
+                //cout << gridX << "==" << charX << " "<< posX <<" | " << gridY << "==" << charY <<" "<< posY << endl;
+                if((int)gridY == charY && (int)gridX == charX) // if character above npc
+                {
+                    if(characterCreated)
+                    {
+                        ImGui::SetCursorPos(characterPos);
+                        character.moveMainCharacter(&image, &charBuild, frameTimer, allowMovement, draw_list);
+                        overlapCharacter = true;
+                    }
+                    charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleUp.at(frameCount_6), 1.f, iter.second.character, 0.4f);
+                    npcContact = true;
+                }
+                else if((int)gridY == charY - 2 && (int)gridX == charX) // if character is below npc
+                {
+                    charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleDown.at(frameCount_6), 1.f, iter.second.character);
+                    npcContact = true;
+                    overlapCharacter = false;
+                }
+                else if((int)gridX == charX + 1 && (int)gridY == charY + 1) // if character is right of npc
+                {
+                    charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleRight.at(frameCount_6), 1.f, iter.second.character);
+                    npcContact = true;
+                    overlapCharacter = false;
+                }
+                else if((int)gridX == charX - 1 && (int)gridY == charY + 1) //if character is left of npc
+                {
+                    charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleLeft.at(frameCount_6), 1.f, iter.second.character);
+                    npcContact = true;
+                    overlapCharacter = false;
+                }
+                else
+                {
+                    charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleDown.at(frameCount_6), 1.f, iter.second.character);
+                    overlapCharacter = false;
+                }
+
+                if(interact == 2 && iter.second.hasQuestion && npcContact) // draw buble
+                {
+                    switch(lastAction)
+                    {
+                        case 1:
+                            ImGui::SetCursorPos(ImVec2(npcPos.x + 24.f, npcPos.y + 5.f));
+                            character.drawTalkBubble(frameCount_8, 1.f);
+                            break;
+                        case 2:
+                            ImGui::SetCursorPos(ImVec2(npcPos.x + 24.f, npcPos.y + 5.f));
+                            character.drawTalkBubble(frameCount_8, 1.f);
+                            break;
+                        case 3:
+                            ImGui::SetCursorPos(ImVec2(npcPos.x + 15.f, npcPos.y - 24.f));
+                            character.drawTalkBubble(frameCount_8, -1.f);
+                            break;
+                        case 4:
+                            ImGui::SetCursorPos(ImVec2(npcPos.x + 17.f, npcPos.y - 23.f));
+                            character.drawTalkBubble(frameCount_8, 1.f);
+                            break;
+                    }
+                }
+            }
+        }
         //cout << "Map: " << grid[gridY][gridX] << " | Interact: " << interact <<  " | X:" << gridX << " TOPX:" << topX <<" BOTX:" << botX <<" Y:" << gridY<< " TOPY:" << topY <<" BOTY:" << botY<< endl;
 
+        if (frameTimer <= 0.f)
+        {
+            frameTimer = frameLength;
+            frameCount_6 ++;
+            frameCount_8 ++;
+            if(frameCount_6 % 6 == 0)
+            {
+                frameCount_6 = 0;
+            }
+            if(frameCount_8 % 8 == 0)
+            {
+                frameCount_8 = 0;
+            }
+        }
     }
 
     ImGui::End();

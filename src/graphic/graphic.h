@@ -87,5 +87,6 @@ private:
     bool changeScreenRes = false;
     pair<int,int> res;
 
-    float adjustment = 8.f;
+    bool overlapCharacter = false;
+    ImVec2 characterPos;
 };
