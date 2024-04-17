@@ -57,6 +57,7 @@ void configReader::getNpc(std::string configPath, characterManager *character)
             auto hasQues = iter->get_as<bool>("hasQuestion");
             auto ques = iter->get_as<int>("questionNum");
             auto charArr = iter->get_array_of<int64_t>("character");
+            auto direction = iter->get_as<int>("direction");
 
             int arr[8];
             int i = 0;
@@ -67,7 +68,7 @@ void configReader::getNpc(std::string configPath, characterManager *character)
                 i++;
             }
 
-            character->getNpc()->emplace(make_pair(*cordX,*cordY), npc(*cordX,*cordY,*hasQues,*ques, arr));
+            character->getNpc()->emplace(make_pair(*cordX,*cordY), npc(*cordX,*cordY,*hasQues,*ques, arr, *direction));
         }
     }
 }

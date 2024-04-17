@@ -58,9 +58,10 @@ public:
     int cordY;
     bool hasQuestion;
     int question;
+    int direction;
     vector<int> character = {0,0,0,0,0,0,0,0};
     // add something for dialog
-    npc(int x, int y, bool hasQ, int q, int arr[8])
+    npc(int x, int y, bool hasQ, int q, int arr[8], int dir)
     {
         this->cordX = x;
         this->cordY = y;
@@ -74,6 +75,7 @@ public:
         this->character[5] = arr[5];
         this->character[6] = arr[6];
         this->character[7] = arr[7];
+        this->direction = dir;
     }
 };
 

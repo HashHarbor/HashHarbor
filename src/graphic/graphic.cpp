@@ -589,40 +589,105 @@ void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, 
 
                 ImVec2 npcPos = ImVec2((float)posX * 32.f - 16.f,(float)posY * 32.f - 16.f); // multiply by 32 for grid size, subtract 16 to adjust the npc to the exact grid location
 
-                //cout << gridX << "==" << charX << " "<< posX <<" | " << gridY << "==" << charY <<" "<< posY << endl;
-                if((int)gridY == charY && (int)gridX == charX) // if character above npc
+                cout << gridX << "==" << charX << " "<< posX <<" | " << gridY << "==" << charY <<" "<< posY << endl;
+                if(iter.second.direction == 0)
                 {
-                    if(characterCreated)
+                    if((int)gridY == charY && (int)gridX == charX) // if character above npc
                     {
-                        ImGui::SetCursorPos(characterPos);
-                        character.moveMainCharacter(&image, &charBuild, frameTimer, allowMovement, draw_list);
-                        overlapCharacter = true;
+                        if(characterCreated)
+                        {
+                            ImGui::SetCursorPos(characterPos);
+                            character.moveMainCharacter(&image, &charBuild, frameTimer, allowMovement, draw_list);
+                            overlapCharacter = true;
+                        }
+                        charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleUp.at(frameCount_6), 1.f, iter.second.character, 0.4f);
+                        npcContact = true;
                     }
-                    charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleUp.at(frameCount_6), 1.f, iter.second.character, 0.4f);
-                    npcContact = true;
-                }
-                else if((int)gridY == charY - 2 && (int)gridX == charX) // if character is below npc
-                {
-                    charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleDown.at(frameCount_6), 1.f, iter.second.character);
-                    npcContact = true;
-                    overlapCharacter = false;
-                }
-                else if((int)gridX == charX + 1 && (int)gridY == charY + 1) // if character is right of npc
-                {
-                    charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleRight.at(frameCount_6), 1.f, iter.second.character);
-                    npcContact = true;
-                    overlapCharacter = false;
-                }
-                else if((int)gridX == charX - 1 && (int)gridY == charY + 1) //if character is left of npc
-                {
-                    charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleLeft.at(frameCount_6), 1.f, iter.second.character);
-                    npcContact = true;
-                    overlapCharacter = false;
+                    else if((int)gridY == charY + 2 && (int)gridX == charX) // if character is below npc
+                    {
+                        charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleDown.at(frameCount_6), 1.f, iter.second.character);
+                        npcContact = true;
+                        overlapCharacter = false;
+                    }
+                    else if((int)gridX == charX + 1 && (int)gridY == charY + 1) // if character is right of npc
+                    {
+                        charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleRight.at(frameCount_6), 1.f, iter.second.character);
+                        npcContact = true;
+                        overlapCharacter = false;
+                    }
+                    else if((int)gridX == charX - 1 && (int)gridY == charY + 1) //if character is left of npc
+                    {
+                        charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleLeft.at(frameCount_6), 1.f, iter.second.character);
+                        npcContact = true;
+                        overlapCharacter = false;
+                    }
+                    else
+                    {
+                        charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleDown.at(frameCount_6), 1.f, iter.second.character);
+                        overlapCharacter = false;
+                    }
                 }
                 else
                 {
-                    charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleDown.at(frameCount_6), 1.f, iter.second.character);
-                    overlapCharacter = false;
+                    switch(iter.second.direction)
+                    {
+                        case 1: // facing up
+                            if(characterCreated && ((int)gridY == charY && (int)gridX == charX))
+                            {
+                                ImGui::SetCursorPos(characterPos);
+                                character.moveMainCharacter(&image, &charBuild, frameTimer, allowMovement, draw_list);
+                                overlapCharacter = true;
+                                charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleUp.at(frameCount_6), 1.f, iter.second.character, 0.4f);
+                            }
+                            else
+                            {
+                                charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleUp.at(frameCount_6), 1.f, iter.second.character);
+                                overlapCharacter = false;
+                            }
+                            break;
+                        case 2: // facing down
+                            if(characterCreated && ((int)gridY == charY && (int)gridX == charX))
+                            {
+                                ImGui::SetCursorPos(characterPos);
+                                character.moveMainCharacter(&image, &charBuild, frameTimer, allowMovement, draw_list);
+                                overlapCharacter = true;
+                                charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleDown.at(frameCount_6), 1.f, iter.second.character, 0.4f);
+                            }
+                            else
+                            {
+                                charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleDown.at(frameCount_6), 1.f, iter.second.character);
+                                overlapCharacter = false;
+                            }
+                            break;
+                        case 3: // facing right
+                            if(characterCreated && ((int)gridY == charY && (int)gridX == charX))
+                            {
+                                ImGui::SetCursorPos(characterPos);
+                                character.moveMainCharacter(&image, &charBuild, frameTimer, allowMovement, draw_list);
+                                overlapCharacter = true;
+                                charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleRight.at(frameCount_6), 1.f, iter.second.character, 0.4f);
+                            }
+                            else
+                            {
+                                charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleRight.at(frameCount_6), 1.f, iter.second.character);
+                                overlapCharacter = false;
+                            }
+                            break;
+                        case 4: // facing left
+                            if(characterCreated && ((int)gridY == charY && (int)gridX == charX))
+                            {
+                                ImGui::SetCursorPos(characterPos);
+                                character.moveMainCharacter(&image, &charBuild, frameTimer, allowMovement, draw_list);
+                                overlapCharacter = true;
+                                charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleLeft.at(frameCount_6), 1.f, iter.second.character, 0.4f);
+                            }
+                            else
+                            {
+                                charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleLeft.at(frameCount_6), 1.f, iter.second.character);
+                                overlapCharacter = false;
+                            }
+                            break;
+                    }
                 }
 
                 if(interact == 2 && iter.second.hasQuestion && npcContact) // draw buble
