@@ -86,4 +86,6 @@ private:
     bool reset = false;
     bool changeScreenRes = false;
     pair<int,int> res;
+
+    float adjustment = 8.f;
 };

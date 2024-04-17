@@ -367,6 +367,37 @@ void graphic::makeBlur(){
 
 void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gridX, double &gridY, movementHandler& move, int &lastAction, characterManager &character, characterBuilder& charBuild)
 {
+
+    static float topGridX = 0.f;
+    static float topGridY = 0.f;
+    static float botGridX = 0.f;
+    static float botGridY = 0.f;
+    static float npcGridX = 0.0f;
+    static float npcGridY = 0.0f;
+    static float pixelX = 0.0f;
+    static float pixelY = 0.0f;
+    static int key = 0;
+    ImGui::SetNextWindowSize({500.f,500.f});
+    ImGui::Begin("DEBUG NPC / CHARACTER", NULL, ImGuiWindowFlags_None);
+    {
+        ImGui::InputFloat("%f", &adjustment);
+        ImGui::Text("Key Down: %d", key);
+        ImGui::Text("Last Key Down: %d", lastAction);
+        ImGui::Text(" ");
+        ImGui::Text("Player Grid: %f , %f", gridX, gridY);
+        ImGui::Text(" ");
+        ImGui::Text("Top Left Grid: %f , %f", topGridX, topGridY);
+        ImGui::Text("Bottom Right Grid: %f , %f", botGridX, botGridY);
+        ImGui::Text(" ");
+        ImGui::Text("Grids to NPC X-Y: %f , %f", npcGridX, npcGridY);
+        ImGui::Text("Pixels to NPC: %f , %f", pixelX, pixelY);
+        ImGui::Text(" ");
+        for(auto iter : *character.getNpc())
+        {
+            ImGui::Text("NPC Position: %d , %d", iter.second.cordX, iter.second.cordY);
+        }
+    }
+    ImGui::End();
     // Graphics window calculation
     ImGui::SetNextWindowSize({(float)width_px /2, (float)height_px / 2});
     ImGui::SetNextWindowPos({0, 0});
@@ -395,10 +426,22 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
         ImVec2 characterPos = ImVec2((ImGui::GetContentRegionAvail() - ImVec2(32, 64)) * 0.5f) + ImVec2(8, 0) - ImVec2(0, 8);
         character.drawPos = characterPos;
 
+        int keyDown = 0; // used to identify which direction the character is moving
+        bool moving = true;
+
+        if(allowMovement){
+            if(ImGui::IsKeyDown(ImGuiKey_W)) { keyDown = 1; }
+            else if(ImGui::IsKeyDown(ImGuiKey_S)) { keyDown = 2; }
+            else if(ImGui::IsKeyDown(ImGuiKey_D)) { keyDown = 3; }
+            else if(ImGui::IsKeyDown(ImGuiKey_A)) { keyDown = 4; }
+        }
+
         bool overlapCharacter = false;
 
         for(auto iter : *character.getNpc())
         {
+            bool npcContact = false;
+
             // calcluate what grids are on the edge of the screen
             float topX = gridX - (((float)width_px / 2.f) / 32.f) / 2.f;
             float topY = gridY - (((float)height_px / 2.f) / 32.f) / 2.f;
@@ -412,9 +455,43 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
             {
                 float posX = (float)charX - topX; // calculate how many grids the npc needs to be from the top left
                 float posY = (float)charY - topY;
-                ImVec2 npcPos = ImVec2((float)posX * 32.f - 16.f,(float)posY * 32.f - 16.f); // multiply by 32 for grid size, subtract 16 to adjust the npc to the exact grid location
 
-                //cout << gridX << "==" << charX << " | " << gridY << "==" << charY << endl;
+                //float adjustment = 8.f;
+                float adjustmentX = 0.0f;
+                float adjustmentY = 0.0f;
+
+                if(keyDown != 0)
+                {
+                    switch(keyDown)
+                    {
+                        case 1:
+                            adjustmentY = adjustment;
+                            break;
+                        case 2:
+                            adjustmentY = -adjustment;
+                            break;
+                        case 3:
+                            adjustmentX = -adjustment;
+                            break;
+                        case 4:
+                            adjustmentX = adjustment;
+                            break;
+                    }
+                }
+
+                ImVec2 npcPos = ImVec2((float)posX * 32.f - 16.f + adjustmentX,(float)posY * 32.f - 16.f + adjustmentY); // multiply by 32 for grid size, subtract 16 to adjust the npc to the exact grid location
+
+                 topGridX = topX;
+                 topGridY = topY;
+                 botGridX = botX;
+                 botGridY = botY;
+                 npcGridX = posX;
+                 npcGridY = posY;
+                 pixelX = npcPos.x;
+                 pixelY = npcPos.y;
+                 key = keyDown;
+
+                cout << gridX << "==" << charX << " "<< posX <<" | " << gridY << "==" << charY <<" "<< posY << endl;
                 if((int)gridY == charY && (int)gridX == charX) // if character above npc
                 {
                     if(characterCreated)
@@ -424,25 +501,29 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
                         overlapCharacter = true;
                     }
                     charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleUp.at(frameCount_6), 1.f, iter.second.character, 0.4f);
+                    npcContact = true;
                 }
                 else if((int)gridY == charY - 2 && (int)gridX == charX) // if character is below npc
                 {
                     charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleDown.at(frameCount_6), 1.f, iter.second.character);
+                    npcContact = true;
                 }
                 else if((int)gridX == charX + 1 && (int)gridY == charY + 1) // if character is right of npc
                 {
                     charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleRight.at(frameCount_6), 1.f, iter.second.character);
+                    npcContact = true;
                 }
                 else if((int)gridX == charX - 1 && (int)gridY == charY + 1) //if character is left of npc
                 {
                     charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleLeft.at(frameCount_6), 1.f, iter.second.character);
+                    npcContact = true;
                 }
                 else
                 {
-                    charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleDown.at(frameCount_6), 1.f, iter.second.character);
+                    charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleDown.at(0), 1.f, iter.second.character);
                 }
 
-                if(interact == 2 && iter.second.hasQuestion) // draw buble
+                if(interact == 2 && iter.second.hasQuestion && npcContact) // draw buble
                 {
                     switch(lastAction)
                     {
@@ -467,7 +548,6 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
             }
         }
 
-
         if(characterCreated && !overlapCharacter)
         {
             ImGui::SetCursorPos(characterPos);
@@ -476,18 +556,9 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
 
         ImGui::SetCursorPos(ImVec2(0, 0));
 
-        int keyDown = 0; // used to identify which direction the character is moving
-
-        if(allowMovement){
-            if(ImGui::IsKeyDown(ImGuiKey_W)) { keyDown = 1; }
-            else if(ImGui::IsKeyDown(ImGuiKey_S)) { keyDown = 2; }
-            else if(ImGui::IsKeyDown(ImGuiKey_D)) { keyDown = 3; }
-            else if(ImGui::IsKeyDown(ImGuiKey_A)) { keyDown = 4; }
-        }
-
         move.mapMovement(keyDown, overlap, gridX, gridY, move.getGrid().size(), move.getGrid()[0].size(), lastAction, interact);
 
-        cout << gridX << ", " << gridY << " and last action " << lastAction << endl;
+        //cout << gridX << ", " << gridY << " and last action " << lastAction << endl;
 
         if(interact != 0){
             // ImGui::SetCursorPos(ImVec2((float)width_px/ 4 , (float)height_px / 4 ));
