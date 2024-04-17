@@ -582,7 +582,7 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
             }
 
 
-            if(ImGui::IsKeyDown(ImGuiKey_Q) && show_codeEditor == false){
+            if(ImGui::IsKeyDown(ImGuiKey_Q) && show_blur == false){
                 // cout << "trigger interaction here" << endl;
                 if(interact == 1){
                     //update the visuals and locations of character
