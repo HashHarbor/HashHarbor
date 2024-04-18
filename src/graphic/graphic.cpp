@@ -589,11 +589,12 @@ void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, 
 
                 ImVec2 npcPos = ImVec2((float)posX * 32.f - 16.f,(float)posY * 32.f - 16.f); // multiply by 32 for grid size, subtract 16 to adjust the npc to the exact grid location
 
-                cout << gridX << "==" << charX << " "<< posX <<" | " << gridY << "==" << charY <<" "<< posY << endl;
+                //cout << gridX << "==" << charX << " "<< posX <<" | " << gridY << "==" << charY <<" "<< posY << endl;
                 if(iter.second.direction == 0)
                 {
                     if((int)gridY == charY && (int)gridX == charX) // if character above npc
                     {
+                        draw_list->AddRectFilled(ImVec2(npcPos.x + 0.f, npcPos.y + 55.f), ImVec2(npcPos.x + 32.f, npcPos.y + 64.f), ImColor(ImVec4(0.0f, 0.0f, 0.0f, 0.15f)), 20.f);
                         if(characterCreated)
                         {
                             ImGui::SetCursorPos(characterPos);
@@ -605,24 +606,28 @@ void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, 
                     }
                     else if((int)gridY == charY + 2 && (int)gridX == charX) // if character is below npc
                     {
+                        draw_list->AddRectFilled(ImVec2(npcPos.x + 0.f, npcPos.y + 55.f), ImVec2(npcPos.x + 32.f, npcPos.y + 64.f), ImColor(ImVec4(0.0f, 0.0f, 0.0f, 0.15f)), 20.f);
                         charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleDown.at(frameCount_6), 1.f, iter.second.character);
                         npcContact = true;
                         overlapCharacter = false;
                     }
                     else if((int)gridX == charX + 1 && (int)gridY == charY + 1) // if character is right of npc
                     {
+                        draw_list->AddRectFilled(ImVec2(npcPos.x + 5.f, npcPos.y + 55.f), ImVec2(npcPos.x + 27.f, npcPos.y + 64.f), ImColor(ImVec4(0.0f, 0.0f, 0.0f, 0.15f)), 20.f);
                         charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleRight.at(frameCount_6), 1.f, iter.second.character);
                         npcContact = true;
                         overlapCharacter = false;
                     }
                     else if((int)gridX == charX - 1 && (int)gridY == charY + 1) //if character is left of npc
                     {
+                        draw_list->AddRectFilled(ImVec2(npcPos.x + 5.f, npcPos.y + 55.f), ImVec2(npcPos.x + 27.f, npcPos.y + 64.f), ImColor(ImVec4(0.0f, 0.0f, 0.0f, 0.15f)), 20.f);
                         charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleLeft.at(frameCount_6), 1.f, iter.second.character);
                         npcContact = true;
                         overlapCharacter = false;
                     }
                     else
                     {
+                        draw_list->AddRectFilled(ImVec2(npcPos.x + 0.f, npcPos.y + 55.f), ImVec2(npcPos.x + 32.f, npcPos.y + 64.f), ImColor(ImVec4(0.0f, 0.0f, 0.0f, 0.15f)), 20.f);
                         charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleDown.at(frameCount_6), 1.f, iter.second.character);
                         overlapCharacter = false;
                     }
@@ -632,6 +637,7 @@ void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, 
                     switch(iter.second.direction)
                     {
                         case 1: // facing up
+                            draw_list->AddRectFilled(ImVec2(npcPos.x + 0.f, npcPos.y + 55.f), ImVec2(npcPos.x + 32.f, npcPos.y + 64.f), ImColor(ImVec4(0.0f, 0.0f, 0.0f, 0.15f)), 20.f);
                             if(characterCreated && ((int)gridY == charY && (int)gridX == charX))
                             {
                                 ImGui::SetCursorPos(characterPos);
@@ -646,6 +652,7 @@ void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, 
                             }
                             break;
                         case 2: // facing down
+                            draw_list->AddRectFilled(ImVec2(npcPos.x + 0.f, npcPos.y + 55.f), ImVec2(npcPos.x + 32.f, npcPos.y + 64.f), ImColor(ImVec4(0.0f, 0.0f, 0.0f, 0.15f)), 20.f);
                             if(characterCreated && ((int)gridY == charY && (int)gridX == charX))
                             {
                                 ImGui::SetCursorPos(characterPos);
@@ -660,6 +667,7 @@ void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, 
                             }
                             break;
                         case 3: // facing right
+                            draw_list->AddRectFilled(ImVec2(npcPos.x + 5.f, npcPos.y + 55.f), ImVec2(npcPos.x + 27.f, npcPos.y + 64.f), ImColor(ImVec4(0.0f, 0.0f, 0.0f, 0.15f)), 20.f);
                             if(characterCreated && ((int)gridY == charY && (int)gridX == charX))
                             {
                                 ImGui::SetCursorPos(characterPos);
@@ -674,6 +682,7 @@ void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, 
                             }
                             break;
                         case 4: // facing left
+                            draw_list->AddRectFilled(ImVec2(npcPos.x + 5.f, npcPos.y + 55.f), ImVec2(npcPos.x + 27.f, npcPos.y + 64.f), ImColor(ImVec4(0.0f, 0.0f, 0.0f, 0.15f)), 20.f);
                             if(characterCreated && ((int)gridY == charY && (int)gridX == charX))
                             {
                                 ImGui::SetCursorPos(characterPos);
