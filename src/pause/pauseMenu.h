@@ -88,6 +88,7 @@ class pauseMenu
 
     void settingsMain(bool* changeScreenRes, pair<int,int>* res, int* font);
     void settingsUser(imageHandler *image, characterBuilder *charBuild, characterManager *character);
+    void settingsCredits();
 
 public:
     pauseMenu(int width, int height, ImFont* font_15, ImFont* font_18, ImFont* font_21);

@@ -59,6 +59,7 @@ cordsY = 38
 character = [0,5,8,0,2,2,5,0]
 hasQuestion = true
 questionNum = 1
+direction = 0
 
 [[npc]]
 cordsX = 44
@@ -66,13 +67,15 @@ cordsY = 34
 character = [3,5,7,2,2,2,2,3]
 hasQuestion = false
 questionNum = 1
+direction = 2
 
 [[npc]]
 cordsX = 42
 cordsY = 46
 character = [0,6,11,2,9,4,6,0]
 hasQuestion = false
-questionNum = 1
+questionNum = 2
+direction = 1
 
 [[npc]]
 cordsX = 62
@@ -80,10 +83,12 @@ cordsY = 43
 character = [1,5,10,3,4,2,3,1]
 hasQuestion = false
 questionNum = 1
+direction = 0
 
 [[npc]]
-cordsX = 38
+cordsX = 40
 cordsY = 25
 character = [0,0,7,3,13,2,8,0]
 hasQuestion = false
 questionNum = 1
+direction = 2

@@ -86,4 +86,9 @@ private:
     bool reset = false;
     bool changeScreenRes = false;
     pair<int,int> res;
+
+    bool overlapCharacter = false;
+    ImVec2 characterPos;
+
+    bool playTutorial = true;
 };
