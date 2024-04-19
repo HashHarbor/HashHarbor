@@ -1068,7 +1068,7 @@ void graphic::makeConfig(ImFont* font){
                                    "As you explore the world, keep an eye out for characters wearing chefs hats. They often have coding problems for you to solve",
                                    "Best of luck on your journey!"};
 
-        if(index < tutorial.size())
+        if(index < tutorial.size() && playTutorial)
         {
             draw_list->AddRectFilled(ImVec2(((float)width_px / 4.f) - 250.f, ((float)height_px / 2.f) + 50.f), ImVec2(((float)width_px / 4.f) + 250.f, ((float)height_px / 2.f) + 200.f), ImColor(ImVec4(0.65f, 0.65f, 0.65f, 1.0f)), 20.f);
             draw_list->AddRectFilled(ImVec2(((float)width_px / 4.f) - 247.f, ((float)height_px / 2.f) + 53.f), ImVec2(((float)width_px / 4.f) + 247.f, ((float)height_px / 2.f) + 197.f), ImColor(ImVec4(0.1f, 0.1f, 0.1f, 1.0f)), 20.f);
@@ -1265,6 +1265,7 @@ void graphic::makeLogIn(login& Login, imageHandler& image, characterManager &cha
         show_display = true;
         show_userProfile = true;
         show_config = true;
+        playTutorial = false;
 
         if(Login.checkChar())
         {

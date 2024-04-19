@@ -89,4 +89,6 @@ private:
 
     bool overlapCharacter = false;
     ImVec2 characterPos;
+
+    bool playTutorial = true;
 };
