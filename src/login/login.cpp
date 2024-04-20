@@ -101,7 +101,11 @@ void login::drawLoginScreen(imageHandler* imgHandler)
         else
         {
             drawCreateUser();
-            if(errorCmp)
+            if(errorEmptyCreate)
+            {
+                error_EmptyCreate();
+            }
+            else if(errorCmp)
             {
                 error_Comp();
             }
@@ -189,10 +193,9 @@ void login::drawLogin()
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(200.f / 360.f,1.0f,0.61f));
     if(ImGui::Button("Sign Up", ImVec2(100.f,20.f)))
     {
+        reset();
         createAccount = true;
         viewPasswd = false;
-        errorAuth = false;
-        errorTotalError = false;
     }
     ImGui::PopStyleColor(3);
     ImGui::PopID();
@@ -206,7 +209,7 @@ void login::drawLogin()
     if(failedLogin == 5 || errorAuth) // time out of 5 consecutive failed attempts
     {
         std::chrono::high_resolution_clock::time_point current = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<float> time = current - startTotal;
+        std::chrono::duration<float> time = current - startLogin;
         if(errorAuth && time.count() <= 5.f)
         {
             ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
@@ -258,7 +261,7 @@ void login::drawLogin()
             else
             {
                 failedLogin ++;
-                startTotal = std::chrono::high_resolution_clock::now();
+                startLogin = std::chrono::high_resolution_clock::now();
                 if(failedLogin == 5)
                 {
                     errorTotalError = true;
@@ -286,21 +289,16 @@ void login::drawLogin()
 
 void login::drawCreateUser()
 {
+    static bool disabled = false;
+
     ImGui::SetCursorPos(ImVec2(minWidth + 20.f, minHeight + 20.f));
     ImGui::PushID(7);
     ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.f / 360.f,0.0f,1.0f));
     if(ImGui::Button(ICON_FA_CHEVRON_LEFT, ImVec2(23.f,18.f)))
     {
+        reset();
         createAccount = false;
-        errorCreate = false;
-        errorCmp = false;
-        viewPasswd = false; // turn off both the new account and viewing passwd
-
-        username[0] = '\0';
-        passwd[0] = '\0';
-        createUsername[0] = '\0';
-        createPasswd[0] = '\0';
-        confirmPasswd[0] = '\0';
+        disabled = false;
     }
     ImGui::PopStyleColor(1);
     ImGui::PopID();
@@ -381,6 +379,32 @@ void login::drawCreateUser()
 
     passwordGuide(createPasswd);
 
+    if(errorEmptyCreate && createUsername[0] != '\0' && createPasswd[0] != '\0' && confirmPasswd[0] != '\0')
+    {
+        errorEmptyCreate = false;
+    }
+
+    std::chrono::high_resolution_clock::time_point current = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<float> time = current - startCreate;
+
+    if((errorEmptyCreate || errorCreate || errorCmp) && time.count() <= 10.f)
+    {
+        ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+        ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+        disabled = true;
+    }
+    else
+    {
+        disabled = false;
+    }
+
+    if((errorEmptyCreate || errorCreate || errorCmp) && time.count() >= 30.f)
+    {
+        errorEmptyCreate = false;
+        errorCreate = false;
+        errorCmp = false;
+    }
+
     ImGui::SetCursorPos(ImVec2((width_px / 2.f - 50.f),minHeight + 420.f));
     ImGui::PushID(3);
     ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(200.f / 360.f,1.0f,1.0f));
@@ -390,12 +414,21 @@ void login::drawCreateUser()
     {
         errorCmp = false;
         errorCreate = false;
+        errorEmptyCreate = false;
         viewPasswd = false;
-        if(strcmp(createPasswd,confirmPasswd) != 0) // confirm passwords match
+        if(createUsername[0] == '\0' || createPasswd[0] == '\0' || confirmPasswd[0] == '\0')
+        {
+            errorEmptyCreate = true;
+            createPasswd[0] = '\0';
+            confirmPasswd[0] = '\0';
+            startCreate = std::chrono::high_resolution_clock::now();
+        }
+        else if(strcmp(createPasswd,confirmPasswd) != 0) // confirm passwords match
         {
             errorCmp = true;
             createPasswd[0] = '\0';
             confirmPasswd[0] = '\0';
+            startCreate = std::chrono::high_resolution_clock::now();
         }
         else
         {
@@ -419,11 +452,18 @@ void login::drawCreateUser()
                 createUsername[0] = '\0';
                 createPasswd[0] = '\0';
                 confirmPasswd[0] = '\0';
+                startCreate = std::chrono::high_resolution_clock::now();
             }
         }
     }
     ImGui::PopStyleColor(3);
     ImGui::PopID();
+
+    if (disabled)
+    {
+        ImGui::PopItemFlag();
+        ImGui::PopStyleVar();
+    }
 }
 
 void login::passwordGuide(string tempPasswd)
@@ -594,6 +634,20 @@ void login::error_EmptyLogin()
     ImGui::Text("Please enter username or password");
     ImGui::PopStyleColor();
 }
+void login::error_EmptyCreate()
+{
+    draw_list->AddRectFilled(ImVec2(minWidth + 15.f, minHeight + 340.f), ImVec2(minWidth + 385.f, minHeight + 395.f), ImColor(ImVec4(1.0f, 0.0f, 0.0f, 1.0f)), 20.0f);
+    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0,0,0,255));
+    ImGui::SetCursorPos(ImVec2(minWidth + 25.f, minHeight + 349.f));
+    ImGui::Text(ICON_FA_TRIANGLE_EXCLAMATION);
+    txtPos_x = (width_px / 2.f) - ((ImGui::CalcTextSize("All fields are required").x) / 2.f);
+    ImGui::SetCursorPos(ImVec2(txtPos_x, minHeight + 347.f));
+    ImGui::Text("All fields are required");
+    txtPos_x = (width_px / 2.f) - ((ImGui::CalcTextSize("Please enter username or password").x) / 2.f);
+    ImGui::SetCursorPos(ImVec2(txtPos_x, minHeight + 370.f));
+    ImGui::Text("Please enter username or password");
+    ImGui::PopStyleColor();
+}
 
 void login::drawBackground(imageHandler* imgHandler)
 {
@@ -636,5 +690,6 @@ void login::reset()
     errorCmp = false;
     errorCreate = false;
     errorTotalError = false;
-    errorTotalError = false;
+    errorEmptyLogin = false;
+    errorEmptyCreate = false;
 }
