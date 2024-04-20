@@ -1053,6 +1053,7 @@ void graphic::makeConfig(ImFont* font){
     // Window - Config
     ImGui::Begin("Interactions", NULL, flags);
     {
+        ImGui::Text("%f", ImGui::GetIO().DeltaTime);
         ImDrawList* draw_list = ImGui::GetWindowDrawList();
         //ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         static int index = 0;

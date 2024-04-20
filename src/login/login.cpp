@@ -3,6 +3,7 @@
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
+#include "imgui_internal.h"
 #include "database/database.h"
 
 #if defined(__APPLE__)
@@ -19,6 +20,7 @@ using std::pair;
 #endif
 
 #include <regex>
+#include <chrono>
 #include "../assets/font/IconsFontAwesome6.h"
 #include "../backends/authentication/authentication.h"
 #include "../backends/database/database.h"
@@ -48,7 +50,6 @@ login::login(int width, int height, imageHandler* imgHandler)
 
     minWidth = (width / 2.f) - 200.f;
     minHeight = (height / 2.f) - 240.f;
-    // todo - add linux Support
 #if defined(__APPLE__)
     //string path = std::filesystem::current_path().string() + "/assets/other/login.png";
     string path = "../assets/other/login.png";
@@ -81,23 +82,18 @@ void login::drawLoginScreen(imageHandler* imgHandler)
         draw_list = ImGui::GetWindowDrawList();
         draw_list->AddRectFilled(ImVec2(minWidth, minHeight), ImVec2(minWidth + 400.f, minHeight + 500.f), ImColor(ImVec4(1.0f, 1.0f, 1.0f, 1.0f)), 20.0f);
 
-        ImGui::SetCursorPos(ImVec2(txtPos_x, minHeight + 50.f));
-        static bool DEV = false;
-        ImGui::Checkbox("DEVELOPER SIGN IN", &DEV);
-        if(DEV)
-        {
-            string s = "HARDCODED";
-            string p = "Admin_2024";
-
-            strcpy(username, s.c_str());
-            strcpy(passwd, p.c_str());
-            DEV = false;
-        }
-
         if(!createAccount)
         {
             drawLogin();
-            if(errorAuth)
+            if(errorTotalError) // this error overrodes other
+            {
+                error_TotalError();
+            }
+            else if(errorEmptyLogin)
+            {
+                error_EmptyLogin();
+            }
+            else if(errorAuth)
             {
                 error_Auth();
             }
@@ -123,6 +119,19 @@ void login::drawLogin()
     txtPos_x = (width_px / 2.f) - ((ImGui::CalcTextSize("LOGIN").x) / 2.f);
     ImGui::SetCursorPos(ImVec2(txtPos_x, minHeight + 30.f));
     ImGui::Text("LOGIN");
+
+    ImGui::SetCursorPos(ImVec2(txtPos_x - 20.f, minHeight + 50.f));
+    static bool DEV = false;
+    ImGui::Checkbox("DEMO LOGIN", &DEV);
+    if(DEV)
+    {
+        string s = "HARDCODED";
+        string p = "Admin_2024";
+
+        strcpy(username, s.c_str());
+        strcpy(passwd, p.c_str());
+        DEV = false;
+    }
 
     txtPos_x = (width_px / 2.f) - ((ImGui::CalcTextSize("Username").x) / 2.f);
     ImGui::SetCursorPos(ImVec2(txtPos_x, minHeight + 120.f));
@@ -183,9 +192,44 @@ void login::drawLogin()
         createAccount = true;
         viewPasswd = false;
         errorAuth = false;
+        errorTotalError = false;
     }
     ImGui::PopStyleColor(3);
     ImGui::PopID();
+
+    if(errorEmptyLogin && username[0] != '\0' && passwd[0] != '\0')
+    {
+        errorEmptyLogin = false;
+    }
+    if(errorAuth && username[0] != '\0' && (passwd[0] != '\0' && passwd[1] != '\0' && passwd[2] != '\0')) // allow user to enter 3 characters before disabling the error message
+    {
+        errorAuth = false;
+    }
+
+    static bool disable = false;
+    if(failedLogin == 5) // time out of 5 consecutive failed attempts
+    {
+        std::chrono::high_resolution_clock::time_point current = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<float> time = current - startTotal;
+        // TODO = long term change to 1 minute
+        if(time.count() <= 30.f)
+        {
+            ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+            ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+            disable = true;
+        }
+        else
+        {
+            failedLogin = 0;
+            disable = false;
+            errorTotalError = false;
+            errorAuth = false;
+        }
+    }
+    else
+    {
+        disable = false;
+    }
 
     ImGui::SetCursorPos(ImVec2((width_px / 2.f - 50.f),minHeight + 400.f));
     ImGui::PushID(1);
@@ -194,26 +238,45 @@ void login::drawLogin()
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(200.f / 360.f,1.0f,0.81f));
     if(ImGui::Button("Login", ImVec2(100.f,50.f)))
     {
-        authentication auth = authentication();
-        viewPasswd = false;
-        if(auth.inputValidation( username, passwd, true)) // this will validate the input and then authenticate the user
+        if(username[0] == '\0' || passwd[0] == '\0')
         {
-            STATUS = true;
-            CHAR = true;
+            errorEmptyLogin = true;
+        }
+        else
+        {
+            authentication auth = authentication();
+            viewPasswd = false;
+            if(auth.inputValidation( username, passwd, true)) // this will validate the input and then authenticate the user
+            {
+                STATUS = true;
+                CHAR = true;
 
-            username[0] = '\0';
+                username[0] = '\0';
+            }
+            else
+            {
+                errorAuth = true;
+                failedLogin ++;
+                if(failedLogin == 5)
+                {
+                    startTotal = std::chrono::high_resolution_clock::now();
+                    errorTotalError = true;
+                }
+            }
             passwd[0] = '\0';
             createUsername[0] = '\0';
             createPasswd[0] = '\0';
             confirmPasswd[0] = '\0';
         }
-        else
-        {
-            errorAuth = true;
-        }
     }
     ImGui::PopStyleColor(3);
     ImGui::PopID();
+
+    if (failedLogin == 5 && disable)
+    {
+        ImGui::PopItemFlag();
+        ImGui::PopStyleVar();
+    }
 }
 
 void login::drawCreateUser()
@@ -498,6 +561,34 @@ void login::error_Create()
     ImGui::Text("Please double-check your information and try again.");
     ImGui::PopStyleColor();
 }
+void login::error_TotalError()
+{
+    draw_list->AddRectFilled(ImVec2(minWidth + 30.f, minHeight + 270.f), ImVec2(minWidth + 370.f, minHeight + 325.f), ImColor(ImVec4(1.0f, 0.0f, 0.0f, 1.0f)), 20.0f);
+    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0,0,0,255));
+    ImGui::SetCursorPos(ImVec2(minWidth + 40.f, minHeight + 279.f));
+    ImGui::Text(ICON_FA_TRIANGLE_EXCLAMATION);
+    txtPos_x = (width_px / 2.f) - ((ImGui::CalcTextSize("Too Many Failed Login Attempts").x) / 2.f);
+    ImGui::SetCursorPos(ImVec2(txtPos_x, minHeight + 277.f));
+    ImGui::Text("Too Many Failed Login Attempts");
+    txtPos_x = (width_px / 2.f) - ((ImGui::CalcTextSize("Please wait half a minute try again").x) / 2.f);
+    ImGui::SetCursorPos(ImVec2(txtPos_x, minHeight + 300.f));
+    ImGui::Text("Please wait half a minute try again");
+    ImGui::PopStyleColor();
+}
+void login::error_EmptyLogin()
+{
+    draw_list->AddRectFilled(ImVec2(minWidth + 30.f, minHeight + 270.f), ImVec2(minWidth + 370.f, minHeight + 325.f), ImColor(ImVec4(1.0f, 0.0f, 0.0f, 1.0f)), 20.0f);
+    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0,0,0,255));
+    ImGui::SetCursorPos(ImVec2(minWidth + 40.f, minHeight + 279.f));
+    ImGui::Text(ICON_FA_TRIANGLE_EXCLAMATION);
+    txtPos_x = (width_px / 2.f) - ((ImGui::CalcTextSize("Username or password field is required").x) / 2.f);
+    ImGui::SetCursorPos(ImVec2(txtPos_x, minHeight + 277.f));
+    ImGui::Text("Username or password field is required");
+    txtPos_x = (width_px / 2.f) - ((ImGui::CalcTextSize("Please enter username or password").x) / 2.f);
+    ImGui::SetCursorPos(ImVec2(txtPos_x, minHeight + 300.f));
+    ImGui::Text("Please enter username or password");
+    ImGui::PopStyleColor();
+}
 
 void login::drawBackground(imageHandler* imgHandler)
 {
@@ -539,4 +630,5 @@ void login::reset()
     errorAuth = false;
     errorCmp = false;
     errorCreate = false;
+    errorTotalError = false;
 }
