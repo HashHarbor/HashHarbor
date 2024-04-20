@@ -201,18 +201,20 @@ void login::drawLogin()
     {
         errorEmptyLogin = false;
     }
-    if(errorAuth && username[0] != '\0' && (passwd[0] != '\0' && passwd[1] != '\0' && passwd[2] != '\0')) // allow user to enter 3 characters before disabling the error message
-    {
-        errorAuth = false;
-    }
 
     static bool disable = false;
-    if(failedLogin == 5) // time out of 5 consecutive failed attempts
+    if(failedLogin == 5 || errorAuth) // time out of 5 consecutive failed attempts
     {
         std::chrono::high_resolution_clock::time_point current = std::chrono::high_resolution_clock::now();
         std::chrono::duration<float> time = current - startTotal;
+        if(errorAuth && time.count() <= 5.f)
+        {
+            ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+            ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+            disable = true;
+        }
         // TODO = long term change to 1 minute
-        if(time.count() <= 30.f)
+        else if(failedLogin == 5 && time.count() <= 30.f)
         {
             ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
             ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -255,12 +257,15 @@ void login::drawLogin()
             }
             else
             {
-                errorAuth = true;
                 failedLogin ++;
+                startTotal = std::chrono::high_resolution_clock::now();
                 if(failedLogin == 5)
                 {
-                    startTotal = std::chrono::high_resolution_clock::now();
                     errorTotalError = true;
+                }
+                else
+                {
+                    errorAuth = true;
                 }
             }
             passwd[0] = '\0';
@@ -272,7 +277,7 @@ void login::drawLogin()
     ImGui::PopStyleColor(3);
     ImGui::PopID();
 
-    if (failedLogin == 5 && disable)
+    if ((failedLogin == 5 || errorAuth) && disable)
     {
         ImGui::PopItemFlag();
         ImGui::PopStyleVar();
@@ -630,5 +635,6 @@ void login::reset()
     errorAuth = false;
     errorCmp = false;
     errorCreate = false;
+    errorTotalError = false;
     errorTotalError = false;
 }
