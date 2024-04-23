@@ -26,3 +26,6 @@
 /src/assets/
 /src/pauseMenu.o
 /src/userProfile.o
+/src/configReader.o
+/.idea/vcs.xml
+/.idea/workspace.xml

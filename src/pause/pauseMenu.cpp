@@ -264,6 +264,11 @@ void pauseMenu::drawSettingsWindow(imageHandler *image, characterBuilder *charBu
                 settingsUser(image, charBuild, character);
                 ImGui::EndTabItem();
             }
+            if (ImGui::BeginTabItem("Credits"))
+            {
+                settingsCredits();
+                ImGui::EndTabItem();
+            }
             ImGui::EndTabBar();
         }
     }
@@ -825,6 +830,51 @@ void pauseMenu::settingsMain(bool* changeScreenRes, pair<int,int>* res, int* fon
     draw_list->AddRect(ImVec2(windowWidth + paddingWidth + 45.f, paddingHeight + 310.f), ImVec2(windowWidth + paddingWidth + 540.f, paddingHeight + 360.f),IM_COL32(190, 190, 190, 255));
     ImGui::PopTextWrapPos();
     ImGui::PopFont();
+
+    ImGui::SetCursorPos(ImVec2(30.f, 380.f));
+    ImGui::Separator();
+    ImGui::SetCursorPos(ImVec2(30.f, 390.f));
+    ImGui::Text("%s", "Game Controls");
+    ImGui::SetCursorPos(ImVec2(40.f, 410.f));
+    ImGui::Text("%s", "Movement");
+
+    draw_list->AddRect(ImVec2(windowWidth + paddingWidth + 80.f, paddingHeight + 430.f), ImVec2(windowWidth + paddingWidth + 100.f, paddingHeight + 450.f),IM_COL32(190, 190, 190, 255), 2.f); // W
+    draw_list->AddRect(ImVec2(windowWidth + paddingWidth + 50.f, paddingHeight + 460.f), ImVec2(windowWidth + paddingWidth + 70.f, paddingHeight + 480.f),IM_COL32(190, 190, 190, 255), 2.f); // A
+    draw_list->AddRect(ImVec2(windowWidth + paddingWidth + 80.f, paddingHeight + 460.f), ImVec2(windowWidth + paddingWidth + 100.f, paddingHeight + 480.f),IM_COL32(190, 190, 190, 255), 2.f); // S
+    draw_list->AddRect(ImVec2(windowWidth + paddingWidth + 110.f, paddingHeight + 460.f), ImVec2(windowWidth + paddingWidth + 130.f, paddingHeight + 480.f),IM_COL32(190, 190, 190, 255), 2.f); // D
+    draw_list->AddRect(ImVec2(windowWidth + paddingWidth + 350.f, paddingHeight + 460.f), ImVec2(windowWidth + paddingWidth + 370.f, paddingHeight + 480.f),IM_COL32(190, 190, 190, 255), 2.f); // Q
+
+    draw_list->AddLine(ImVec2(windowWidth + paddingWidth + 100.f, paddingHeight + 440.f), ImVec2(windowWidth + paddingWidth + 175.f, paddingHeight + 440.f),IM_COL32(190, 190, 190, 255), 1.f);
+    draw_list->AddLine(ImVec2(windowWidth + paddingWidth + 130.f, paddingHeight + 470.f), ImVec2(windowWidth + paddingWidth + 175.f, paddingHeight + 470.f),IM_COL32(190, 190, 190, 255), 1.f);
+    draw_list->AddLine(ImVec2(windowWidth + paddingWidth + 90.f, paddingHeight + 500.f), ImVec2(windowWidth + paddingWidth + 175.f, paddingHeight + 500.f),IM_COL32(190, 190, 190, 255), 1.f);
+    draw_list->AddLine(ImVec2(windowWidth + paddingWidth + 60.f, paddingHeight + 530.f), ImVec2(windowWidth + paddingWidth + 175.f, paddingHeight + 530.f),IM_COL32(190, 190, 190, 255), 1.f);
+    draw_list->AddLine(ImVec2(windowWidth + paddingWidth + 90.f, paddingHeight + 480.f), ImVec2(windowWidth + paddingWidth + 90.f, paddingHeight + 500.f),IM_COL32(190, 190, 190, 255), 1.f);
+    draw_list->AddLine(ImVec2(windowWidth + paddingWidth + 60.f, paddingHeight + 480.f), ImVec2(windowWidth + paddingWidth + 60.f, paddingHeight + 530.f),IM_COL32(190, 190, 190, 255), 1.f);
+    draw_list->AddLine(ImVec2(windowWidth + paddingWidth + 370.f, paddingHeight + 470.f), ImVec2(windowWidth + paddingWidth + 390.f, paddingHeight + 470.f),IM_COL32(190, 190, 190, 255), 1.f);
+
+    ImGui::PushFont(noto_18);
+    ImGui::SetCursorPos(ImVec2(73.5f, 430.f));
+    ImGui::Text("%s", "W");
+    ImGui::SetCursorPos(ImVec2(46.f, 460.f));
+    ImGui::Text("%s", "A");
+    ImGui::SetCursorPos(ImVec2(76.5f, 460.f));
+    ImGui::Text("%s", "S");
+    ImGui::SetCursorPos(ImVec2(105.f, 460.f));
+    ImGui::Text("%s", "D");
+    ImGui::SetCursorPos(ImVec2(345.f, 460.f));
+    ImGui::Text("%s", "Q");
+    ImGui::PopFont();
+
+    ImGui::SetCursorPos(ImVec2(170.f, 432.f));
+    ImGui::Text("%s", "Up");
+    ImGui::SetCursorPos(ImVec2(170.f, 462.f));
+    ImGui::Text("%s", "Right");
+    ImGui::SetCursorPos(ImVec2(170.f, 492.f));
+    ImGui::Text("%s", "Down");
+    ImGui::SetCursorPos(ImVec2(170.f, 522.f));
+    ImGui::Text("%s", "Left");
+    ImGui::SetCursorPos(ImVec2(385.f, 462.f));
+    ImGui::Text("%s", "Interact");
 }
 void pauseMenu::settingsUser(imageHandler *image, characterBuilder *charBuild, characterManager *character)
 {
@@ -918,6 +968,10 @@ void pauseMenu::settingsUser(imageHandler *image, characterBuilder *charBuild, c
     {
         updateUserPassword(profileWidth, profileHeight);
     }
+}
+void pauseMenu::settingsCredits()
+{
+    ImGui::Text("%s", "INSERT CREDITS");
 }
 
 void pauseMenu::drawCharacterCreatorWindow(imageHandler *image, characterBuilder *charBuild, bool *updateCharacter)
