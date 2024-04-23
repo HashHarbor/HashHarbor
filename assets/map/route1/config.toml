@@ -1,54 +1,54 @@
 ["37,62"]
 next = "-town1"
 coordX = "57"
-coordY = "17"
+coordY = "15"
 
 ["38,62"]
 next = "-town1"
 coordX = "57"
-coordY = "17"
+coordY = "15"
 
 ["39,62"]
 next = "-town1"
-coordX = "57"
-coordY = "17"
+coordX = "55"
+coordY = "15"
 
 ["40,62"]
 next = "-town1"
-coordX = "57"
-coordY = "17"
+coordX = "56"
+coordY = "15"
 
 ["41,62"]
 next = "-town1"
 coordX = "57"
-coordY = "17"
+coordY = "15"
 
 ["42,62"]
 next = "-town1"
-coordX = "57"
-coordY = "17"
+coordX = "58"
+coordY = "15"
 
 ["43,62"]
 next = "-town1"
 coordX = "57"
-coordY = "17"
+coordY = "15"
 
 ["100,16"]
 next = "-town2"
-coordX = "40"
-coordY = "50"
+coordX = "58"
+coordY = "85"
 
 ["101,16"]
 next = "-town2"
-coordX = "40"
-coordY = "50"
+coordX = "59"
+coordY = "85"
 
 ["102,16"]
 next = "-town2"
-coordX = "40"
-coordY = "50"
+coordX = "60"
+coordY = "85"
 
 ["103,16"]
 next = "-town2"
-coordX = "40"
-coordY = "50"
+coordX = "61"
+coordY = "85"
