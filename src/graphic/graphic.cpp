@@ -44,6 +44,7 @@ using std::ofstream;
 #include "database/database.h"
 #include "authentication/authentication.h"
 #include "configReader/configReader.h"
+#include "testing/cpp/testFrameCpp.h"
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui_internal.h"
@@ -433,7 +434,7 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
                 }
             }
 
-            if(ImGui::IsKeyDown(ImGuiKey_Q) && show_blur == false){
+            if(ImGui::IsKeyDown(ImGuiKey_Q) && show_codeEditor == false){
                 // cout << "trigger interaction here" << endl;
                 if(interact == 1){
                     //update the visuals and locations of character
@@ -528,6 +529,7 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
 void graphic::triggerQuestion(int question){
     database &db = database::getInstance();
     db.getQuestion(question, qes);
+    questionNumber = question;
 }
 
 void graphic::loadMapUpdate(movementHandler &move){
@@ -780,7 +782,7 @@ void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit, ImFont*
                 if (ImGui::Button("Run Code"))
                 {
                     string textToSave = editor.GetText();
-                    result = executeCPP(textToSave);
+                    result = executeCPP(textToSave, true);
                 }
 
                 ImGui::Text("Results:");
@@ -1212,59 +1214,9 @@ void graphic::makeCharacterSelector(imageHandler& image, characterManager &chara
     style.FrameRounding = 0.f;
 }
 
-string graphic::executeCPP(string code){
-    // Step 1: Write code to a temporary file
-    string setup = "#include <bits/stdc++.h> \n";
-    setup += "using namespace std; \n";
-
-    code = setup + code + qes.exeCode;
-
-    std::ofstream file("temp.cpp");
-    file << code;
-    file.close();
-
-    // Step 2: Invoke the compiler and capture output
-    std::string compileCommand = "g++ -o temp temp.cpp 2>&1"; // Redirect stderr to stdout
-    FILE* pipe = popen(compileCommand.c_str(), "r");
-    if (!pipe) {
-        std::cerr << "Error invoking compiler command." << std::endl;
-        return "Error invoking compiler command.";
-    }
-
-    char buffer[128];
-    std::string compileOutput = "";
-    while (!feof(pipe)) {
-        if (fgets(buffer, 128, pipe) != NULL)
-            compileOutput += buffer;
-    }
-    pclose(pipe);
-
-    if (!compileOutput.empty()) {  //has error
-        remove("temp.cpp");
-        return compileOutput;
-    }
-
-    FILE* executePipe = popen("./temp 2>&1", "r");
-    if (!executePipe) {
-        std::cerr << "Error invoking execute command." << std::endl;
-        remove("temp.cpp");
-        remove("temp");
-        return "Error invoking execute command.";
-    }
-
-    char executeBuffer[128];
-    std::string executeOutput = "";
-    while (!feof(executePipe)) {
-        if (fgets(executeBuffer, 128, executePipe) != NULL)
-            executeOutput += executeBuffer;
-    }
-    pclose(executePipe);
-
-    // Clean up temporary files
-    remove("temp.cpp");
-    remove("temp");
-
-    return executeOutput;
+string graphic::executeCPP(string code, bool sampleTest){
+    testFrameCpp tester = testFrameCpp();
+    return tester.runTest(code, questionNumber, sampleTest);
 }
 
 void graphic::makeLogIn(login& Login, imageHandler& image, characterManager &character, characterBuilder& charBuild)
@@ -1279,7 +1231,6 @@ void graphic::makeLogIn(login& Login, imageHandler& image, characterManager &cha
         show_display = true;
         show_userProfile = true;
         show_config = true;
-        playTutorial = false;
 
         if(Login.checkChar())
         {
@@ -1289,11 +1240,14 @@ void graphic::makeLogIn(login& Login, imageHandler& image, characterManager &cha
             characterCreated = true;
             show_charSelector = false;
             allowMovement = true;
+            playTutorial = false;
         }
         else
         {
             characterCreated = false;
             show_charSelector = true;
+            show_blur = true;
+            playTutorial = true;
         }
 
         style.FrameRounding = 0.f;

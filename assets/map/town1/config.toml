@@ -35,23 +35,23 @@ coordY = "27"
 
 ["55,15"]
 next = "-route1"
-coordX = "40"
-coordY = "60"
+coordX = "39"
+coordY = "62"
 
 ["56,15"]
 next = "-route1"
 coordX = "40"
-coordY = "60"
+coordY = "62"
 
 ["57,15"]
 next = "-route1"
-coordX = "40"
-coordY = "60"
+coordX = "41"
+coordY = "62"
 
 ["58,15"]
 next = "-route1"
-coordX = "40"
-coordY = "60"
+coordX = "42"
+coordY = "62"
 
 [[npc]]
 cordsX = 63

@@ -42,6 +42,7 @@ public:
     bool characterCreated = false;
 
     string result = "";
+    int questionNumber = -1;
     database::questionData qes;
 
     vector<TextEditor::LanguageDefinition> languages;
@@ -78,7 +79,7 @@ public:
 
     void triggerQuestion(int question);
     void loadMapUpdate(movementHandler &move);
-    string executeCPP(string code);
+    string executeCPP(string code, bool sampleTest);
     void makeSettings(pauseMenu& Pause, imageHandler& image, characterManager& character, characterBuilder& charBuild, movementHandler& movement, login& Login, bool& done);
 
 private:

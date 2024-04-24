@@ -1,54 +1,78 @@
 ["37,62"]
 next = "-town1"
 coordX = "57"
-coordY = "17"
+coordY = "15"
 
 ["38,62"]
 next = "-town1"
 coordX = "57"
-coordY = "17"
+coordY = "15"
 
 ["39,62"]
 next = "-town1"
-coordX = "57"
-coordY = "17"
+coordX = "55"
+coordY = "15"
 
 ["40,62"]
 next = "-town1"
-coordX = "57"
-coordY = "17"
+coordX = "56"
+coordY = "15"
 
 ["41,62"]
 next = "-town1"
 coordX = "57"
-coordY = "17"
+coordY = "15"
 
 ["42,62"]
 next = "-town1"
-coordX = "57"
-coordY = "17"
+coordX = "58"
+coordY = "15"
 
 ["43,62"]
 next = "-town1"
 coordX = "57"
-coordY = "17"
+coordY = "15"
 
 ["100,16"]
 next = "-town2"
-coordX = "40"
-coordY = "50"
+coordX = "57"
+coordY = "85"
 
 ["101,16"]
 next = "-town2"
-coordX = "40"
-coordY = "50"
+coordX = "58"
+coordY = "85"
 
 ["102,16"]
 next = "-town2"
-coordX = "40"
-coordY = "50"
+coordX = "59"
+coordY = "85"
 
 ["103,16"]
 next = "-town2"
-coordX = "40"
-coordY = "50"
+coordX = "60"
+coordY = "85"
+
+[[npc]]
+cordsX = 37
+cordsY = 27
+character = [1,4,9,1,15,6,5,0]
+hasQuestion = true
+questionNum = 1
+direction = 0
+
+[[npc]]
+cordsX = 67
+cordsY = 36
+character = [1,4,9,1,15,6,5,0]
+hasQuestion = true
+questionNum = 1
+direction = 0
+
+[[npc]]
+cordsX = 81
+cordsY = 47
+character = [1,4,9,1,15,6,5,0]
+hasQuestion = true
+questionNum = 1
+direction = 0

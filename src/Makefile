@@ -21,7 +21,7 @@ SOURCES = main.cpp graphic/graphic.cpp imageHandler/imageHandler.cpp character/c
 SOURCES += $(IMGUI_DIR)/imgui/imgui.cpp $(IMGUI_DIR)/imgui/imgui_demo.cpp $(IMGUI_DIR)/imgui/imgui_draw.cpp $(IMGUI_DIR)/imgui/imgui_tables.cpp $(IMGUI_DIR)/imgui/imgui_widgets.cpp
 SOURCES += $(IMGUI_DIR)/backends/imgui_impl_sdl.cpp $(IMGUI_DIR)/backends/imgui_impl_opengl3.cpp 
 SOURCES += $(IMGUI_DIR)/backends/textEditor/TextEditor.cpp $(IMGUI_DIR)/backends/database/database.cpp $(IMGUI_DIR)/backends/authentication/authentication.cpp
-SOURCES += $(IMGUI_DIR)/backends/userProfile/userProfile.cpp $(IMGUI_DIR)/backends/configReader/configReader.cpp
+SOURCES += $(IMGUI_DIR)/backends/userProfile/userProfile.cpp $(IMGUI_DIR)/backends/configReader/configReader.cpp $(IMGUI_DIR)/backends/testing/cpp/testFrameCpp.cpp
 OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))
 UNAME_S := $(shell uname -s)
 LINUX_GL_LIBS = -lGL
@@ -145,6 +145,9 @@ endif
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 %.o:$(IMGUI_DIR)/backends/configReader/%.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+%.o:$(IMGUI_DIR)/backends/testing/cpp/%.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 all: $(EXE)
