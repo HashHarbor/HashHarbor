@@ -35,20 +35,44 @@ coordY = "15"
 
 ["100,16"]
 next = "-town2"
-coordX = "58"
+coordX = "57"
 coordY = "85"
 
 ["101,16"]
 next = "-town2"
-coordX = "59"
+coordX = "58"
 coordY = "85"
 
 ["102,16"]
 next = "-town2"
-coordX = "60"
+coordX = "59"
 coordY = "85"
 
 ["103,16"]
 next = "-town2"
-coordX = "61"
+coordX = "60"
 coordY = "85"
+
+[[npc]]
+cordsX = 37
+cordsY = 27
+character = [1,4,9,1,15,6,5,0]
+hasQuestion = true
+questionNum = 1
+direction = 0
+
+[[npc]]
+cordsX = 67
+cordsY = 36
+character = [1,4,9,1,15,6,5,0]
+hasQuestion = true
+questionNum = 1
+direction = 0
+
+[[npc]]
+cordsX = 81
+cordsY = 47
+character = [1,4,9,1,15,6,5,0]
+hasQuestion = true
+questionNum = 1
+direction = 0

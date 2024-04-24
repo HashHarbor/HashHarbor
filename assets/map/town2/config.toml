@@ -32,3 +32,64 @@ coordY = "17"
 next = "-town1"
 coordX = "57"
 coordY = "17"
+
+
+["57,85"]
+next = "-route1"
+coordX = "100"
+coordY = "16"
+
+["58,85"]
+next = "-route1"
+coordX = "101"
+coordY = "16"
+
+["59,85"]
+next = "-route1"
+coordX = "102"
+coordY = "16"
+
+["60,85"]
+next = "-route1"
+coordX = "103"
+coordY = "16"
+
+[[npc]]
+cordsX = 83
+cordsY = 25
+character = [1,4,9,1,15,6,5,0]
+hasQuestion = true
+questionNum = 1
+direction = 0
+
+[[npc]]
+cordsX = 39
+cordsY = 28
+character = [1,4,9,1,15,6,5,0]
+hasQuestion = true
+questionNum = 1
+direction = 0
+
+[[npc]]
+cordsX = 84
+cordsY = 43
+character = [1,4,9,1,15,6,5,0]
+hasQuestion = true
+questionNum = 1
+direction = 0
+
+[[npc]]
+cordsX = 64
+cordsY = 44
+character = [1,4,9,1,15,6,5,0]
+hasQuestion = true
+questionNum = 1
+direction = 0
+
+[[npc]]
+cordsX = 44
+cordsY = 50
+character = [1,4,9,1,15,6,5,0]
+hasQuestion = true
+questionNum = 1
+direction = 0
