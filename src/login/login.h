@@ -4,6 +4,7 @@
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
+#include <chrono>
 
 #if defined(__APPLE__)
 #include <iostream>
@@ -47,12 +48,19 @@ class login
     bool errorAuth = false;
     bool errorCmp = false;
     bool errorCreate = false;
+    bool errorEmptyLogin = false;
+    bool errorEmptyCreate = false;
+    bool errorTotalError = false;
 
     ImDrawList* draw_list = nullptr;
     imageHandler* img;
 
     bool STATUS = false;
     bool CHAR = false;
+
+    int failedLogin = 0;
+    std::chrono::high_resolution_clock::time_point startLogin;
+    std::chrono::high_resolution_clock::time_point startCreate;
 
     void drawLogin() ;// screen for existing users to login
     void drawCreateUser(); // screen for new users
@@ -62,6 +70,9 @@ class login
     void error_Auth();
     void error_Comp();
     void error_Create();
+    void error_TotalError();
+    void error_EmptyLogin();
+    void error_EmptyCreate();
 public:
     login(int width, int height, imageHandler* imgHandler);
     void updateResolution(int width, int height);

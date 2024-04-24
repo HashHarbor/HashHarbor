@@ -392,8 +392,10 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
         characterPos = ImVec2((ImGui::GetContentRegionAvail() - ImVec2(32, 64)) * 0.5f) + ImVec2(8, 0) - ImVec2(0, 8);
         character.drawPos = characterPos;
 
+        //cout << "-----| " << overlapCharacter << endl;
         if(characterCreated && !overlapCharacter)
         {
+            //cout << "DRAW: "<< endl;
             ImGui::SetCursorPos(characterPos);
             character.moveMainCharacter(&image, &charBuild, frameTimer, allowMovement, draw_list);
         }
@@ -577,6 +579,7 @@ void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, 
         int botX = (int)(gridX + (((float)width_px / 2.f) / 32.f)/ 2.f);
         int botY = (int)(gridY + (((float)height_px / 2.f) / 32.f)/ 2.f);
 
+        static pair<int,int> lock;
         for(auto iter : *character.getNpc())
         {
             bool npcContact = false;
@@ -601,6 +604,8 @@ void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, 
                             ImGui::SetCursorPos(characterPos);
                             character.moveMainCharacter(&image, &charBuild, frameTimer, allowMovement, draw_list);
                             overlapCharacter = true;
+                            lock.first = iter.first.first;
+                            lock.second = iter.first.second;
                         }
                         charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleUp.at(frameCount_6), 1.f, iter.second.character, 0.4f);
                         npcContact = true;
@@ -630,71 +635,80 @@ void graphic::makeBackground(imageHandler background, vector<vector<int>> grid, 
                     {
                         draw_list->AddRectFilled(ImVec2(npcPos.x + 0.f, npcPos.y + 55.f), ImVec2(npcPos.x + 32.f, npcPos.y + 64.f), ImColor(ImVec4(0.0f, 0.0f, 0.0f, 0.15f)), 20.f);
                         charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleDown.at(frameCount_6), 1.f, iter.second.character);
-                        overlapCharacter = false;
+                        if((iter.first.first == lock.first && iter.first.second == lock.second) && overlapCharacter)
+                        {
+                            overlapCharacter = false;
+                            ImGui::SetCursorPos(characterPos);
+                            character.moveMainCharacter(&image, &charBuild, frameTimer, allowMovement, draw_list);
+                            lock.first = INT_MAX;
+                            lock.second = INT_MAX;
+                        }
                     }
                 }
                 else
                 {
+                    bool opacity = false;
+                    if(characterCreated && ((int)gridY == charY && (int)gridX == charX))
+                    {
+                        ImGui::SetCursorPos(characterPos);
+                        character.moveMainCharacter(&image, &charBuild, frameTimer, allowMovement, draw_list);
+                        overlapCharacter = true;
+                        lock.first = iter.first.first;
+                        lock.second = iter.first.second;
+                        opacity = true;
+                    }
+                    else if((iter.first.first == lock.first && iter.first.second == lock.second) && overlapCharacter)
+                    {
+                        overlapCharacter = false;
+                        ImGui::SetCursorPos(characterPos);
+                        character.moveMainCharacter(&image, &charBuild, frameTimer, allowMovement, draw_list);
+                        lock.first = INT_MAX;
+                        lock.second = INT_MAX;
+                    }
                     switch(iter.second.direction)
                     {
                         case 1: // facing up
                             draw_list->AddRectFilled(ImVec2(npcPos.x + 0.f, npcPos.y + 55.f), ImVec2(npcPos.x + 32.f, npcPos.y + 64.f), ImColor(ImVec4(0.0f, 0.0f, 0.0f, 0.15f)), 20.f);
-                            if(characterCreated && ((int)gridY == charY && (int)gridX == charX))
+                            if(opacity)
                             {
-                                ImGui::SetCursorPos(characterPos);
-                                character.moveMainCharacter(&image, &charBuild, frameTimer, allowMovement, draw_list);
-                                overlapCharacter = true;
                                 charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleUp.at(frameCount_6), 1.f, iter.second.character, 0.4f);
                             }
                             else
                             {
                                 charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleUp.at(frameCount_6), 1.f, iter.second.character);
-                                overlapCharacter = false;
                             }
                             break;
                         case 2: // facing down
                             draw_list->AddRectFilled(ImVec2(npcPos.x + 0.f, npcPos.y + 55.f), ImVec2(npcPos.x + 32.f, npcPos.y + 64.f), ImColor(ImVec4(0.0f, 0.0f, 0.0f, 0.15f)), 20.f);
-                            if(characterCreated && ((int)gridY == charY && (int)gridX == charX))
+                            if(opacity)
                             {
-                                ImGui::SetCursorPos(characterPos);
-                                character.moveMainCharacter(&image, &charBuild, frameTimer, allowMovement, draw_list);
-                                overlapCharacter = true;
                                 charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleDown.at(frameCount_6), 1.f, iter.second.character, 0.4f);
                             }
                             else
                             {
                                 charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleDown.at(frameCount_6), 1.f, iter.second.character);
-                                overlapCharacter = false;
                             }
                             break;
                         case 3: // facing right
                             draw_list->AddRectFilled(ImVec2(npcPos.x + 5.f, npcPos.y + 55.f), ImVec2(npcPos.x + 27.f, npcPos.y + 64.f), ImColor(ImVec4(0.0f, 0.0f, 0.0f, 0.15f)), 20.f);
-                            if(characterCreated && ((int)gridY == charY && (int)gridX == charX))
+                            if(opacity)
                             {
-                                ImGui::SetCursorPos(characterPos);
-                                character.moveMainCharacter(&image, &charBuild, frameTimer, allowMovement, draw_list);
-                                overlapCharacter = true;
                                 charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleRight.at(frameCount_6), 1.f, iter.second.character, 0.4f);
                             }
                             else
                             {
                                 charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleRight.at(frameCount_6), 1.f, iter.second.character);
-                                overlapCharacter = false;
                             }
                             break;
                         case 4: // facing left
                             draw_list->AddRectFilled(ImVec2(npcPos.x + 5.f, npcPos.y + 55.f), ImVec2(npcPos.x + 27.f, npcPos.y + 64.f), ImColor(ImVec4(0.0f, 0.0f, 0.0f, 0.15f)), 20.f);
-                            if(characterCreated && ((int)gridY == charY && (int)gridX == charX))
+                            if(opacity)
                             {
-                                ImGui::SetCursorPos(characterPos);
-                                character.moveMainCharacter(&image, &charBuild, frameTimer, allowMovement, draw_list);
-                                overlapCharacter = true;
                                 charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleLeft.at(frameCount_6), 1.f, iter.second.character, 0.4f);
                             }
                             else
                             {
                                 charBuild.drawCharacterAnimation(&image, npcPos, charConfig.cordsIdleLeft.at(frameCount_6), 1.f, iter.second.character);
-                                overlapCharacter = false;
                             }
                             break;
                     }
