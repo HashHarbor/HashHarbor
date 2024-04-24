@@ -36,6 +36,13 @@ class database
     database(const database&) = delete;
     database& operator=(const database&) = delete;
 
+    string aes(const std::string& encrypted_text, const std::string& key, const std::string& iv);
+    std::string aes_decrypt(const std::string& ciphertext, const std::string& key);
+    std::string aes_encrypt(const std::string& plaintext, const std::string& key);
+    string b64(string data);
+    string Eb64(string data);
+    string XOR(const std::string& input, const std::string& key);
+
 public:
     struct usrProfile
     {

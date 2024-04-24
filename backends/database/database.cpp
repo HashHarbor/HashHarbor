@@ -1,5 +1,10 @@
 #include "database.h"
 
+#include <openssl/evp.h>
+#include <openssl/err.h>
+#include <openssl/bio.h>
+#include <openssl/buffer.h>
+
 #include <bsoncxx/builder/stream/document.hpp>
 //#include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/json.hpp>
@@ -30,6 +35,8 @@ using std::vector;
 #include "../src/imageHandler/imagePath.h"
 #include "userProfile/userProfile.h"
 
+#define AES_KEY_SIZE 256
+
 database::database() : client(), db(){}
 database::~database() {}
 
@@ -39,30 +46,118 @@ database& database::getInstance()
     return instance;
 }
 
+string database::XOR(const string& input, const string& key) {
+    string encrypted;
+    for (size_t i = 0; i < input.size(); ++i) {
+        encrypted += input[i] ^ key[i % 2]; // XOR with the key characters alternately
+    }
+    return encrypted;
+}
+
+string database::b64(string data)
+{
+    BIO *bio, *b64;
+    int decodedLength = 0;
+    char *decodedBuffer = new char[data.length()];
+
+    b64 = BIO_new(BIO_f_base64());
+    BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
+    bio = BIO_new_mem_buf(data.c_str(), data.length());
+    bio = BIO_push(b64, bio);
+
+    decodedLength = BIO_read(bio, decodedBuffer, data.length());
+
+    string result(decodedBuffer, decodedLength);
+
+    BIO_free_all(bio);
+    delete[] decodedBuffer;
+
+    return result;
+}
+
+string database::aes_decrypt(const string& ciphertext, const string& key)
+{
+    EVP_CIPHER_CTX *ctx;
+    int len;
+    int plaintext_len;
+    unsigned char plaintext[1024];
+
+    if (!(ctx = EVP_CIPHER_CTX_new())) {
+        return "";
+    }
+
+    if (EVP_DecryptInit_ex(ctx, EVP_aes_256_ecb(), NULL, reinterpret_cast<const unsigned char*>(key.c_str()), NULL) != 1) {
+        EVP_CIPHER_CTX_free(ctx);
+        return "";
+    }
+
+    if (EVP_DecryptUpdate(ctx, plaintext, &len, reinterpret_cast<const unsigned char*>(ciphertext.c_str()), ciphertext.length()) != 1) {
+        EVP_CIPHER_CTX_free(ctx);
+        return "";
+    }
+    plaintext_len = len;
+
+    if (EVP_DecryptFinal_ex(ctx, plaintext + len, &len) != 1) {
+        EVP_CIPHER_CTX_free(ctx);
+        return "";
+    }
+    plaintext_len += len;
+
+    EVP_CIPHER_CTX_free(ctx);
+
+    return string(reinterpret_cast<char*>(plaintext), plaintext_len);
+}
+
 void database::connect()
 {
     imagePath imgPth = imagePath();
 
-    auto config = cpptoml::parse_file(imgPth.absolutePath + "assets/api.toml");
-    auto apikey = config->get_table("mongodb");
-
     auto config_Q = cpptoml::parse_file(imgPth.absolutePath + "assets/api.toml");
     auto apikey_Q = config_Q->get_table("questions");
-
-    const auto uri = mongocxx::uri{*apikey->get_as<string>("uri")};
-
-    const auto uri_Q = mongocxx::uri{*apikey_Q->get_as<string>("uri")};
-    // Set the version of the Stable API on the client
+    string r = "=" + *apikey_Q->get_as<string>("uri");
+    string u = "";
+    for (int i = r.length() - 1; i >= 0; --i)
+    {
+        u.push_back(r[i]);
+    }
+    const auto uri_Q = mongocxx::uri{b64(u)};
     mongocxx::options::client client_options;
     const auto api = mongocxx::options::server_api{mongocxx::options::server_api::version::k_version_1};
     client_options.server_api_opts(api);
 
-    client = mongocxx::client { uri, client_options };
-    db = client["HashHarbor"];
-
     client_Q = mongocxx::client { uri_Q, client_options };
     db_Q = client_Q["question"];
-    std::cout << "Connected to MongoDB" << std::endl;
+    mongocxx::database dbAuth = client_Q["enc"];
+    try
+    {
+        auto collection = dbAuth["usr"];
+
+        auto auth = collection.find_one({});
+
+        if(auth)
+        {
+            bsoncxx::document::element A = auth.value()["a"];
+            bsoncxx::document::element B = auth.value()["b"];
+            bsoncxx::document::element C = auth.value()["c"];
+            bsoncxx::document::element D = auth.value()["d"];
+
+            string kA = XOR(b64(XOR(A.get_string().value.data(), "34")), "UF");
+            string kB = XOR(b64(XOR(B.get_string().value.data(), "55")), "FF");
+            string kD = XOR(b64(XOR(D.get_string().value.data(), "24")), "AB");
+
+            const auto uri = mongocxx::uri{aes_decrypt(C.get_string().value.data(), (kB + kA + kD))};
+            client = mongocxx::client { uri, client_options };
+            db = client["HashHarbor"];
+
+            assert(auth);
+        }
+
+        cout << "Connected to MongoDB" << endl;
+
+    }catch(const exception& e)
+    {
+        cout << "Unable to connect to Database: " << e.what() << endl;
+    }
 }
 
 bool database::getUserAuth(string usr, database::usrProfile& profile)
