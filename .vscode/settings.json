@@ -1,0 +1,14 @@
+{
+    "files.associations": {
+        "any": "cpp",
+        "bitset": "cpp",
+        "string_view": "cpp",
+        "*.tcc": "cpp",
+        "optional": "cpp",
+        "system_error": "cpp",
+        "regex": "cpp",
+        "iostream": "cpp",
+        "ostream": "cpp",
+        "vector": "cpp"
+    }
+}

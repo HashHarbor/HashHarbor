@@ -766,6 +766,8 @@ void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit, ImFont*
         flags |= ImGuiWindowFlags_NoInputs;
     }
 
+    static bool ranAllTests = false;
+
     ImGui::SetNextWindowSize({(float)width_px / 2, (float)height_px / 4});
     ImGui::SetNextWindowPos({(float)width_px / 2, (float)height_px / 4 * 3});
 
@@ -799,15 +801,50 @@ void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit, ImFont*
 
             if (ImGui::BeginTabItem("Run All Tests"))
             {
-
+                
                 if (ImGui::Button("Run All Test Cases"))
                 {
                     string textToSave = editor.GetText();
                     result = executeCPP(textToSave, false);
+                    ranAllTests = true;
                 }
 
-                ImGui::Text("Results:");
-                ImGui::InputTextMultiline(" ", const_cast<char*>(result.c_str()), result.size() + 1, ImVec2((float)width_px / 2 - 20, (height_px / 4) - 100), ImGuiInputTextFlags_ReadOnly);
+                if(result.substr(0,5) == "valid"){
+                    vector<string> lines;
+                    stringstream ss(result);
+                    string line;
+                    while (getline(ss, line, '\n')) {
+                        lines.push_back(line);
+                    }
+
+                    unordered_map<int, int> passed;
+                    for (int i = 1; i < lines.size(); i++) {
+                        passed[stoi(lines[i])] = 1;
+                    }
+
+                    for(int i = 1; i < 11; i++){
+                        if(passed[i] == 1){
+                            ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255));
+                            ImGui::Text(ICON_FA_CHECK);
+                            ImGui::PopStyleColor();
+                            ImGui::SameLine();
+                            ImGui::Text("Test %d passed", i);
+                        }
+                        else if (passed[i] == 0 && ranAllTests){
+                            ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
+                            ImGui::Text(ICON_FA_CIRCLE);
+                            ImGui::PopStyleColor();
+                            ImGui::SameLine();
+                            ImGui::Text("Test %d failed", i);
+                        }
+                    }
+                }
+                else if (ranAllTests){
+                    ImGui::Text("Error:");
+                    ImGui::InputTextMultiline(" ", const_cast<char*>(result.c_str()), result.size() + 1, ImVec2((float)width_px / 2 - 20, (height_px / 4) - 100), ImGuiInputTextFlags_ReadOnly);
+                }
+
+                
 
                 ImGui::EndTabItem();
             }
@@ -837,6 +874,8 @@ void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit, ImFont*
         if (ImGui::Button("X")) {
             show_codeEditor = !show_codeEditor;
             show_userProfile = !show_userProfile;
+            ranAllTests = false;
+            result = "";
         }
         ImGui::SameLine(); // Place subsequent widgets on the same line
 
@@ -905,8 +944,18 @@ void graphic::makeUserProfile(ImFont* fontLarge, ImFont* fontSmall, ImFont* font
     }
     ImGui::End();
 
+    ImGui::SetNextWindowSize({(float)width_px / 2, (float)height_px / 3});
+    ImGui::SetNextWindowPos({(float)width_px / 2, (float)height_px / 3});
+
+    // Submission window
+    ImGui::Begin("Objectives", NULL, flags);
+    {
+
+    }
+    ImGui::End();
+
     float windowWidth = (float)width_px / 2;
-    float windowHeight = (float)height_px / 3 * 2;
+    float windowHeight = (float)height_px / 3;
     // Code Editor
     ImGui::SetNextWindowSize({windowWidth,windowHeight});
     ImGui::SetNextWindowPos({(float)width_px / 2, 0});

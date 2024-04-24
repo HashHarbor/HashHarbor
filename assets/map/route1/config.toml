@@ -58,7 +58,7 @@ cordsX = 37
 cordsY = 27
 character = [1,4,9,1,15,6,5,0]
 hasQuestion = true
-questionNum = 1
+questionNum = 2
 direction = 0
 
 [[npc]]
@@ -74,5 +74,5 @@ cordsX = 81
 cordsY = 47
 character = [1,4,9,1,15,6,5,0]
 hasQuestion = true
-questionNum = 1
+questionNum = 2
 direction = 0

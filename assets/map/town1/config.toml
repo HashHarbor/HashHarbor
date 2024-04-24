@@ -82,7 +82,7 @@ cordsX = 62
 cordsY = 43
 character = [1,5,10,3,4,2,3,1]
 hasQuestion = false
-questionNum = 1
+questionNum = 2
 direction = 0
 
 [[npc]]
