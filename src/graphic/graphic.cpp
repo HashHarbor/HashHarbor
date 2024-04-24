@@ -501,10 +501,9 @@ void graphic::makeCharacter(imageHandler& image, TextEditor& editor, double &gri
                         show_codeEditor = !show_codeEditor;
                         show_userProfile = !show_userProfile;
 
-                    triggerQuestion(question);
+                        triggerQuestion(question);
 
-                    editor.SetTextLines(qes.boiler);
-                    cout << qes.boiler.size() << endl;
+                        editor.SetTextLines(qes.boiler);
 
                         result = "";
                     }
@@ -777,17 +776,24 @@ void graphic::makeCodeEditor(TextEditor &editor, const char* fileToEdit, ImFont*
                 ImGui::EndTabItem();
             }
 
-            if (ImGui::BeginTabItem("Custom Test Case"))
-            {
-                ImGui::Text("To be implemented");
+            // if (ImGui::BeginTabItem("Custom Test Case"))
+            // {
+            //     ImGui::Text("To be implemented");
 
-                ImGui::EndTabItem();
-            }
+            //     ImGui::EndTabItem();
+            // }
 
             if (ImGui::BeginTabItem("Run All Tests"))
             {
 
-                ImGui::Text("To be implemented");
+                if (ImGui::Button("Run All Test Cases"))
+                {
+                    string textToSave = editor.GetText();
+                    result = executeCPP(textToSave, false);
+                }
+
+                ImGui::Text("Results:");
+                ImGui::InputTextMultiline(" ", const_cast<char*>(result.c_str()), result.size() + 1, ImVec2((float)width_px / 2 - 20, (height_px / 4) - 100), ImGuiInputTextFlags_ReadOnly);
 
                 ImGui::EndTabItem();
             }
